@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "scripts": {
+    "build": ""
+  },
+  "workspaces": [
+    "examples/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": "^20",
+    "yarn": "1.22.21"
+  },
+  "packageManager": "yarn@1.22.21",
+  "devDependencies": {
+    "lerna": "^8.1.2"
+  }
+}

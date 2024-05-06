@@ -1,0 +1,26 @@
+{
+  "name": "@feature-sliced/lint-example-01",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "develop": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint:fs": "fsd-lint src"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@feature-sliced/lint": "^0.0.0",
+    "@types/node": "^20.12.8",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "pkg-dir": "^8.0.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}
