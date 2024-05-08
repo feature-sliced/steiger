@@ -2,7 +2,11 @@ import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 
-import { configDefault, ConfigInternal, configInternalSchema } from './shared/config'
+import {
+  configDefault,
+  ConfigInternal,
+  configInternalSchema,
+} from './shared/config'
 
 import { createLinter } from './app'
 

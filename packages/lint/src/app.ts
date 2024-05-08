@@ -1,7 +1,9 @@
 import { files } from './model/files'
 import {
-  configSchema, Config,
-  configInternalSchema, ConfigInternal,
+  configSchema,
+  Config,
+  configInternalSchema,
+  ConfigInternal,
   configDefault,
 } from './shared/config'
 import { createWatcher } from './services/watcher'
@@ -21,6 +23,6 @@ export const createLinter = (config: Config) => {
     },
     close: async () => {
       await watcher.close()
-    }
+    },
   }
 }

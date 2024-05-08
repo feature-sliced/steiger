@@ -6,10 +6,7 @@ import chokidar from 'chokidar'
 import { files } from '../model/files'
 import { ConfigInternal } from '../shared/config'
 
-export const createWatcher = (
-  watchRoot: string,
-  config: ConfigInternal,
-) => {
+export const createWatcher = (watchRoot: string, config: ConfigInternal) => {
   const fsWatcher = chokidar.watch(watchRoot, {
     ignoreInitial: false,
     alwaysStat: true,
@@ -23,7 +20,9 @@ export const createWatcher = (
       pathRelative,
       pathAbsolute: path.join(watchRoot, pathRelative),
       pathRoot: watchRoot,
-      content: (await fs.readFile(path.join(watchRoot, pathRelative))).toString(),
+      content: (
+        await fs.readFile(path.join(watchRoot, pathRelative))
+      ).toString(),
     })
   })
 
@@ -32,7 +31,9 @@ export const createWatcher = (
       pathRelative,
       pathAbsolute: path.join(watchRoot, pathRelative),
       pathRoot: watchRoot,
-      content: (await fs.readFile(path.join(watchRoot, pathRelative))).toString(),
+      content: (
+        await fs.readFile(path.join(watchRoot, pathRelative))
+      ).toString(),
     })
   })
 
