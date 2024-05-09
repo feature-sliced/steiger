@@ -11,9 +11,7 @@ export interface FileRaw {
 
 const filesMap = createStore<Map<FileRaw['pathAbsolute'], FileRaw>>(new Map())
 const filesList = combine(filesMap, (filesMap) => Array.from(filesMap.values()))
-const filesTree = combine(filesList, (filesList) =>
-  treeifyPaths(filesList.map((f) => f.pathAbsolute)),
-)
+const filesTree = combine(filesList, (filesList) => treeifyPaths(filesList.map((f) => f.pathAbsolute)))
 
 const filesAdd = createEvent<FileRaw>()
 filesMap.on(filesAdd, (state, payload) => {

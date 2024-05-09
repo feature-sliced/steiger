@@ -20,9 +20,7 @@ export const createWatcher = (watchRoot: string, config: ConfigInternal) => {
       pathRelative,
       pathAbsolute: path.join(watchRoot, pathRelative),
       pathRoot: watchRoot,
-      content: (
-        await fs.readFile(path.join(watchRoot, pathRelative))
-      ).toString(),
+      content: (await fs.readFile(path.join(watchRoot, pathRelative))).toString(),
     })
   })
 
@@ -31,9 +29,7 @@ export const createWatcher = (watchRoot: string, config: ConfigInternal) => {
       pathRelative,
       pathAbsolute: path.join(watchRoot, pathRelative),
       pathRoot: watchRoot,
-      content: (
-        await fs.readFile(path.join(watchRoot, pathRelative))
-      ).toString(),
+      content: (await fs.readFile(path.join(watchRoot, pathRelative))).toString(),
     })
   })
 
