@@ -1,0 +1,33 @@
+{
+  "name": "fsd-rules",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "tsup src/index.ts --format esm --watch",
+    "build": "tsup src/index.ts --format esm --clean",
+    "test": "vitest"
+  },
+  "description": "A set of rules to verify correct usage of Feature-Sliced Design",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Anton Medvedev",
+      "email": "unordinarity@yandex.ru",
+      "url": "https://github.com/unordinarity"
+    },
+    {
+      "name": "Lev Chelyadinov",
+      "email": "leva181777@gmail.com",
+      "url": "https://github.com/illright"
+    }
+  ],
+  "dependencies": {
+    "@feature-sliced/filesystem": "^1.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
