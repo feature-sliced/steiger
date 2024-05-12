@@ -1,4 +1,4 @@
-import type { Rule } from '../rule'
+import type { Diagnostic, Rule } from '../types'
 
 /**
  * Pattern that matches one word in different naming conventions.
@@ -16,7 +16,7 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 const repetitiveNaming = {
   name: 'repetitive-naming',
   check(root) {
-    const errors: Array<string> = []
+    const diagnostics: Array<Diagnostic> = []
 
     for (const layer of Object.values(root.layers)) {
       if (layer === null || layer.type === 'unsliced-layer') {
@@ -28,18 +28,18 @@ const repetitiveNaming = {
         (name.match(wordPattern) ?? <Array<string>>[]).map((word) => word.toLowerCase()),
       )
       const mostCommonWords = wordsInSliceNames.flat().reduce((acc, word) => {
-        acc.set(word,( acc.get(word) ?? 0) + 1)
+        acc.set(word, (acc.get(word) ?? 0) + 1)
         return acc
       }, new Map<string, number>())
 
       for (const [word, count] of mostCommonWords.entries()) {
         if (count >= sliceNames.length && wordsInSliceNames.every((words) => words.includes(word))) {
-          errors.push(`Repetitive word "${word}" in slice names on layer "${layer.name}"`)
+          diagnostics.push({ message: `Repetitive word "${word}" in slice names on layer "${layer.name}"` })
         }
       }
     }
 
-    return { errors }
+    return { diagnostics }
   },
 } satisfies Rule
 

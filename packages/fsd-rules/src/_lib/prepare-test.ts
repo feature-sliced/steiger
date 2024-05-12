@@ -1,4 +1,5 @@
 import type { FsdRoot, Segment, Slice, SlicedLayer, UnslicedLayer } from '@feature-sliced/filesystem'
+import type { Diagnostic } from '../types'
 
 /**
  * Parse a multi-line indented string with emojis for files and folders into an FSD root.
@@ -220,4 +221,8 @@ function parseAsSlices(lines: string[], pathPrefix: string): Record<string, Slic
   }
 
   return slices
+}
+
+export function compareMessages(a: Diagnostic, b: Diagnostic): number {
+  return a.message.localeCompare(b.message)
 }

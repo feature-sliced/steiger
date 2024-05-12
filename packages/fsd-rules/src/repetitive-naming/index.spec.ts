@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import repetitiveNaming from '.'
-import { parseIntoFsdRoot } from '../prepare-test'
+import { compareMessages, parseIntoFsdRoot } from '../prepare-test'
 
 it('reports no errors on a project with no repetitive words in slices', () => {
   const root = parseIntoFsdRoot(`
@@ -17,7 +17,7 @@ it('reports no errors on a project with no repetitive words in slices', () => {
         📄 index.ts
   `)
 
-  expect(repetitiveNaming.check(root)).toEqual({ errors: [] })
+  expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project with repetition of "page"', () => {
@@ -34,10 +34,8 @@ it('reports errors on a project with repetition of "page"', () => {
         📄 index.ts
   `)
 
-  const errors = repetitiveNaming.check(root).errors.sort()
-  expect(errors).toEqual([
-    'Repetitive word "page" in slice names on layer "pages"',
-  ])
+  const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
+  expect(diagnostics).toEqual([{ message: 'Repetitive word "page" in slice names on layer "pages"' }])
 })
 
 it('recognizes words in different naming conventions', () => {
@@ -54,8 +52,6 @@ it('recognizes words in different naming conventions', () => {
         📄 index.ts
   `)
 
-  const errors = repetitiveNaming.check(root).errors.sort()
-  expect(errors).toEqual([
-    'Repetitive word "folder" in slice names on layer "entities"',
-  ])
+  const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
+  expect(diagnostics).toEqual([{ message: 'Repetitive word "folder" in slice names on layer "entities"' }])
 })

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import segmentsByPurpose from '.'
-import { parseIntoFsdRoot } from '../prepare-test'
+import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test'
 
 it('reports no errors on a project with good segments', () => {
   const root = parseIntoFsdRoot(`
@@ -21,7 +21,7 @@ it('reports no errors on a project with good segments', () => {
         📄 index.ts
   `)
 
-  expect(segmentsByPurpose.check(root)).toEqual({ errors: [] })
+  expect(segmentsByPurpose.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project with bad segments', () => {
@@ -48,12 +48,12 @@ it('reports errors on a project with bad segments', () => {
         📄 index.ts
   `)
 
-  const errors = segmentsByPurpose.check(root).errors.sort()
-  expect(errors).toEqual([
-    'Non-descriptive segment name: components',
-    'Non-descriptive segment name: helpers',
-    'Non-descriptive segment name: hooks',
-    'Non-descriptive segment name: modals',
-    'Non-descriptive segment name: utils',
+  const diagnostics = segmentsByPurpose.check(root).diagnostics.sort(compareMessages)
+  expect(diagnostics).toEqual([
+    { message: 'Non-descriptive segment name: components' },
+    { message: 'Non-descriptive segment name: helpers' },
+    { message: 'Non-descriptive segment name: hooks' },
+    { message: 'Non-descriptive segment name: modals' },
+    { message: 'Non-descriptive segment name: utils' },
   ])
 })
