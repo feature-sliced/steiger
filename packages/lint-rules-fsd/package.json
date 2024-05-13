@@ -1,6 +1,6 @@
 {
-  "name": "@feature-sliced/lint",
-  "description": "FSD-compliant file structure and project architecture linter",
+  "name": "@feature-sliced/lint-rules-fsd",
+  "description": "FSD rules for @feature-sliced/lint",
   "version": "0.0.0",
   "license": "MIT",
   "authors": [
@@ -26,9 +26,6 @@
     "clean": "rimraf dist"
   },
   "type": "module",
-  "bin": {
-    "fsd-lint": "bin/index.js"
-  },
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "jsnext:main": "dist/index.js",
@@ -39,23 +36,13 @@
       "default": "./dist/index.js"
     }
   },
-  "dependencies": {
-    "chokidar": "^3.6.0",
-    "commander": "^12.0.0",
-    "cosmiconfig": "^9.0.0",
-    "cross-env": "^7.0.3",
-    "effector": "^23.2.1",
-    "modern-async": "^2.0.0",
-    "patronum": "^2.2.0",
-    "prexit": "^2.2.0",
-    "yargs": "^17.7.2",
-    "zod": "^3.23.6",
-    "zod-validation-error": "^3.3.0"
+  "peerDependencies": {
+    "@feature-sliced/lint": "^0.0.0"
   },
+  "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.12.8",
-    "@types/yargs": "^17.0.32",
     "read-pkg-up": "^11.0.0",
     "rimraf": "^5.0.5",
     "rollup": "^4.17.2",

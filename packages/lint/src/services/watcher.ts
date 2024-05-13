@@ -1,9 +1,9 @@
-import path from 'node:path'
-import fs from 'node:fs/promises'
+import nodePath from 'node:path'
+import nodeFsPromises from 'node:fs/promises'
 
 import chokidar from 'chokidar'
 
-import { files } from '../model/files'
+import { fsUnits } from '../models/fs-units'
 import { ConfigInternal } from '../shared/config'
 
 export const createWatcher = (watchRoot: string, config: ConfigInternal) => {
@@ -12,29 +12,29 @@ export const createWatcher = (watchRoot: string, config: ConfigInternal) => {
     alwaysStat: true,
     awaitWriteFinish: true,
     disableGlobbing: true,
-    cwd: config.cwd,
+    cwd: nodePath.join(config.cwd, config.path),
   })
 
-  fsWatcher.on('add', async (pathRelative, stats) => {
-    files.add({
-      pathRelative,
-      pathAbsolute: path.join(watchRoot, pathRelative),
-      pathRoot: watchRoot,
-      content: (await fs.readFile(path.join(watchRoot, pathRelative))).toString(),
+  fsWatcher.on('add', async (path, stats) => {
+    fsUnits.add({
+      kind: 'file',
+      path: path,
+      content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, path))).toString(),
+      imports: [],
     })
   })
 
   fsWatcher.on('change', async (pathRelative, stats) => {
-    files.change({
-      pathRelative,
-      pathAbsolute: path.join(watchRoot, pathRelative),
-      pathRoot: watchRoot,
-      content: (await fs.readFile(path.join(watchRoot, pathRelative))).toString(),
+    fsUnits.change({
+      kind: 'file',
+      path: pathRelative,
+      content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, pathRelative))).toString(),
+      imports: [],
     })
   })
 
   fsWatcher.on('unlink', async (pathRelative) => {
-    files.remove(pathRelative)
+    fsUnits.remove(pathRelative)
   })
 
   return {

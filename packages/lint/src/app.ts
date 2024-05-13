@@ -1,6 +1,8 @@
-import { files } from './model/files'
+import nodePath from 'node:path'
 import { configSchema, Config, configInternalSchema, ConfigInternal, configDefault } from './shared/config'
+
 import { createWatcher } from './services/watcher'
+import { warnings } from './models/warnings'
 
 export const createLinter = (config: Config) => {
   configSchema.parse(config)
@@ -9,11 +11,11 @@ export const createLinter = (config: Config) => {
     ...config,
   })
 
-  const watcher = createWatcher(configInternal.path, configInternal)
+  const watcher = createWatcher(nodePath.join(configInternal.cwd, configInternal.path), configInternal)
 
   return {
     watch: (cb: (files: any) => void) => {
-      files.list.watch(cb)
+      warnings.store.watch(cb)
     },
     close: async () => {
       await watcher.close()
