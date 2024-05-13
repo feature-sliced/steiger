@@ -1,9 +1,13 @@
 import type { FsdRoot } from '@feature-sliced/filesystem'
 
+export interface Context {
+  isTypeScript: boolean
+}
+
 export interface Rule {
   /** Short code name for the rule. */
   name: string
-  check: (root: FsdRoot) => RuleResult
+  check: (root: FsdRoot, context: Context) => RuleResult
 }
 
 export interface RuleResult {
