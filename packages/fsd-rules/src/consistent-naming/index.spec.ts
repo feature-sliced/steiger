@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test'
-import consistentNaming from '.'
+import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import consistentNaming from './index.js'
 
 it('reports no errors on slice names that are pluralized consistently', () => {
   const root = parseIntoFsdRoot(`
@@ -35,7 +35,7 @@ it('reports an error on slice names that are not pluralized consistently', () =>
       fixes: [
         {
           type: 'rename',
-          path: './entities/user',
+          path: '/entities/user',
           newName: 'users',
         },
       ],
@@ -64,7 +64,7 @@ it('prefers the singular form when there are more singular slices', () => {
       fixes: [
         {
           type: 'rename',
-          path: './entities/comments',
+          path: '/entities/comments',
           newName: 'comment',
         },
       ],

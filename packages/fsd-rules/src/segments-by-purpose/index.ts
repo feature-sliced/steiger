@@ -1,10 +1,8 @@
-import type { Diagnostic, Rule } from '../types'
+import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
+
+import type { Diagnostic, Rule } from '../types.js'
 
 const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals']
-
-function formatError(segmentName: string) {
-  return { message: `Non-descriptive segment name: ${segmentName}` }
-}
 
 /** Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose. */
 const segmentsByPurpose = {
@@ -12,22 +10,24 @@ const segmentsByPurpose = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const layer of Object.values(root.layers)) {
+    for (const [layerName, layer] of Object.entries(getLayers(root))) {
       if (layer === null) {
         continue
       }
 
-      if (layer.type === 'unsliced-layer') {
-        for (const segment of Object.values(layer.segments)) {
-          if (BAD_NAMES.includes(segment.name)) {
-            diagnostics.push(formatError(segment.name))
+      if (!isSliced(layer)) {
+        for (const segmentName of Object.keys(getSegments(layer))) {
+          if (BAD_NAMES.includes(segmentName)) {
+            diagnostics.push({ message: `Non-descriptive segment name "${segmentName}" on layer "${layerName}"` })
           }
         }
       } else {
-        for (const slice of Object.values(layer.slices)) {
-          for (const segment of Object.values(slice.segments)) {
-            if (BAD_NAMES.includes(segment.name)) {
-              diagnostics.push(formatError(segment.name))
+        for (const [sliceName, slice] of Object.entries(getSlices(layer))) {
+          for (const segmentName of Object.keys(getSegments(slice))) {
+            if (BAD_NAMES.includes(segmentName)) {
+              diagnostics.push({
+                message: `Non-descriptive segment name "${segmentName}" on slice "${sliceName}" on layer "${layerName}"`,
+              })
             }
           }
         }

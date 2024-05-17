@@ -1,1 +1,1 @@
-export { default as segmentsByPurpose } from './segments-by-purpose'
+export { default as segmentsByPurpose } from './segments-by-purpose/index.js'

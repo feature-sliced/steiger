@@ -1,6 +1,7 @@
 import { join } from 'node:path'
+import { getLayers, getSegments, isSliced, getIndex, getSlices } from '@feature-sliced/filesystem'
 
-import type { Diagnostic, Rule } from '../types'
+import type { Diagnostic, Rule } from '../types.js'
 
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {
@@ -8,20 +9,16 @@ const publicApi = {
   check(root, context) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const layer of Object.values(root.layers)) {
-      if (layer === null) {
-        continue
-      }
-
-      if (layer.type === 'unsliced-layer') {
-        for (const segment of Object.values(layer.segments)) {
-          if (segment.index === null) {
+    for (const [layerName, layer] of Object.entries(getLayers(root))) {
+      if (!isSliced(layer)) {
+        for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
+          if (getIndex(segment) === undefined) {
             diagnostics.push({
-              message: `On the "${layer.name}" layer, segment "${segment.name}" is missing a public API.`,
+              message: `On the "${layerName}" layer, segment "${segmentName}" is missing a public API.`,
               fixes: [
                 {
                   type: 'create-file',
-                  path: join(segment.path, `index.${context.isTypeScript ? 'ts' : 'js'}`),
+                  path: join(segment.path, `index.${context.sourceFileExtension}`),
                   // TODO: Infer better content for this file
                   content: '',
                 },
@@ -30,14 +27,14 @@ const publicApi = {
           }
         }
       } else {
-        for (const slice of Object.values(layer.slices)) {
-          if (slice.index === null) {
+        for (const [sliceName, slice] of Object.entries(getSlices(layer))) {
+          if (getIndex(slice) === undefined) {
             diagnostics.push({
-              message: `On the "${layer.name}" layer, slice "${slice.name}" is missing a public API.`,
+              message: `On the "${layerName}" layer, slice "${sliceName}" is missing a public API.`,
               fixes: [
                 {
                   type: 'create-file',
-                  path: join(slice.path, `index.${context.isTypeScript ? 'ts' : 'js'}`),
+                  path: join(slice.path, `index.${context.sourceFileExtension}`),
                   // TODO: Infer better content for this file
                   content: '',
                 },

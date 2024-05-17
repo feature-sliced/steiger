@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
-import repetitiveNaming from '.'
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test'
+import repetitiveNaming from './index.js'
+import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project with no repetitive words in slices', () => {
   const root = parseIntoFsdRoot(`

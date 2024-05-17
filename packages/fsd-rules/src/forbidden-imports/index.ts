@@ -1,28 +1,58 @@
-import { join } from 'node:path'
-import { globbyStream } from 'globby'
+import * as fs from 'node:fs'
+import { resolveImport, type LayerName } from '@feature-sliced/filesystem'
 import { paperwork } from 'precinct'
+import { parse as parseNearestTsConfig } from 'tsconfck'
 
-import type { Diagnostic, Rule } from '../types'
-import { locateInFsdRoot, type LayerName } from '@feature-sliced/filesystem'
+import type { Diagnostic, Rule } from '../types.js'
+import { indexSourceFiles } from '../_lib/index-source-files.js'
 
 const forbiddenImports = {
   name: 'forbidden-imports',
-  async check(root, context) {
+  async check(root) {
     const diagnostics: Array<Diagnostic> = []
+    const { tsconfig } = await parseNearestTsConfig(root.path)
+    const sourceFileIndex = indexSourceFiles(root)
 
-    for (const layer of Object.values(root.layers)) {
-      if (layer === null) {
-        continue
-      }
-
-      if (layer.type === 'unsliced-layer') {
-        for (const segment of Object.values(layer.segments)) {
-          await crawlSubtree(segment.path, context.include, diagnostics)
+    for (const sourceFile of Object.values(sourceFileIndex)) {
+      const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
+      for (const dependency of dependencies) {
+        const resolvedDependency = resolveImport(
+          dependency,
+          sourceFile.file.path,
+          tsconfig?.compilerOptions ?? {},
+          fs.existsSync,
+          fs.existsSync,
+        )
+        if (resolvedDependency === null) {
+          continue
         }
-      } else {
-        for (const slice of Object.values(layer.slices)) {
-          for (const segment of Object.values(slice.segments)) {
-            await crawlSubtree(segment.path, context.include, diagnostics)
+
+        const dependencyLocation = sourceFileIndex[resolvedDependency]
+        if (dependencyLocation === undefined) {
+          continue
+        }
+
+        if (
+          sourceFile.layerName === dependencyLocation.layerName &&
+          sourceFile.sliceName !== dependencyLocation.sliceName
+        ) {
+          if (dependencyLocation.sliceName === null) {
+            diagnostics.push({
+              message: `Forbidden cross-import from "${sourceFile.file.path}" to segment "${dependencyLocation.segmentName}" on layer "${dependencyLocation.layerName}".`,
+            })
+          } else {
+            diagnostics.push({
+              message: `Forbidden cross-import from "${sourceFile.file.path}" to slice "${dependencyLocation.sliceName}" on layer "${dependencyLocation.layerName}".`,
+            })
+          }
+        } else {
+          const thisLayerIndex = layerSequence.indexOf(sourceFile.layerName)
+          const dependencyLayerIndex = layerSequence.indexOf(dependencyLocation.layerName)
+
+          if (thisLayerIndex < dependencyLayerIndex) {
+            diagnostics.push({
+              message: `Forbidden import from "${sourceFile.file.path}" to higher layer "${dependencyLocation.layerName}".`,
+            })
           }
         }
       }
@@ -32,46 +62,6 @@ const forbiddenImports = {
   },
 } satisfies Rule
 
-async function crawlSubtree(subtreePath: string, include: Array<string>, diagnostics: Array<Diagnostic>) {
-  for await (const path of globbyStream(include, { cwd: subtreePath })) {
-    if (typeof path !== 'string') {
-      continue
-    }
+export default forbiddenImports
 
-    const fullPath = join(subtreePath, path)
-    const thisFileLocation = locateInFsdRoot(fullPath)
-    if (thisFileLocation === null) {
-      continue
-    }
-
-    const dependencies = paperwork(fullPath, { includeCore: false })
-    for (const dependency of dependencies) {
-      const dependencyLocation = locateInFsdRoot(dependency)
-      if (dependencyLocation === null) {
-        continue
-      }
-
-      if (thisFileLocation.fsdRoot === dependencyLocation.fsdRoot) {
-        if (
-          thisFileLocation.layer === dependencyLocation.layer &&
-          thisFileLocation.slice !== dependencyLocation.slice
-        ) {
-          diagnostics.push({
-            message: `Forbidden cross-import from "${fullPath}" to slice "${dependencyLocation.slice}" on layer "${thisFileLocation.layer}".`,
-          })
-        } else {
-          const thisLayerIndex = layerSequence.indexOf(thisFileLocation.layer)
-          const dependencyLayerIndex = layerSequence.indexOf(dependencyLocation.layer)
-
-          if (thisLayerIndex < dependencyLayerIndex) {
-            diagnostics.push({
-              message: `Forbidden import from "${fullPath}" to higher layer "${dependencyLocation.layer}".`,
-            })
-          }
-        }
-      }
-    }
-  }
-}
-
-const layerSequence: Array<LayerName> = ["shared", "entities", "features", "widgets", "pages", "app"]
+const layerSequence: Array<LayerName> = ['shared', 'entities', 'features', 'widgets', 'pages', 'app']

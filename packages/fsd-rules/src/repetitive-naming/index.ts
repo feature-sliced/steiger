@@ -1,4 +1,6 @@
-import type { Diagnostic, Rule } from '../types'
+import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
+
+import type { Diagnostic, Rule } from '../types.js'
 
 /**
  * Pattern that matches one word in different naming conventions.
@@ -18,12 +20,12 @@ const repetitiveNaming = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const layer of Object.values(root.layers)) {
-      if (layer === null || layer.type === 'unsliced-layer') {
+    for (const [layerName, layer] of Object.entries(getLayers(root))) {
+      if (!isSliced(layer)) {
         continue
       }
 
-      const sliceNames = Object.keys(layer.slices)
+      const sliceNames = Object.keys(getSlices(layer))
       const wordsInSliceNames = sliceNames.map((name) =>
         (name.match(wordPattern) ?? <Array<string>>[]).map((word) => word.toLowerCase()),
       )
@@ -34,7 +36,7 @@ const repetitiveNaming = {
 
       for (const [word, count] of mostCommonWords.entries()) {
         if (count >= sliceNames.length && wordsInSliceNames.every((words) => words.includes(word))) {
-          diagnostics.push({ message: `Repetitive word "${word}" in slice names on layer "${layer.name}"` })
+          diagnostics.push({ message: `Repetitive word "${word}" in slice names on layer "${layerName}"` })
         }
       }
     }

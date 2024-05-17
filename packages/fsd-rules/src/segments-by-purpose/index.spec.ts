@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
-import segmentsByPurpose from '.'
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test'
+import segmentsByPurpose from './index.js'
+import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project with good segments', () => {
   const root = parseIntoFsdRoot(`
@@ -50,10 +50,10 @@ it('reports errors on a project with bad segments', () => {
 
   const diagnostics = segmentsByPurpose.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
-    { message: 'Non-descriptive segment name: components' },
-    { message: 'Non-descriptive segment name: helpers' },
-    { message: 'Non-descriptive segment name: hooks' },
-    { message: 'Non-descriptive segment name: modals' },
-    { message: 'Non-descriptive segment name: utils' },
+    { message: 'Non-descriptive segment name "components" on slice "user" on layer "entities"' },
+    { message: 'Non-descriptive segment name "helpers" on layer "shared"' },
+    { message: 'Non-descriptive segment name "hooks" on layer "shared"' },
+    { message: 'Non-descriptive segment name "modals" on layer "shared"' },
+    { message: 'Non-descriptive segment name "utils" on layer "shared"' },
   ])
 })

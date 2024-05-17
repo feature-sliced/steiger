@@ -1,7 +1,7 @@
 import type { FsdRoot } from '@feature-sliced/filesystem'
 
 export interface Context {
-  isTypeScript: boolean
+  sourceFileExtension: "js" | "ts"
   include: Array<string>
 }
 
