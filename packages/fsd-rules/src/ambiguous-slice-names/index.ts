@@ -18,17 +18,17 @@ const ambiguousSliceNames = {
 
     const segmentNamesInShared = Object.keys(getSegments(sharedLayer))
 
-    for (const sliceName of Object.keys(getAllSlices(root))) {
+    for (const [sliceName, slice] of Object.entries(getAllSlices(root))) {
       const pathSegments = sliceName.split(sep)
       const matchingSegment = segmentNamesInShared.find(segmentName => pathSegments.includes(segmentName))
       if (matchingSegment !== undefined) {
         if (matchingSegment === sliceName) {
           diagnostics.push({
-            message: `Slice name "${sliceName}" is ambiguous with a segment name in Shared`,
+            message: `Slice name "${sliceName}" on layer "${slice.layerName}" is ambiguous with a segment name in Shared`,
           })
         } else {
           diagnostics.push({
-            message: `Slice name "${sliceName}" is ambiguous with a segment name "${matchingSegment}" in Shared`,
+            message: `Slice name "${sliceName}" on layer "${slice.layerName}" is ambiguous with a segment name "${matchingSegment}" in Shared`,
           })
         }
       }

@@ -47,5 +47,5 @@ it('reports errors on a project with slice names that match some segment name in
   `)
 
   const diagnostics = ambiguousSliceNames.check(root).diagnostics
-  expect(diagnostics).toEqual([{ message: 'Slice name "i18n" is ambiguous with a segment name in Shared' }])
+  expect(diagnostics).toEqual([{ message: 'Slice name "i18n" on layer "features" is ambiguous with a segment name in Shared' }])
 })
