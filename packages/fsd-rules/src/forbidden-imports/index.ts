@@ -1,5 +1,5 @@
 import * as fs from 'node:fs'
-import { resolveImport, type LayerName } from '@feature-sliced/filesystem'
+import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
 import { paperwork } from 'precinct'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 
@@ -63,5 +63,3 @@ const forbiddenImports = {
 } satisfies Rule
 
 export default forbiddenImports
-
-const layerSequence: Array<LayerName> = ['shared', 'entities', 'features', 'widgets', 'pages', 'app']
