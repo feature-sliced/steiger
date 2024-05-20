@@ -17,7 +17,11 @@ type SourceFile = {
   segmentName: string | null
 }
 
-/** Walk the folder as an FSD root and create an index of all existing source files along with their layer, slice, and segment. */
+/**
+ * Walk the folder as an FSD root and create an index of all existing source files along with their layer, slice, and segment.
+ *
+ * @returns A mapping of source file paths to their file object and location information.
+ */
 export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
   const index = {} as Record<string, SourceFile>
   function walk(node: File | Folder, metadata: Pick<SourceFile, 'layerName' | 'sliceName' | 'segmentName'>) {
