@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { join } from 'node:path'
 import { paperwork } from 'precinct'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 
