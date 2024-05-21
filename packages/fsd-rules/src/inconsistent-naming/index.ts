@@ -7,8 +7,8 @@ import type { Diagnostic, Rule } from '../types.js'
 import { groupSlices } from '../_lib/group-slices.js'
 
 /** Detect consistent naming of slices on layers (singular vs plural, casing) */
-const consistentNaming = {
-  name: 'consistent-naming',
+const inconsistentNaming = {
+  name: 'inconsistent-naming',
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
@@ -56,4 +56,4 @@ const consistentNaming = {
   },
 } satisfies Rule
 
-export default consistentNaming
+export default inconsistentNaming

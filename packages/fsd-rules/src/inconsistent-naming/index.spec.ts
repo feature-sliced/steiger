@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
-import consistentNaming from './index.js'
+import inconsistentNaming from './index.js'
 
 it('reports no errors on slice names that are pluralized consistently', () => {
   const root = parseIntoFsdRoot(`
@@ -14,7 +14,7 @@ it('reports no errors on slice names that are pluralized consistently', () => {
         📄 index.ts
   `)
 
-  expect(consistentNaming.check(root)).toEqual({ diagnostics: [] })
+  expect(inconsistentNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports an error on slice names that are not pluralized consistently', () => {
@@ -28,7 +28,7 @@ it('reports an error on slice names that are not pluralized consistently', () =>
         📄 index.ts
   `)
 
-  const diagnostics = consistentNaming.check(root).diagnostics.sort(compareMessages)
+  const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: 'Inconsistent pluralization on layer "entities". Prefer all plural names',
@@ -57,7 +57,7 @@ it('prefers the singular form when there are more singular slices', () => {
         📄 index.ts
   `)
 
-  const diagnostics = consistentNaming.check(root).diagnostics.sort(compareMessages)
+  const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: 'Inconsistent pluralization on layer "entities". Prefer all singular names',
