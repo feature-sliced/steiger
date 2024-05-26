@@ -17,19 +17,17 @@ export const createWatcher = (watchRoot: string, config: ConfigInternal) => {
 
   fsWatcher.on('add', async (path, stats) => {
     fsUnits.add({
-      kind: 'file',
+      type: 'file',
       path: path,
-      content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, path))).toString(),
-      imports: [],
+      // content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, path))).toString(),
     })
   })
 
   fsWatcher.on('change', async (pathRelative, stats) => {
     fsUnits.change({
-      kind: 'file',
+      type: 'file',
       path: pathRelative,
-      content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, pathRelative))).toString(),
-      imports: [],
+      // content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, pathRelative))).toString(),
     })
   })
 

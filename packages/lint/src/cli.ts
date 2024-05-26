@@ -13,7 +13,7 @@ const yargsProgram = yargs(hideBin(process.argv))
   .option('watch', {
     alias: 'w',
     demandOption: false,
-    describe: 'watch file system changes',
+    describe: 'watch filesystem changes',
     type: 'boolean'
   })
   .option('skip-fs-errors', {

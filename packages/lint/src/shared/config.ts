@@ -7,6 +7,7 @@ export const configSchema = z.object({
   fileSizeLimit: z.number().optional(),
   fileNumberLimit: z.number().optional(),
   watch: z.boolean().optional(),
+  typescript: z.boolean(),
 })
 
 export type Config = z.infer<typeof configSchema>
@@ -24,4 +25,5 @@ export const configDefault: Partial<ConfigInternal> = {
   fileSizeLimit: 10000,
   fileNumberLimit: 1000,
   watch: false,
+  typescript: true,
 }

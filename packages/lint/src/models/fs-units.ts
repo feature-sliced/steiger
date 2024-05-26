@@ -1,26 +1,42 @@
-import { combine, createEvent, createStore } from 'effector'
+import nodePath from 'node:path'
 
-interface FsUnitProto {
-  path: string
-}
+import { createEvent, createStore } from 'effector'
+import { File, Folder, FsdRoot } from '@feature-sliced/filesystem'
 
-interface FsUnitFile extends FsUnitProto {
-  kind: 'file'
-  content: string
-  imports: Array<FsUnitProto['path']>
-}
+const tree = createStore<FsdRoot>({ type: 'folder', path: '/', children: [] })
 
-interface FsUnitDirectory extends FsUnitProto {
-  kind: 'directory'
-  nested: Array<FsUnit['path']>
-}
+tree.watch(value => {
+  console.log(JSON.stringify(value, null, 2))
+})
 
-export type FsUnit = FsUnitFile | FsUnitDirectory
+const add = createEvent<File>()
+tree.on(add, (state, payload) => {
+  let currentFolder = state
+  const pathSegments = payload.path.split(nodePath.sep).slice(0, -1)
+  pathSegments.forEach((pathSegment, index, pathSegments) => {
+    const childToFoundPath = pathSegments.slice(0, index + 1).join(nodePath.sep)
+    let foundChildren = currentFolder.children.find((c) => c.path === childToFoundPath)
+    if (!foundChildren) currentFolder.children.push({ type: 'folder', path: childToFoundPath, children: [] })
+    foundChildren = currentFolder.children.find((c) => c.path === childToFoundPath)
+    currentFolder = foundChildren as Folder
+  })
+  currentFolder.children.push({
+    type: 'file',
+    path: payload.path
+  })
+  return { ...state }
+})
 
-const map = createStore<Map<FsUnit['path'], FsUnit>>(new Map())
-const list = combine(map, (filesMap) => Array.from(filesMap.values()))
+const change = createEvent<File>()
+tree.on(change, (state, payload) => {})
 
-const add = createEvent<FsUnit>()
+const remove = createEvent<File['path']>()
+tree.on(remove, (state, pathAbsolute) => {})
+
+// TODO DB-like normalized structure with relations between engine entities
+
+// const map = createStore<Map<FsUnit['path'], FsUnit>>(new Map())
+/*
 map.on(add, (state, payload) => {
   if (!state.has(payload.path)) {
     state.set(payload.path, payload)
@@ -28,7 +44,6 @@ map.on(add, (state, payload) => {
   } else return state
 })
 
-const change = createEvent<FsUnit>()
 map.on(change, (state, payload) => {
   if (!state.has(payload.path)) {
     state.set(payload.path, payload)
@@ -36,17 +51,18 @@ map.on(change, (state, payload) => {
   } else return state
 })
 
-const remove = createEvent<FsUnit['path']>()
 map.on(remove, (state, pathAbsolute) => {
   if (state.has(pathAbsolute)) {
     state.delete(pathAbsolute)
     return new Map(state)
   } else return state
 })
+*/
+
+// const list = combine(map, (filesMap) => Array.from(filesMap.values()))
 
 export const fsUnits = {
-  map,
-  list,
+  tree,
   add,
   change,
   remove,

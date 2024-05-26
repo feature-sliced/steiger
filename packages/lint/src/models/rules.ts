@@ -1,11 +1,19 @@
+import { FsdRoot } from '@feature-sliced/filesystem'
+
 import { createEffectorArray } from '../shared/create-effector-array'
 
-import { FsUnit } from './fs-units'
-import { Warning } from './warnings'
+import { Diagnostic } from './diagnostics'
+
+import { Context } from './context'
 
 export interface Rule {
+  /** Short code name for the rule. */
   name: string
-  fn: (fsUnits: Array<FsUnit>) => null | Warning | Array<Warning>
+  check: (root: FsdRoot, context: Context) => RuleResult | Promise<RuleResult>
+}
+
+export interface RuleResult {
+  diagnostics: Array<Diagnostic>
 }
 
 export const rules = createEffectorArray<Rule>([])
