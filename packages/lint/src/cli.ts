@@ -1,11 +1,9 @@
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
-import { fromError } from 'zod-validation-error'
 
-import { configDefault, ConfigInternal, configInternalSchema } from './shared/config'
-
-import { createLinter } from './app'
+import { linter } from './app'
+import { Config } from './models/infractructure/config'
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('fsd-lint')
@@ -63,25 +61,20 @@ const consoleArgs = yargsProgram.parseSync()
 
 console.log('consoleArgs', consoleArgs)
 
-const parsingResult = configInternalSchema.safeParse({
-  ...configDefault,
+const configFromConsole: Config = {
   ...consoleArgs,
   path: consoleArgs._[0],
-})
-
-if (!parsingResult.success) {
-  console.error(fromError(parsingResult.error).toString())
-  process.exit(1)
 }
 
-const configInternal: ConfigInternal = parsingResult.data
+console.log('configFromConsole', configFromConsole)
 
-console.log('configInternal', configInternal)
-
-const linter = createLinter(configInternal)
-
-linter.watch(console.log)
+linter.loadConfig(configFromConsole)
+linter.loadEnvironment({})
+linter.start()
+linter.diagnostics.watch(state => {
+  console.log('diagnostics:\n', JSON.stringify(state, null, 2))
+})
 
 prexit(async () => {
-  await linter.close()
+  await linter.stop()
 })

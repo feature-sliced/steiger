@@ -1,24 +1,19 @@
-import nodePath from 'node:path'
-import { configSchema, Config, configInternalSchema, ConfigInternal, configDefault } from './shared/config'
+export { type Rule, type RuleResult } from './models/business/rules'
+export { type Diagnostic } from './models/business/diagnostics'
+export { type Config } from './models/infractructure/config'
 
-import { createWatcher } from './services/watcher'
-import { diagnostics } from './models/diagnostics'
+import { loadEnvironment } from './features/load-environment'
+import { diagnostics } from './models/business/diagnostics'
+import { loadConfig } from './features/load-config'
+import { watcher } from './features/transfer-fs-to-vfs'
 
-export const createLinter = (config: Config) => {
-  configSchema.parse(config)
-  const configInternal: ConfigInternal = configInternalSchema.parse({
-    ...configDefault,
-    ...config,
-  })
+const start = () => watcher.start()
+const stop = () => watcher.stop()
 
-  const watcher = createWatcher(nodePath.join(configInternal.cwd, configInternal.path), configInternal)
-
-  return {
-    watch: (cb: (files: any) => void) => {
-      diagnostics.store.watch(cb)
-    },
-    close: async () => {
-      await watcher.close()
-    },
-  }
+export const linter = {
+  loadConfig,
+  loadEnvironment,
+  start,
+  diagnostics: diagnostics.store,
+  stop,
 }

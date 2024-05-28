@@ -27,7 +27,7 @@ export default defineConfig([
     ],
   },
   {
-    input: 'src/index.ts',
+    input: 'src/app.ts',
     plugins: [typescriptPlugin()],
     output: [
       {
@@ -44,7 +44,7 @@ export default defineConfig([
     ],
   },
   {
-    input: 'src/index.ts',
+    input: 'src/app.ts',
     plugins: [typescriptPlugin(), typescriptDtsPlugin()],
     output: {
       file: packageJson.types,

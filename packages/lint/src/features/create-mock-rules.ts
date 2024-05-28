@@ -1,7 +1,7 @@
 import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
 
-import { Rule, rules } from '../models/rules'
-import type { Diagnostic } from '../models/diagnostics'
+import { Diagnostic } from '../models/business/diagnostics'
+import { Rule, rules } from '../models/business/rules'
 
 const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals']
 

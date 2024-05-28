@@ -61,7 +61,7 @@ map.on(remove, (state, pathAbsolute) => {
 
 // const list = combine(map, (filesMap) => Array.from(filesMap.values()))
 
-export const fsUnits = {
+export const vfs = {
   tree,
   add,
   change,

@@ -1,9 +1,8 @@
 import { FsdRoot } from '@feature-sliced/filesystem'
 
-import { createEffectorArray } from '../shared/create-effector-array'
+import { createEffectorArray } from '../../shared/create-effector-array'
 
 import { Diagnostic } from './diagnostics'
-
 import { Context } from './context'
 
 export interface Rule {
