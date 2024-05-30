@@ -1,5 +1,5 @@
 {
-  "name": "@feature-sliced/pretty-reporter",
+  "name": "pretty-reporter",
   "version": "0.0.1",
   "scripts": {
     "dev": "tsup src/index.ts --format esm --watch",

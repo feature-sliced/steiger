@@ -1,7 +1,7 @@
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
-import { reportPretty } from '@feature-sliced/pretty-reporter'
+import { reportPretty } from 'pretty-reporter'
 
 import { linter } from './app'
 import { Config } from './models/infractructure/config'
