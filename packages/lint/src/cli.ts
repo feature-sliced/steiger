@@ -72,7 +72,21 @@ linter.loadConfig(configFromConsole)
 linter.loadEnvironment({})
 linter.start()
 linter.diagnostics.watch(state => {
-  console.log('diagnostics:\n', JSON.stringify(state, null, 2))
+  console.clear()
+  console.log(`Found problems: ${state.length}`)
+  state.forEach(d => {
+    console.log(`${d.message}`)
+    if (d.fixes && d.fixes.length > 0) {
+      console.log(`\tPossible fixes:`)
+      d.fixes.forEach(f => {
+        if (f.type === 'create-file') console.log(`\t\tCreate file ${f.path}`)
+        else if (f.type === 'modify-file') console.log(`\t\tChange file ${f.path}`)
+        else if (f.type === 'delete') console.log(`\t\tDelete ${f.path}`)
+        else if (f.type === 'create-folder') console.log(`\t\tCreate directory ${f.path}`)
+        else if (f.type === 'rename') console.log(`\t\tRename ${f.path} to ${f.newName}`)
+      })
+    }
+  })
 })
 
 prexit(async () => {
