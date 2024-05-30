@@ -1,18 +1,21 @@
-import { sample } from 'effector'
+import { combine, sample } from 'effector'
+import { debounce } from 'patronum'
 
-import { Rule, rules } from '../models/business/rules'
+import { rules } from '../models/business/rules'
 import { Diagnostic, diagnostics } from '../models/business/diagnostics'
 import { vfs } from '../models/business/vfs'
-import { Config, config } from '../models/infractructure/config'
+import { config } from '../models/infractructure/config'
+
+const dataDebounced = debounce(combine({
+  vfs: vfs.tree,
+  rules: rules.store,
+  config: config.store,
+}), 1000)
 
 export const runRulesOnVfs = () => {
   sample({
-    clock: [vfs.tree, rules.store, config.store],
-    source: {
-      vfs: vfs.tree,
-      rules: rules.store,
-      config: config.store,
-    },
+    clock: dataDebounced,
+    source: dataDebounced,
     fn: (source) => {
       const { vfs, rules, config } = source
       let diagnosticsResult: Array<Diagnostic> = []
