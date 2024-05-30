@@ -1,3 +1,5 @@
+// TODO fix imports
+// https://github.com/microsoft/TypeScript/issues/54018
 import { resolveModuleName, sys, type CompilerOptions } from "typescript";
 
 /**

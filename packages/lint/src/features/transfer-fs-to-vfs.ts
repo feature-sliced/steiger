@@ -29,15 +29,15 @@ export const watcher = {
     fsWatcher.on('add', async (path, stats) => {
       vfs.add({
         type: 'file',
-        path: path,
+        path: nodePath.join(environmentValue.cwd, configValue.path, path),
         // content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, path))).toString(),
       })
     })
 
-    fsWatcher.on('change', async (pathRelative, stats) => {
+    fsWatcher.on('change', async (path, stats) => {
       vfs.change({
         type: 'file',
-        path: pathRelative,
+        path: nodePath.join(environmentValue.cwd, configValue.path, path),
         // content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, pathRelative))).toString(),
       })
     })

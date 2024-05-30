@@ -24,7 +24,10 @@ export const runRulesOnVfs = () => {
         console.log('rule.name', rule.name)
         console.log('ruleResult', ruleResult)
         if ('finally' in ruleResult) {
-          ruleResult.then((r) => diagnosticsResult.push(...r.diagnostics))
+          ruleResult.then((r) => {
+            // diagnosticsResult.push(...r.diagnostics)
+            console.log(r)
+          })
         } else {
           diagnosticsResult.push(...ruleResult.diagnostics)
         }
