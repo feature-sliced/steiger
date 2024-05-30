@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
-import { paperwork } from 'precinct'
+import precinct from 'precinct'
+const { paperwork } = precinct;
 import { parse as parseNearestTsConfig } from 'tsconfck'
 
 import type { Diagnostic, Rule } from '../types.js'

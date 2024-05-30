@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { partition } from 'lodash-es'
-import { isPlural, plural, singular } from 'pluralize'
+import pluralize from 'pluralize'
+const { isPlural, plural, singular } = pluralize;
 import { isSliced, getLayers, getSlices } from '@feature-sliced/filesystem'
 
 import type { Diagnostic, Rule } from '../types.js'
