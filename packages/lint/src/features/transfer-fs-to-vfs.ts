@@ -29,7 +29,7 @@ export const watcher = {
     fsWatcher.on('add', async (path, stats) => {
       vfs.add({
         type: 'file',
-        path: nodePath.join(environmentValue.cwd, configValue.path, path),
+        path: nodePath.join(configValue.path, path),
         // content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, path))).toString(),
       })
     })
@@ -37,7 +37,7 @@ export const watcher = {
     fsWatcher.on('change', async (path, stats) => {
       vfs.change({
         type: 'file',
-        path: nodePath.join(environmentValue.cwd, configValue.path, path),
+        path: nodePath.join(configValue.path, path),
         // content: (await nodeFsPromises.readFile(nodePath.join(watchRoot, pathRelative))).toString(),
       })
     })
