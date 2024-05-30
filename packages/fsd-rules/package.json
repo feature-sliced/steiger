@@ -3,11 +3,13 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "tsup src/index.ts --format esm --watch",
-    "build": "tsup src/index.ts --format esm --clean",
+    "build": "tsup src/index.ts --format esm --dts --clean",
     "test": "vitest"
   },
   "description": "A set of rules to verify correct usage of Feature-Sliced Design",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "license": "MIT",
   "authors": [

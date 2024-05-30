@@ -1,27 +1,37 @@
 import { sample } from 'effector'
-import { FsdRoot } from '@feature-sliced/filesystem'
 
 import { Rule, rules } from '../models/business/rules'
 import { Diagnostic, diagnostics } from '../models/business/diagnostics'
 import { vfs } from '../models/business/vfs'
 import { Config, config } from '../models/infractructure/config'
 
-sample({
-  clock: [vfs.tree, rules.store, config.store],
-  fn: (clock) => {
-    const [fsUnits, rules, config] = clock as unknown as [FsdRoot, Array<Rule>, Config]
-    let diagnosticsResult: Array<Diagnostic> = []
+export const runRulesOnVfs = () => {
+  sample({
+    clock: [vfs.tree, rules.store, config.store],
+    source: {
+      vfs: vfs.tree,
+      rules: rules.store,
+      config: config.store,
+    },
+    fn: (source) => {
+      const { vfs, rules, config } = source
+      let diagnosticsResult: Array<Diagnostic> = []
 
-    rules.forEach((rule) => {
-      const ruleResult = rule.check(fsUnits, { sourceFileExtension: config.typescript ? 'ts' : 'js', include: [] })
-      if ('finally' in ruleResult) {
-        ruleResult.then((r) => diagnosticsResult.push(...r.diagnostics))
-      } else {
-        diagnosticsResult.push(...ruleResult.diagnostics)
-      }
-    })
+      if (!config) throw Error('config not initialized')
 
-    return diagnosticsResult
-  },
-  target: diagnostics.store,
-})
+      rules.forEach((rule) => {
+        const ruleResult = rule.check(vfs, { sourceFileExtension: config.typescript ? 'ts' : 'js', include: [] })
+        console.log('rule.name', rule.name)
+        console.log('ruleResult', ruleResult)
+        if ('finally' in ruleResult) {
+          ruleResult.then((r) => diagnosticsResult.push(...r.diagnostics))
+        } else {
+          diagnosticsResult.push(...ruleResult.diagnostics)
+        }
+      })
+
+      return diagnosticsResult
+    },
+    target: diagnostics.store,
+  })
+}

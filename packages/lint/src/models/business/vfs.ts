@@ -5,10 +5,6 @@ import { File, Folder, FsdRoot } from '@feature-sliced/filesystem'
 
 const tree = createStore<FsdRoot>({ type: 'folder', path: '/', children: [] })
 
-tree.watch(value => {
-  console.log(JSON.stringify(value, null, 2))
-})
-
 const add = createEvent<File>()
 tree.on(add, (state, payload) => {
   let currentFolder = state
