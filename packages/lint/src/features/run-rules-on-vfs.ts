@@ -22,14 +22,14 @@ export const runRulesOnVfs = () => {
       rules.forEach((rule) => {
         const ruleResult = rule.check(vfs, { sourceFileExtension: config.typescript ? 'ts' : 'js', include: [] })
         console.log('rule.name', rule.name)
-        console.log('ruleResult', ruleResult)
         if ('finally' in ruleResult) {
           ruleResult.then((r) => {
             // diagnosticsResult.push(...r.diagnostics)
-            console.log(r)
+            console.log('ruleResult (async)', rule.name, r)
           })
         } else {
           diagnosticsResult.push(...ruleResult.diagnostics)
+          console.log('ruleResult', ruleResult)
         }
       })
 

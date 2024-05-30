@@ -1,9 +1,31 @@
-import { insignificantSlice, ambiguousSliceNames, excessiveSlicing, forbiddenImports } from 'fsd-rules'
+import {
+  ambiguousSliceNames,
+  excessiveSlicing,
+  forbiddenImports,
+  inconsistentNaming,
+  insignificantSlice,
+  noLayerPublicApi,
+  noPublicApiSidestep,
+  noReservedFolderNames,
+  noSegmentlessSlices,
+  publicApi,
+} from 'fsd-rules'
 
 import { Rule, rules } from '../models/business/rules'
 
-const mockRules: Array<Rule> = [insignificantSlice, ambiguousSliceNames, excessiveSlicing, forbiddenImports]
+const mockRules: Array<Rule> = [
+  ambiguousSliceNames,
+  excessiveSlicing,
+  forbiddenImports,
+  inconsistentNaming,
+  insignificantSlice,
+  noLayerPublicApi,
+  noPublicApiSidestep,
+  noReservedFolderNames,
+  noSegmentlessSlices,
+  publicApi,
+]
 
 export const createMockRules = () => {
-  mockRules.forEach(rule => rules.create(rule))
+  mockRules.forEach((rule) => rules.create(rule))
 }
