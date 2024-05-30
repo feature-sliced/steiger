@@ -19,3 +19,5 @@ reportPretty([
   { message: 'Layer "shared" should not have an index file' },
   { message: 'Layer "pages" should not have an index file' },
 ])
+
+// reportPretty([])
