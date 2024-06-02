@@ -7,9 +7,12 @@
     "test": "vitest"
   },
   "description": "A set of rules to verify correct usage of Feature-Sliced Design",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts"
+  },
   "type": "module",
   "license": "MIT",
   "authors": [

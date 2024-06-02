@@ -7,9 +7,12 @@
     "test": "vitest"
   },
   "description": "A reporter that can print diagnostics nice and pretty",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts"
+  },
   "type": "module",
   "license": "MIT",
   "authors": [
