@@ -1,3 +1,4 @@
+import * as nodePath from 'node:path'
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
@@ -13,27 +14,27 @@ const yargsProgram = yargs(hideBin(process.argv))
     alias: 'w',
     demandOption: false,
     describe: 'watch filesystem changes',
-    type: 'boolean'
+    type: 'boolean',
   })
   .option('skip-fs-errors', {
     demandOption: false,
     describe: 'skip filesystem errors',
-    type: 'boolean'
+    type: 'boolean',
   })
   .option('skip-parse-errors', {
     demandOption: false,
     describe: 'skip module parsing errors',
-    type: 'boolean'
+    type: 'boolean',
   })
   .option('file-size-limit', {
     demandOption: false,
     describe: 'do not parse large files, limit in bytes',
-    type: 'number'
+    type: 'number',
   })
   .option('file-number-limit', {
     demandOption: false,
     describe: 'throw an error if there are too many files',
-    type: 'number'
+    type: 'number',
   })
   .string('_')
   .check((argv, options) => {
@@ -64,7 +65,7 @@ console.log('consoleArgs', consoleArgs)
 
 const configFromConsole: Config = {
   ...consoleArgs,
-  path: consoleArgs._[0],
+  path: nodePath.resolve(consoleArgs._[0]),
 }
 
 console.log('configFromConsole', configFromConsole)
@@ -72,7 +73,7 @@ console.log('configFromConsole', configFromConsole)
 linter.loadConfig(configFromConsole)
 linter.loadEnvironment({})
 linter.start()
-linter.diagnostics.watch(state => {
+linter.diagnostics.watch((state) => {
   console.clear()
   reportPretty(state)
 })

@@ -3,16 +3,16 @@ import { debounce } from 'patronum'
 
 import { rules } from '../models/business/rules'
 import { Diagnostic, diagnostics } from '../models/business/diagnostics'
-import { vfs } from '../models/business/vfs'
+import type { createVfsRoot } from "../models/business/vfs"
 import { config } from '../models/infractructure/config'
 
-const dataDebounced = debounce(combine({
-  vfs: vfs.tree,
-  rules: rules.store,
-  config: config.store,
-}), 1000)
+export const runRulesOnVfs = (vfs: ReturnType<typeof createVfsRoot>) => {
+  const dataDebounced = debounce(combine({
+    vfs: vfs.$tree,
+    rules: rules.store,
+    config: config.store,
+  }), 1000)
 
-export const runRulesOnVfs = () => {
   sample({
     clock: dataDebounced,
     source: dataDebounced,

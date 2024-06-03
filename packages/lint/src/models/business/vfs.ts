@@ -1,65 +1,138 @@
-import nodePath from 'node:path'
-
+import { basename, sep, join, relative } from 'node:path'
+import type { Folder } from '@feature-sliced/filesystem'
 import { createEvent, createStore } from 'effector'
-import { File, Folder, FsdRoot } from '@feature-sliced/filesystem'
+import { produce } from 'immer'
 
-const tree = createStore<FsdRoot>({ type: 'folder', path: '/', children: [] })
+export function createVfsRoot(rootPath: string) {
+  const rootFolder: Folder = { type: 'folder', path: rootPath, children: [] }
+  const $tree = createStore(rootFolder)
 
-const add = createEvent<File>()
-tree.on(add, (state, payload) => {
-  let currentFolder = state
-  const pathSegments = payload.path.split(nodePath.sep).slice(0, -1)
-  pathSegments.forEach((pathSegment, index, pathSegments) => {
-    const childToFoundPath = pathSegments.slice(0, index + 1).join(nodePath.sep)
-    let foundChildren = currentFolder.children.find((c) => c.path === childToFoundPath)
-    if (!foundChildren) currentFolder.children.push({ type: 'folder', path: childToFoundPath, children: [] })
-    foundChildren = currentFolder.children.find((c) => c.path === childToFoundPath)
-    currentFolder = foundChildren as Folder
+  const fileAdded = createEvent<string>()
+  $tree.on(fileAdded, (state, newFilePath) =>
+    produce(state, (draft) => {
+      const pathSegments = relative(rootPath, newFilePath).split(sep)
+      let currentFolder = draft
+
+      for (const pathSegment of pathSegments.slice(0, -1)) {
+        const existingChild = currentFolder.children.find(
+          (child) => child.type === 'folder' && basename(child.path) === pathSegment,
+        ) as Folder | undefined
+
+        if (existingChild === undefined) {
+          currentFolder.children.push({
+            type: 'folder',
+            path: join(currentFolder.path, pathSegment),
+            children: [],
+          })
+          currentFolder = currentFolder.children[currentFolder.children.length - 1] as Folder
+        } else {
+          currentFolder = existingChild
+        }
+      }
+
+      currentFolder.children.push({ type: 'file', path: newFilePath })
+    }),
+  )
+
+  return { $tree, fileAdded }
+}
+
+if (import.meta.vitest) {
+  const { describe, it, expect } = import.meta.vitest
+  describe('createVfsRoot', () => {
+    it('allows adding files and creates folders automatically', () => {
+      const { $tree, fileAdded } = createVfsRoot('/project/src')
+
+      expect($tree.getState()).toEqual({ type: 'folder', path: '/project/src', children: [] })
+
+      fileAdded('/project/src/index.ts')
+      fileAdded('/project/src/components/button.ts')
+      fileAdded('/project/src/components/input.ts')
+      fileAdded('/project/src/components/input/styles.ts')
+
+      expect($tree.getState()).toEqual({
+        type: 'folder',
+        path: '/project/src',
+        children: [
+          {
+            type: 'file',
+            path: '/project/src/index.ts',
+          },
+          {
+            type: 'folder',
+            path: '/project/src/components',
+            children: [
+              {
+                type: 'file',
+                path: '/project/src/components/button.ts',
+              },
+              {
+                type: 'file',
+                path: '/project/src/components/input.ts',
+              },
+
+              {
+                type: 'folder',
+                path: '/project/src/components/input',
+                children: [
+                  {
+                    type: 'file',
+                    path: '/project/src/components/input/styles.ts',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+    })
+
+    it('allows tracking two separate roots independently', () => {
+      const root1 = createVfsRoot('/project1/src')
+      const root2 = createVfsRoot('/project2/src')
+
+      root1.fileAdded('/project1/src/index.ts')
+
+      expect(root1.$tree.getState()).toEqual({
+        type: 'folder',
+        path: '/project1/src',
+        children: [
+          {
+            type: 'file',
+            path: '/project1/src/index.ts',
+          },
+        ],
+      })
+      expect(root2.$tree.getState()).toEqual({
+        type: 'folder',
+        path: '/project2/src',
+        children: [],
+      })
+
+      root2.fileAdded('/project2/src/shared/ui/button.ts')
+
+      expect(root2.$tree.getState()).toEqual({
+        type: 'folder',
+        path: '/project2/src',
+        children: [
+          {
+            type: 'folder',
+            path: '/project2/src/shared',
+            children: [
+              {
+                type: 'folder',
+                path: '/project2/src/shared/ui',
+                children: [
+                  {
+                    type: 'file',
+                    path: '/project2/src/shared/ui/button.ts',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+    })
   })
-  currentFolder.children.push({
-    type: 'file',
-    path: payload.path
-  })
-  return { ...state }
-})
-
-const change = createEvent<File>()
-tree.on(change, (state, payload) => {})
-
-const remove = createEvent<File['path']>()
-tree.on(remove, (state, pathAbsolute) => {})
-
-// TODO DB-like normalized structure with relations between engine entities
-
-// const map = createStore<Map<FsUnit['path'], FsUnit>>(new Map())
-/*
-map.on(add, (state, payload) => {
-  if (!state.has(payload.path)) {
-    state.set(payload.path, payload)
-    return new Map(state)
-  } else return state
-})
-
-map.on(change, (state, payload) => {
-  if (!state.has(payload.path)) {
-    state.set(payload.path, payload)
-    return new Map(state)
-  } else return state
-})
-
-map.on(remove, (state, pathAbsolute) => {
-  if (state.has(pathAbsolute)) {
-    state.delete(pathAbsolute)
-    return new Map(state)
-  } else return state
-})
-*/
-
-// const list = combine(map, (filesMap) => Array.from(filesMap.values()))
-
-export const vfs = {
-  tree,
-  add,
-  change,
-  remove,
 }

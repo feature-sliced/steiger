@@ -11,8 +11,8 @@ import { loadConfig } from './features/load-config'
 import { watcher } from './features/transfer-fs-to-vfs'
 
 const start = () => {
-  watcher.start()
-  runRulesOnVfs()
+  const vfs = watcher.start()
+  runRulesOnVfs(vfs)
   createMockRules()
 }
 const stop = () => watcher.stop()
