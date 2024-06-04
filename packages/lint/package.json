@@ -40,7 +40,7 @@
     }
   },
   "dependencies": {
-    "@feature-sliced/filesystem": "^2.2.1",
+    "@feature-sliced/filesystem": "^2.2.3",
     "chokidar": "^3.6.0",
     "commander": "^12.0.0",
     "cosmiconfig": "^9.0.0",
