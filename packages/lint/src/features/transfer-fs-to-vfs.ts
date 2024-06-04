@@ -1,18 +1,39 @@
 import nodePath from 'node:path'
 import chokidar, { FSWatcher } from 'chokidar'
+import type { Folder } from '@feature-sliced/filesystem'
 
 import { createVfsRoot } from '../models/business/vfs'
 import { config } from '../models/infractructure/config'
-import { environment } from '../models/infractructure/environment'
 
 let fsWatcher: FSWatcher | null = null
 
 // TODO rewrite to reactive structure
 export const watcher = {
-  start: () => {
-    const environmentValue = environment.store.getState()
-    if (!environmentValue) throw Error('environment not initialized')
+  scan: (path: string) =>
+    new Promise<Folder>((resolve) => {
+      const vfs = createVfsRoot(path)
+      const watcher = chokidar.watch(path, {
+        ignoreInitial: false,
+        alwaysStat: true,
+        awaitWriteFinish: true,
+        disableGlobbing: true,
+        cwd: path,
+      })
 
+      watcher.on('add', async (relativePath) => {
+        vfs.fileAdded(nodePath.join(path, relativePath))
+      })
+
+      watcher.on('unlink', async (relativePath) => {
+        vfs.fileRemoved(nodePath.join(path, relativePath))
+      })
+
+      watcher.on('ready', () => {
+        watcher.close()
+        resolve(vfs.$tree.getState())
+      })
+    }),
+  start: () => {
     const configValue = config.store.getState()
     if (!configValue) throw Error('config not initialized')
     const vfs = createVfsRoot(configValue.path)

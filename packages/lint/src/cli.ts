@@ -1,11 +1,13 @@
-import * as nodePath from 'node:path'
+import { resolve } from 'node:path'
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from 'pretty-reporter'
+import { findUp } from 'find-up'
 
-import { linter } from './app'
-import { Config } from './models/infractructure/config'
+import { createLinter } from './app'
+
+const CONFIG_FILENAMES = ['fsd-lint.config.js', 'fsd-lint.config.mjs', 'fsd-lint.config.cjs']
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('fsd-lint')
@@ -16,38 +18,12 @@ const yargsProgram = yargs(hideBin(process.argv))
     describe: 'watch filesystem changes',
     type: 'boolean',
   })
-  .option('skip-fs-errors', {
-    demandOption: false,
-    describe: 'skip filesystem errors',
-    type: 'boolean',
-  })
-  .option('skip-parse-errors', {
-    demandOption: false,
-    describe: 'skip module parsing errors',
-    type: 'boolean',
-  })
-  .option('file-size-limit', {
-    demandOption: false,
-    describe: 'do not parse large files, limit in bytes',
-    type: 'number',
-  })
-  .option('file-number-limit', {
-    demandOption: false,
-    describe: 'throw an error if there are too many files',
-    type: 'number',
-  })
   .string('_')
-  .check((argv, options) => {
+  .check((argv) => {
     const filePaths = argv._
     if (filePaths.length > 1) {
       throw new Error('Pass only one path to watch')
-    } else {
-      return true
-    }
-  })
-  .check((argv, options) => {
-    const filePaths = argv._
-    if (filePaths.length === 0) {
+    } else if (filePaths.length === 0) {
       throw new Error('Pass a path to watch')
     } else {
       return true
@@ -61,23 +37,21 @@ const yargsProgram = yargs(hideBin(process.argv))
 
 const consoleArgs = yargsProgram.parseSync()
 
-console.log('consoleArgs', consoleArgs)
+const configFilePath = await findUp(CONFIG_FILENAMES, { type: 'file' })
+const config = configFilePath !== undefined ? (await import(configFilePath)).default : {}
 
-const configFromConsole: Config = {
-  ...consoleArgs,
-  path: nodePath.resolve(consoleArgs._[0]),
+const linter = createLinter(config)
+
+if (consoleArgs.watch) {
+  // const $diagnostics = linter.watch(resolve(consoleArgs._[0]))
+  // const unsubscribe = $diagnostics.watch((state) => {
+  //   console.clear()
+  //   reportPretty(state)
+  // })
+  // prexit(() => {
+  //   linter.stop()
+  //   unsubscribe()
+  // })
+} else {
+  await linter.run(resolve(consoleArgs._[0])).then(reportPretty)
 }
-
-console.log('configFromConsole', configFromConsole)
-
-linter.loadConfig(configFromConsole)
-linter.loadEnvironment({})
-linter.start()
-linter.diagnostics.watch((state) => {
-  console.clear()
-  reportPretty(state)
-})
-
-prexit(async () => {
-  await linter.stop()
-})

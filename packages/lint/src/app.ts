@@ -1,26 +1,58 @@
-import { createMockRules } from './features/create-mock-rules'
+import {
+  ambiguousSliceNames,
+  excessiveSlicing,
+  forbiddenImports,
+  inconsistentNaming,
+  insignificantSlice,
+  noLayerPublicApi,
+  noPublicApiSidestep,
+  noReservedFolderNames,
+  noSegmentlessSlices,
+  publicApi,
+  repetitiveNaming,
+  segmentsByPurpose,
+  sharedLibGrouping,
+} from 'fsd-rules'
 
-export { type Rule, type RuleResult } from './models/business/rules'
-export { type Diagnostic } from './models/business/diagnostics'
-export { type Config } from './models/infractructure/config'
+export type { Rule, RuleResult } from './models/business/rules'
+export type { Diagnostic } from 'fsd-rules'
+export type { Config } from './models/infractructure/config'
 
-import { runRulesOnVfs } from './features/run-rules-on-vfs'
-import { loadEnvironment } from './features/load-environment'
-import { diagnostics } from './models/business/diagnostics'
-import { loadConfig } from './features/load-config'
 import { watcher } from './features/transfer-fs-to-vfs'
+import type { AugmentedDiagnostic } from 'pretty-reporter'
 
-const start = () => {
-  const vfs = watcher.start()
-  runRulesOnVfs(vfs)
-  createMockRules()
-}
-const stop = () => watcher.stop()
+const rules = [
+  ambiguousSliceNames,
+  excessiveSlicing,
+  forbiddenImports,
+  inconsistentNaming,
+  insignificantSlice,
+  noLayerPublicApi,
+  noPublicApiSidestep,
+  noReservedFolderNames,
+  noSegmentlessSlices,
+  publicApi,
+  repetitiveNaming,
+  segmentsByPurpose,
+  sharedLibGrouping,
+]
 
-export const linter = {
-  loadConfig,
-  loadEnvironment,
-  start,
-  diagnostics: diagnostics.store,
-  stop,
+export function createLinter(_config: any) {
+  return {
+    run: async (path: string) => {
+      const vfs = await watcher.scan(path)
+
+      const ruleResults = await Promise.all(
+        rules.map((rule) =>
+          Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
+            diagnostics.map((d) => ({ ...d, ruleName: rule.name }) as AugmentedDiagnostic),
+          ),
+        ),
+      )
+      return ruleResults.flat()
+    },
+    watch: (path: string) => {
+      // TODO
+    },
+  }
 }

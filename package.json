@@ -3,17 +3,11 @@
   "scripts": {
     "format": "prettier --ignore-unknown --write ."
   },
-  "workspaces": [
-    "examples/*",
-    "packages/*"
-  ],
   "engines": {
-    "node": ">= 20",
-    "yarn": "1.22.22"
+    "node": ">= 20"
   },
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "pnpm@9.1.4",
   "devDependencies": {
-    "lerna": "^8.1.2",
     "prettier": "^3.2.5"
   }
 }
