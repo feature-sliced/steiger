@@ -42,3 +42,5 @@ export function formatPretty(diagnostics: Array<AugmentedDiagnostic>) {
 export function reportPretty(diagnostics: Array<AugmentedDiagnostic>) {
   console.error(formatPretty(diagnostics))
 }
+
+export type { AugmentedDiagnostic }
