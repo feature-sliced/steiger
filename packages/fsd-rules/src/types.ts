@@ -2,7 +2,6 @@ import type { FsdRoot } from '@feature-sliced/filesystem'
 
 export interface Context {
   sourceFileExtension: "js" | "ts"
-  include: Array<string>
 }
 
 export interface Rule {

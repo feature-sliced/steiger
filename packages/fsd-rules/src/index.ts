@@ -11,3 +11,5 @@ export { default as publicApi } from './public-api/index.js'
 export { default as repetitiveNaming } from './repetitive-naming/index.js'
 export { default as segmentsByPurpose } from './segments-by-purpose/index.js'
 export { default as sharedLibGrouping } from './shared-lib-grouping/index.js'
+
+export type { Diagnostic, Context, Fix, Rule, RuleResult } from './types.js'
