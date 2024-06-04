@@ -31,6 +31,10 @@ export const watcher = {
       vfs.fileAdded(nodePath.join(configValue.path, path))
     })
 
+    fsWatcher.on('unlink', async (path) => {
+      vfs.fileRemoved(nodePath.join(configValue.path, path))
+    })
+
     return vfs
   },
 

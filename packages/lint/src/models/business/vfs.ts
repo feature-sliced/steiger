@@ -34,7 +34,44 @@ export function createVfsRoot(rootPath: string) {
     }),
   )
 
-  return { $tree, fileAdded }
+  const fileRemoved = createEvent<string>()
+  $tree.on(fileRemoved, (state, removedFilePath) =>
+    produce(state, (draft) => {
+      const pathSegments = relative(rootPath, removedFilePath).split(sep)
+      const parents = [draft]
+      let currentFolder = draft
+
+      for (const pathSegment of pathSegments.slice(0, -1)) {
+        const existingChild = currentFolder.children.find(
+          (child) => child.type === 'folder' && basename(child.path) === pathSegment,
+        ) as Folder | undefined
+
+        if (existingChild === undefined) {
+          throw Error(`Folder ${pathSegment} not found`)
+        } else {
+          currentFolder = existingChild
+          parents.push(currentFolder)
+        }
+      }
+
+      const removedFileIndex = currentFolder.children.findIndex(
+        (child) => child.type === 'file' && child.path === removedFilePath,
+      )
+
+      if (removedFileIndex === -1) {
+        throw Error(`File ${removedFilePath} not found`)
+      }
+
+      currentFolder.children.splice(removedFileIndex, 1)
+      parents.reverse().forEach((parent, index) => {
+        if (parent.children.length === 0 && parents[index + 1] !== undefined) {
+          parents[index + 1].children.splice(parents[index + 1].children.indexOf(parent), 1)
+        }
+      })
+    }),
+  )
+
+  return { $tree, fileAdded, fileRemoved }
 }
 
 if (import.meta.vitest) {
@@ -85,6 +122,57 @@ if (import.meta.vitest) {
           },
         ],
       })
+    })
+
+    it('allows removing files and deletes empty folders automatically', () => {
+      const { $tree, fileAdded, fileRemoved } = createVfsRoot('/project/src')
+
+      fileAdded('/project/src/index.ts')
+      fileAdded('/project/src/components/input/styles.ts')
+
+      expect($tree.getState()).toEqual({
+        type: 'folder',
+        path: '/project/src',
+        children: [
+          {
+            type: 'file',
+            path: '/project/src/index.ts',
+          },
+          {
+            type: 'folder',
+            path: '/project/src/components',
+            children: [
+              {
+                type: 'folder',
+                path: '/project/src/components/input',
+                children: [
+                  {
+                    type: 'file',
+                    path: '/project/src/components/input/styles.ts',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+
+      fileRemoved('/project/src/components/input/styles.ts')
+
+      expect($tree.getState()).toEqual({
+        type: 'folder',
+        path: '/project/src',
+        children: [
+          {
+            type: 'file',
+            path: '/project/src/index.ts',
+          },
+        ],
+      })
+
+      fileRemoved('/project/src/index.ts')
+
+      expect($tree.getState()).toEqual({ type: 'folder', path: '/project/src', children: [] })
     })
 
     it('allows tracking two separate roots independently', () => {
