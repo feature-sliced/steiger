@@ -1,8 +1,8 @@
 import chalk from 'chalk'
 import figures from 'figures'
-import type { Diagnostic } from './types.js'
+import type { AugmentedDiagnostic } from './types.js'
 
-export function formatPretty(diagnostics: Array<Diagnostic>) {
+export function formatPretty(diagnostics: Array<AugmentedDiagnostic>) {
   if (diagnostics.length === 0) {
     return chalk.green(`${figures.tick} No problems found!`)
   }
@@ -22,10 +22,10 @@ export function formatPretty(diagnostics: Array<Diagnostic>) {
     '\n' +
     diagnostics
       .map((d) => {
-        let message = ` ${chalk.red(figures.cross)} ${chalk.reset(d.message)}`
+        let message = ` ${chalk.red(figures.cross)} ${chalk.reset(d.message)}  ${chalk.gray(`// ${d.ruleName}`)}`
 
         if ((d.fixes?.length ?? 0) > 0) {
-          message += chalk.gray(`\n   (${figures.tick} auto-fix available)`)
+          message += chalk.green(`\n   (${figures.tick} auto-fix available)`)
         }
 
         return message
@@ -39,6 +39,6 @@ export function formatPretty(diagnostics: Array<Diagnostic>) {
   )
 }
 
-export function reportPretty(diagnostics: Array<Diagnostic>) {
+export function reportPretty(diagnostics: Array<AugmentedDiagnostic>) {
   console.error(formatPretty(diagnostics))
 }

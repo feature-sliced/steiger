@@ -1,29 +1,5 @@
-export interface Diagnostic {
-  message: string
-  fixes?: Array<Fix>
-}
+import type { Diagnostic } from 'fsd-rules';
 
-export type Fix =
-  | {
-      type: 'rename'
-      path: string
-      newName: string
-    }
-  | {
-      type: 'create-file'
-      path: string
-      content: string
-    }
-  | {
-      type: 'create-folder'
-      path: string
-    }
-  | {
-      type: 'delete'
-      path: string
-    }
-  | {
-      type: 'modify-file'
-      path: string
-      content: string
-    }
+export interface AugmentedDiagnostic extends Diagnostic {
+  ruleName: string;
+}
