@@ -62,6 +62,7 @@ export function createLinter(_config: any) {
 
       sample({
         clock: defer({ clock: treeChanged, until: not(runRulesFx.pending) }),
+        source: vfs.$tree,
         target: runRulesFx,
       })
 
