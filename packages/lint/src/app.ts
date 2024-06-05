@@ -18,10 +18,11 @@ export function createLinter(_config: any) {
     )
     return ruleResults.flat()
   }
+
   return {
     run: (path: string) => scan(path).then(runRules),
-    watch: (path: string) => {
-      const { vfs, stop } = createWatcher(path)
+    watch: async (path: string) => {
+      const { vfs, watcher } = await createWatcher(path)
 
       const treeChanged = debounce(vfs.$tree, 500)
       const runRulesFx = createEffect(runRules)
@@ -32,7 +33,7 @@ export function createLinter(_config: any) {
         target: runRulesFx,
       })
 
-      return [runRulesFx.doneData, stop] as const
+      return [runRulesFx.doneData, () => watcher.close()] as const
     },
   }
 }

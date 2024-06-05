@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "develop": "exit 0",
-    "format": "exit 0",
+    "format": "prettier --write .",
     "lint": "exit 0",
     "typecheck": "tsc --noEmit",
     "test": "exit 0",
@@ -49,6 +49,7 @@
     "find-up": "^7.0.0",
     "fsd-rules": "workspace:*",
     "glob": "^10.4.1",
+    "globby": "^14.0.1",
     "ignore": "^5.3.1",
     "immer": "^10.1.1",
     "modern-async": "^2.0.0",

@@ -43,7 +43,7 @@ const config = configFilePath !== undefined ? (await import(configFilePath)).def
 const linter = createLinter(config)
 
 if (consoleArgs.watch) {
-  const [diagnosticsChanged, stopWatching] = linter.watch(resolve(consoleArgs._[0]))
+  const [diagnosticsChanged, stopWatching] = await linter.watch(resolve(consoleArgs._[0]))
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
     reportPretty(state)

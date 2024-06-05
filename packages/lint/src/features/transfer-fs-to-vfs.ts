@@ -1,39 +1,21 @@
 import { join } from 'node:path'
-import chokidar, { type FSWatcher } from 'chokidar'
+import chokidar from 'chokidar'
 import type { Folder } from '@feature-sliced/filesystem'
+import { isGitIgnored } from 'globby'
 
 import { createVfsRoot } from '../models/business/vfs'
 
-export function scan(path: string): Promise<Folder> {
-  return new Promise<Folder>((resolve) => {
-    const vfs = createVfsRoot(path)
-    const watcher = chokidar.watch(path, {
-      ignoreInitial: false,
-      alwaysStat: true,
-      awaitWriteFinish: true,
-      disableGlobbing: true,
-      cwd: path,
-    })
-
-    watcher.on('add', async (relativePath) => {
-      vfs.fileAdded(join(path, relativePath))
-    })
-
-    watcher.on('unlink', async (relativePath) => {
-      vfs.fileRemoved(join(path, relativePath))
-    })
-
-    watcher.on('ready', () => {
-      watcher.close()
-      resolve(vfs.$tree.getState())
-    })
-  })
-}
-
-export function createWatcher(path: string) {
+/**
+ * Start watching a given path with chokidar.
+ *
+ * Returns a reactive virtual file system (VFS) and a reference to the watcher
+ */
+export async function createWatcher(path: string) {
   const vfs = createVfsRoot(path)
+  const isIgnored = await isGitIgnored({ cwd: path })
 
-  const fsWatcher = chokidar.watch(path, {
+  const watcher = chokidar.watch(path, {
+    ignored: isIgnored,
     ignoreInitial: false,
     alwaysStat: true,
     awaitWriteFinish: true,
@@ -41,16 +23,28 @@ export function createWatcher(path: string) {
     cwd: path,
   })
 
-  fsWatcher.on('add', async (relativePath) => {
+  watcher.on('add', async (relativePath) => {
     vfs.fileAdded(join(path, relativePath))
   })
 
-  fsWatcher.on('unlink', async (relativePath) => {
+  watcher.on('unlink', async (relativePath) => {
     vfs.fileRemoved(join(path, relativePath))
   })
 
   return {
     vfs,
-    stop: () => fsWatcher.close()
+    watcher,
   }
+}
+
+/** Scan a folder once without watching and return its virtual file system. */
+export function scan(path: string): Promise<Folder> {
+  return new Promise<Folder>(async (resolve) => {
+    const { vfs, watcher } = await createWatcher(path)
+
+    watcher.on('ready', () => {
+      watcher.close()
+      resolve(vfs.$tree.getState())
+    })
+  })
 }
