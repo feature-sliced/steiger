@@ -21,10 +21,6 @@ import type { AugmentedDiagnostic } from 'pretty-reporter'
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 
-export type { Diagnostic } from 'fsd-rules'
-export type { Rule, RuleResult } from './models/business/rules'
-export type { Config } from './models/infractructure/config'
-
 const rules = [
   ambiguousSliceNames,
   excessiveSlicing,
