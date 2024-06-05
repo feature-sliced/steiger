@@ -1,12 +1,14 @@
-import { resolve } from 'node:path'
+import { resolve, relative } from 'node:path'
+import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from 'pretty-reporter'
 import { findUp } from 'find-up'
+import { fromError } from 'zod-validation-error'
 
 import { linter } from './app'
-import { setConfig } from './models/config'
+import { setConfig, schema as configSchema } from './models/config'
 
 const CONFIG_FILENAMES = ['fsd-lint.config.js', 'fsd-lint.config.mjs', 'fsd-lint.config.cjs']
 
@@ -40,7 +42,17 @@ const consoleArgs = yargsProgram.parseSync()
 
 const configFilePath = await findUp(CONFIG_FILENAMES, { type: 'file' })
 const config = configFilePath !== undefined ? (await import(configFilePath)).default : {}
-setConfig(config)
+
+try {
+  setConfig(configSchema.parse(config))
+} catch (err) {
+  if (configFilePath !== undefined) {
+    console.error(
+      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), configFilePath)}` }).toString(),
+    )
+    process.exit(100)
+  }
+}
 
 if (consoleArgs.watch) {
   const [diagnosticsChanged, stopWatching] = await linter.watch(resolve(consoleArgs._[0]))
