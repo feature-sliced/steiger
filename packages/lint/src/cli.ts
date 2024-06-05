@@ -1,3 +1,5 @@
+#!/bin/env node
+
 import { resolve, relative } from 'node:path'
 import * as process from 'node:process'
 import yargs from 'yargs'

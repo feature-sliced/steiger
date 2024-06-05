@@ -6,12 +6,14 @@ import type { AugmentedDiagnostic } from 'pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $config } from './models/config'
+import { $config, type Config } from './models/config'
 
 const enabledRules = $config.map((config) =>
   config === null
     ? fsdRules
-    : fsdRules.filter((rule) => !(rule.name in config.rules) || config.rules[rule.name] !== 'off'),
+    : fsdRules.filter(
+        (rule) => !(rule.name in config.rules) || config.rules[rule.name as keyof typeof config.rules] !== 'off',
+      ),
 )
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
@@ -41,4 +43,8 @@ export const linter = {
 
     return [runRulesFx.doneData, () => watcher.close()] as const
   },
+}
+
+export function defineConfig(config: Config) {
+  return config
 }
