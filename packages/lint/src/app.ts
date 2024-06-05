@@ -7,10 +7,12 @@ import type { AugmentedDiagnostic } from 'pretty-reporter'
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 
-export function createLinter(_config: any) {
+export function createLinter(config: { rules: Record<string, 'off'> }) {
+  const enabledRules = fsdRules.filter((rule) => !(rule.name in config.rules) || config.rules[rule.name] !== 'off')
+
   async function runRules(vfs: Folder) {
     const ruleResults = await Promise.all(
-      fsdRules.map((rule) =>
+      enabledRules.map((rule) =>
         Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
           diagnostics.map((d) => ({ ...d, ruleName: rule.name }) as AugmentedDiagnostic),
         ),
