@@ -1,3 +1,5 @@
+import { createEffect, sample } from 'effector'
+import { debounce, not } from 'patronum'
 import {
   ambiguousSliceNames,
   excessiveSlicing,
@@ -13,13 +15,15 @@ import {
   segmentsByPurpose,
   sharedLibGrouping,
 } from 'fsd-rules'
-
-export type { Rule, RuleResult } from './models/business/rules'
-export type { Diagnostic } from 'fsd-rules'
-export type { Config } from './models/infractructure/config'
-
-import { watcher } from './features/transfer-fs-to-vfs'
+import type { Folder } from '@feature-sliced/filesystem'
 import type { AugmentedDiagnostic } from 'pretty-reporter'
+
+import { scan, createWatcher } from './features/transfer-fs-to-vfs'
+import { defer } from './shared/defer'
+
+export type { Diagnostic } from 'fsd-rules'
+export type { Rule, RuleResult } from './models/business/rules'
+export type { Config } from './models/infractructure/config'
 
 const rules = [
   ambiguousSliceNames,
@@ -38,21 +42,30 @@ const rules = [
 ]
 
 export function createLinter(_config: any) {
-  return {
-    run: async (path: string) => {
-      const vfs = await watcher.scan(path)
-
-      const ruleResults = await Promise.all(
-        rules.map((rule) =>
-          Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
-            diagnostics.map((d) => ({ ...d, ruleName: rule.name }) as AugmentedDiagnostic),
-          ),
+  async function runRules(vfs: Folder) {
+    const ruleResults = await Promise.all(
+      rules.map((rule) =>
+        Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
+          diagnostics.map((d) => ({ ...d, ruleName: rule.name }) as AugmentedDiagnostic),
         ),
-      )
-      return ruleResults.flat()
-    },
+      ),
+    )
+    return ruleResults.flat()
+  }
+  return {
+    run: (path: string) => scan(path).then(runRules),
     watch: (path: string) => {
-      // TODO
+      const { vfs, stop } = createWatcher(path)
+
+      const treeChanged = debounce(vfs.$tree, 500)
+      const runRulesFx = createEffect(runRules)
+
+      sample({
+        clock: defer({ clock: treeChanged, until: not(runRulesFx.pending) }),
+        target: runRulesFx,
+      })
+
+      return [runRulesFx.doneData, stop] as const
     },
   }
 }
