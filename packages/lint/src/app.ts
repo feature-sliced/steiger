@@ -1,46 +1,16 @@
 import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import {
-  ambiguousSliceNames,
-  excessiveSlicing,
-  forbiddenImports,
-  inconsistentNaming,
-  insignificantSlice,
-  noLayerPublicApi,
-  noPublicApiSidestep,
-  noReservedFolderNames,
-  noSegmentlessSlices,
-  publicApi,
-  repetitiveNaming,
-  segmentsByPurpose,
-  sharedLibGrouping,
-} from 'fsd-rules'
+import fsdRules from 'fsd-rules'
 import type { Folder } from '@feature-sliced/filesystem'
 import type { AugmentedDiagnostic } from 'pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 
-const rules = [
-  ambiguousSliceNames,
-  excessiveSlicing,
-  forbiddenImports,
-  inconsistentNaming,
-  insignificantSlice,
-  noLayerPublicApi,
-  noPublicApiSidestep,
-  noReservedFolderNames,
-  noSegmentlessSlices,
-  publicApi,
-  repetitiveNaming,
-  segmentsByPurpose,
-  sharedLibGrouping,
-]
-
 export function createLinter(_config: any) {
   async function runRules(vfs: Folder) {
     const ruleResults = await Promise.all(
-      rules.map((rule) =>
+      fsdRules.map((rule) =>
         Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
           diagnostics.map((d) => ({ ...d, ruleName: rule.name }) as AugmentedDiagnostic),
         ),
