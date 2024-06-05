@@ -5,7 +5,8 @@ import { hideBin } from 'yargs/helpers'
 import { reportPretty } from 'pretty-reporter'
 import { findUp } from 'find-up'
 
-import { createLinter } from './app'
+import { linter } from './app'
+import { setConfig } from './models/config'
 
 const CONFIG_FILENAMES = ['fsd-lint.config.js', 'fsd-lint.config.mjs', 'fsd-lint.config.cjs']
 
@@ -39,8 +40,7 @@ const consoleArgs = yargsProgram.parseSync()
 
 const configFilePath = await findUp(CONFIG_FILENAMES, { type: 'file' })
 const config = configFilePath !== undefined ? (await import(configFilePath)).default : {}
-
-const linter = createLinter(config)
+setConfig(config)
 
 if (consoleArgs.watch) {
   const [diagnosticsChanged, stopWatching] = await linter.watch(resolve(consoleArgs._[0]))

@@ -7,12 +7,8 @@ const schema = z.object({
 
 export type Config = z.infer<typeof schema>
 
-const store = createStore<Config | null>(null)
-const set = createEvent<Config>()
-store.on(set, (state, payload) => payload)
+export const $config = createStore<Config | null>(null)
+export const setConfig = createEvent<Config>()
 
-export const config = {
-  schema,
-  store,
-  set,
-}
+$config.on(setConfig, (_state, payload) => payload)
+

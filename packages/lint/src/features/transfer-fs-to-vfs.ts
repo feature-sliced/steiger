@@ -3,7 +3,7 @@ import chokidar from 'chokidar'
 import type { Folder } from '@feature-sliced/filesystem'
 import { isGitIgnored } from 'globby'
 
-import { createVfsRoot } from '../models/business/vfs'
+import { createVfsRoot } from '../models/vfs'
 
 /**
  * Start watching a given path with chokidar.
