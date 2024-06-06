@@ -1,5 +1,5 @@
 {
-  "name": "fsd-rules",
+  "name": "@feature-sliced/steiger-plugin",
   "version": "0.0.1",
   "scripts": {
     "dev": "tsup src/index.ts --format esm --watch",
