@@ -48,3 +48,5 @@ export const linter = {
 export function defineConfig(config: Config) {
   return config
 }
+
+export type { Config }

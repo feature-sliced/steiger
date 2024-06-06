@@ -1,18 +1,14 @@
-#!/bin/env node
-
 import { resolve, relative } from 'node:path'
 import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from 'pretty-reporter'
-import { findUp } from 'find-up'
 import { fromError } from 'zod-validation-error'
+import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
 import { setConfig, schema as configSchema } from './models/config'
-
-const CONFIG_FILENAMES = ['fsd-lint.config.js', 'fsd-lint.config.mjs', 'fsd-lint.config.cjs']
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('fsd-lint')
@@ -42,15 +38,14 @@ const yargsProgram = yargs(hideBin(process.argv))
 
 const consoleArgs = yargsProgram.parseSync()
 
-const configFilePath = await findUp(CONFIG_FILENAMES, { type: 'file' })
-const config = configFilePath !== undefined ? (await import(configFilePath)).default : {}
+const { config, filepath } = await cosmiconfig('fsd-lint').search() ?? { config: null, filepath: undefined }
 
 try {
   setConfig(configSchema.parse(config))
 } catch (err) {
-  if (configFilePath !== undefined) {
+  if (filepath !== undefined) {
     console.error(
-      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), configFilePath)}` }).toString(),
+      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
     )
     process.exit(100)
   }

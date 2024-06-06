@@ -19,7 +19,7 @@ export const schema = z.object({
       'shared-lib-grouping',
     ]),
     z.literal('off'),
-  ),
+  ).optional(),
 })
 
 export type Config = z.infer<typeof schema>
