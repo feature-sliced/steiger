@@ -11,7 +11,7 @@ import { linter } from './app'
 import { setConfig, schema as configSchema } from './models/config'
 
 const yargsProgram = yargs(hideBin(process.argv))
-  .scriptName('fsd-lint')
+  .scriptName('steiger')
   .usage('$0 [options] <path>')
   .option('watch', {
     alias: 'w',
@@ -38,7 +38,7 @@ const yargsProgram = yargs(hideBin(process.argv))
 
 const consoleArgs = yargsProgram.parseSync()
 
-const { config, filepath } = await cosmiconfig('fsd-lint').search() ?? { config: null, filepath: undefined }
+const { config, filepath } = await cosmiconfig('steiger').search() ?? { config: null, filepath: undefined }
 
 try {
   setConfig(configSchema.parse(config))

@@ -1,7 +1,7 @@
 {
-  "name": "@feature-sliced/lint",
-  "description": "FSD-compliant file structure and project architecture linter",
-  "version": "0.0.0",
+  "name": "steiger",
+  "description": "Universal file structure and project architecture linter",
+  "version": "0.1.0",
   "license": "MIT",
   "authors": [
     {
@@ -22,7 +22,7 @@
   },
   "type": "module",
   "bin": {
-    "fsd-lint": "dist/cli.js"
+    "steiger": "dist/cli.js"
   },
   "main": "src/app.ts",
   "exports": {
