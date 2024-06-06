@@ -1,18 +1,12 @@
 {
+  "private": true,
   "name": "pretty-reporter",
+  "description": "A reporter that can print Steiger's diagnostics nice and pretty",
   "version": "0.0.1",
   "scripts": {
-    "dev": "tsup src/index.ts --format esm --watch",
-    "build": "tsup src/index.ts --format esm --dts --clean",
     "test": "vitest"
   },
-  "description": "A reporter that can print diagnostics nice and pretty",
   "exports": "./src/index.ts",
-  "publishConfig": {
-    "main": "dist/index.js",
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts"
-  },
   "type": "module",
   "license": "MIT",
   "authors": [
@@ -30,11 +24,11 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@tsconfig/node-lts": "^20.1.3",
-    "tsup": "^8.0.2",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@feature-sliced/steiger-plugin": "workspace:*",
     "chalk": "^5.3.0",
     "figures": "^6.1.0"
   }

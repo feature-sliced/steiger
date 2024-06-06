@@ -1,5 +1,5 @@
-import type { Diagnostic } from 'fsd-rules';
+import type { Diagnostic } from '@feature-sliced/steiger-plugin'
 
 export interface AugmentedDiagnostic extends Diagnostic {
-  ruleName: string;
+  ruleName: string
 }

@@ -21,26 +21,31 @@
     "build": "tsup"
   },
   "type": "module",
-  "bin": {
-    "steiger": "dist/cli.js"
-  },
-  "main": "src/app.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/app.d.ts",
-      "import": "./dist/app.js"
+  "exports": "./src/app.ts",
+  "publishConfig": {
+    "bin": {
+      "steiger": "dist/cli.js"
+    },
+    "exports": {
+      ".": {
+        "types": "./dist/app.d.ts",
+        "import": "./dist/app.js"
+      }
     }
   },
+  "files": [
+    "dist",
+    "src"
+  ],
   "dependencies": {
     "@feature-sliced/filesystem": "^2.2.3",
     "chokidar": "^3.6.0",
     "cosmiconfig": "^9.0.0",
     "effector": "^23.2.1",
-    "fsd-rules": "workspace:*",
+    "@feature-sliced/steiger-plugin": "workspace:*",
     "globby": "^14.0.1",
     "immer": "^10.1.1",
     "patronum": "^2.2.0",
-    "pretty-reporter": "workspace:*",
     "prexit": "^2.2.0",
     "yargs": "^17.7.2",
     "zod": "^3.23.6",
@@ -50,6 +55,7 @@
     "@tsconfig/node-lts": "^20.1.3",
     "@types/node": "^20.12.8",
     "@types/yargs": "^17.0.32",
+    "pretty-reporter": "workspace:*",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"

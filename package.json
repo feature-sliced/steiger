@@ -1,13 +1,19 @@
 {
+  "name": "@steiger/root",
   "private": true,
   "scripts": {
-    "format": "prettier --ignore-unknown --write ."
+    "format": "prettier --write .",
+    "check-monorepo": "manypkg check"
   },
   "engines": {
     "node": ">= 20"
   },
   "packageManager": "pnpm@9.2.0",
-  "devDependencies": {
+  "dependencies": {
+    "@manypkg/cli": "^0.21.4",
     "prettier": "^3.2.5"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.5"
   }
 }
