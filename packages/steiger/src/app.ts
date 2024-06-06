@@ -8,13 +8,17 @@ import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $config, type Config } from './models/config'
 
-const enabledRules = $config.map((config) =>
-  config === null
-    ? fsdRules
-    : fsdRules.filter(
-        (rule) => !(rule.name in config.rules) || config.rules[rule.name as keyof typeof config.rules] !== 'off',
-      ),
-)
+const enabledRules = $config.map((config) => {
+  const ruleConfigs = config?.rules
+
+  if (ruleConfigs === undefined) {
+    return fsdRules
+  }
+
+  return fsdRules.filter(
+    (rule) => !(rule.name in ruleConfigs) || ruleConfigs[rule.name as keyof typeof ruleConfigs] !== 'off',
+  )
+})
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const ruleResults = await Promise.all(
