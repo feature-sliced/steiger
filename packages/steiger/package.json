@@ -22,10 +22,10 @@
   },
   "type": "module",
   "exports": "./src/app.ts",
+  "bin": {
+    "steiger": "dist/cli.js"
+  },
   "publishConfig": {
-    "bin": {
-      "steiger": "dist/cli.js"
-    },
     "exports": {
       ".": {
         "types": "./dist/app.d.ts",
