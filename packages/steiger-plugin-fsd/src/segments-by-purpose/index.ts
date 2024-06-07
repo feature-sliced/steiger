@@ -2,7 +2,7 @@ import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/fil
 
 import type { Diagnostic, Rule } from '../types.js'
 
-const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals']
+const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals', 'types', 'constants', 'consts', 'const']
 
 /** Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose. */
 const segmentsByPurpose = {

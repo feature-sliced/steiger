@@ -2,11 +2,11 @@ import * as fs from 'node:fs'
 import { sep } from 'node:path'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import { isSliced, resolveImport, unslicedLayers, type Folder, type LayerName } from '@feature-sliced/filesystem'
+import precinct from 'precinct'
+const { paperwork } = precinct
 
 import type { Diagnostic, Rule } from '../types.js'
 import { indexSourceFiles } from '../_lib/index-source-files.js'
-import precinct from 'precinct'
-const { paperwork } = precinct;
 
 const insignificantSlice = {
   name: 'insignificant-slice',
