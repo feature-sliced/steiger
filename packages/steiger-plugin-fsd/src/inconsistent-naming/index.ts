@@ -7,7 +7,7 @@ import { getLayers, getSlices } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '../types.js'
 import { groupSlices } from '../_lib/group-slices.js'
 
-/** Detect consistent naming of slices on layers (singular vs plural, casing) */
+/** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
   name: 'inconsistent-naming',
   check(root) {
