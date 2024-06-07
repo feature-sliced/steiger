@@ -13,8 +13,13 @@ it('reports no errors on a project where every slice has at least one segment', 
     📂 entities
       📂 user
         📂 ui
-        📂 model
+          📄 Name.tsx
+        📂 api
+          📄 useCurrentUser.ts
         📄 index.ts
+      📂 document
+        📂 api
+          📄 useDocument.ts
     📂 pages
       📂 home
         📂 ui
@@ -33,12 +38,15 @@ it('reports errors on a project where some slices have no segments', () => {
         📄 index.ts
     📂 entities
       📂 user
+        📄 index.ts
+        📄 Name.tsx
     📂 pages
       📂 home
         📂 ui
         📄 index.ts
       📂 settings
         📂 profile
+          📄 ProfilePage.tsx
           📄 index.ts
   `)
 

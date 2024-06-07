@@ -1,13 +1,5 @@
-import { basename, relative } from 'node:path'
-import {
-  conventionalSegmentNames,
-  getAllSlices,
-  getLayers,
-  getSegments,
-  isSlice,
-  isSliced,
-  type Folder,
-} from '@feature-sliced/filesystem'
+import { relative } from 'node:path'
+import { getLayers, isSlice, isSliced, type Folder } from '@feature-sliced/filesystem'
 
 import type { Diagnostic, Rule } from '../types.js'
 
@@ -29,11 +21,7 @@ const noSegmentlessSlices = {
         }
 
         // A folder inside a layer can either be a slice or a group of slices
-        const isSliceGroup =
-          sliceCandidate.children.length > 0 &&
-          sliceCandidate.children.every((child) => child.type === 'folder' && !isSlice(child))
-
-        if (isSliceGroup) {
+        if (isSliceGroup(sliceCandidate)) {
           sliceCandidates = sliceCandidates.concat(sliceCandidate.children as Array<Folder>)
         } else {
           // The slice detection algorithm relies on the presence of a conventional segment
@@ -51,3 +39,16 @@ const noSegmentlessSlices = {
 } satisfies Rule
 
 export default noSegmentlessSlices
+
+/** A slice group is a folder that contains only folders, and those folders are either slices or slice groups. */
+function isSliceGroup(folder: Folder): boolean {
+  return (
+    folder.children.length > 0 &&
+    !isSlice(folder) &&
+    folder.children.every(
+      (child) =>
+        child.type === 'folder' &&
+        (isSlice(child) || child.children.every((grandchild) => grandchild.type === 'file') || isSliceGroup(child)),
+    )
+  )
+}
