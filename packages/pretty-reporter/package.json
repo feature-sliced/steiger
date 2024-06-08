@@ -1,12 +1,17 @@
 {
   "private": true,
-  "name": "pretty-reporter",
+  "name": "@steiger/pretty-reporter",
   "description": "A reporter that can print Steiger's diagnostics nice and pretty",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "scripts": {
-    "test": "vitest"
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "check-formatting": "prettier --check .",
+    "typecheck": "tsc --noEmit"
   },
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "type": "module",
   "license": "MIT",
   "authors": [
@@ -22,10 +27,13 @@
     }
   ],
   "devDependencies": {
+    "@steiger/eslint-config": "workspace:*",
+    "@steiger/tsconfig": "workspace:*",
     "@total-typescript/ts-reset": "^0.5.1",
-    "@tsconfig/node-lts": "^20.1.3",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "@types/node": "^20.14.2",
+    "eslint": "^9.4.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@feature-sliced/steiger-plugin": "workspace:*",

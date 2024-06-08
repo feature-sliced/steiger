@@ -1,0 +1,20 @@
+{
+  "name": "@steiger/eslint-config",
+  "private": true,
+  "version": "0.0.1",
+  "files": [
+    "./eslint.config.mjs"
+  ],
+  "exports": {
+    ".": "./eslint.config.mjs"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.4.0",
+    "eslint": "^9.4.0",
+    "globals": "^15.4.0",
+    "typescript-eslint": "^8.0.0-alpha"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^9.1.0"
+  }
+}

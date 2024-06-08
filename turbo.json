@@ -1,0 +1,38 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["transit"],
+      "outputs": ["node_modules/.cache/tsbuildinfo.json"]
+    },
+    "lint": {
+      "dependsOn": ["transit"]
+    },
+    "//#check-formatting": {
+      "outputs": ["node_modules/.cache/.prettiercache"]
+    },
+    "check-formatting": {
+      "dependsOn": ["transit"],
+      "outputs": ["node_modules/.cache/.prettiercache"]
+    },
+    "//#format": {
+      "outputs": ["node_modules/.cache/.prettiercache"],
+      "cache": false
+    },
+    "format": {
+      "dependsOn": ["transit"],
+      "outputs": ["node_modules/.cache/.prettiercache"],
+      "cache": false
+    },
+    "test": {
+      "dependsOn": ["transit"]
+    }
+  }
+}

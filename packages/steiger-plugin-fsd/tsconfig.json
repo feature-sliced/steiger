@@ -1,6 +1,7 @@
 {
-  "extends": "@tsconfig/node-lts/tsconfig.json",
+  "extends": "@steiger/tsconfig/base.json",
   "compilerOptions": {
     "types": ["vitest/importMeta"]
-  }
+  },
+  "include": ["./src", "./reset.d.ts"]
 }

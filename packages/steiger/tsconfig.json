@@ -1,8 +1,9 @@
 {
-  "extends": "@tsconfig/node-lts/tsconfig.json",
+  "extends": "@steiger/tsconfig/base.json",
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "types": ["vitest/importMeta"]
-  }
+  },
+  "include": ["./src", "./reset.d.ts"]
 }

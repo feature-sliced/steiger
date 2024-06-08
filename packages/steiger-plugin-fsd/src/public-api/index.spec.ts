@@ -24,7 +24,7 @@ it('reports no errors on a project with all the required public APIs', () => {
         📄 index.ts
   `)
 
-  expect(publicApi.check(root, { sourceFileExtension: 'ts', include: [] })).toEqual({ diagnostics: [] })
+  expect(publicApi.check(root, { sourceFileExtension: 'ts' })).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on slices that are missing a public API', () => {
@@ -47,9 +47,7 @@ it('reports errors on slices that are missing a public API', () => {
         📂 ui
   `)
 
-  const diagnostics = publicApi
-    .check(root, { sourceFileExtension: 'ts', include: [] })
-    .diagnostics.sort(compareMessages)
+  const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: 'On the "entities" layer, slice "posts" is missing a public API.',
@@ -98,9 +96,7 @@ it('reports errors on segments that are missing a public API', () => {
       📂 styles
   `)
 
-  const diagnostics = publicApi
-    .check(root, { sourceFileExtension: 'ts', include: [] })
-    .diagnostics.sort(compareMessages)
+  const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: 'On the "app" layer, segment "providers" is missing a public API.',

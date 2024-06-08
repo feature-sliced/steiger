@@ -16,21 +16,22 @@
     }
   ],
   "scripts": {
+    "lint": "eslint .",
     "format": "prettier --write .",
+    "check-formatting": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "build": "tsup"
+    "build": "tsup",
+    "test": "vitest run"
   },
   "type": "module",
-  "exports": "./src/app.ts",
   "bin": {
     "steiger": "dist/cli.js"
   },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/app.d.ts",
-        "import": "./dist/app.js"
-      }
+  "exports": {
+    ".": {
+      "typescript": "./src/app.ts",
+      "types": "./dist/app.d.ts",
+      "import": "./dist/app.js"
     }
   },
   "files": [
@@ -39,10 +40,10 @@
   ],
   "dependencies": {
     "@feature-sliced/filesystem": "^2.2.3",
+    "@feature-sliced/steiger-plugin": "workspace:*",
     "chokidar": "^3.6.0",
     "cosmiconfig": "^9.0.0",
     "effector": "^23.2.1",
-    "@feature-sliced/steiger-plugin": "workspace:*",
     "globby": "^14.0.1",
     "immer": "^10.1.1",
     "patronum": "^2.2.0",
@@ -52,10 +53,11 @@
     "zod-validation-error": "^3.3.0"
   },
   "devDependencies": {
-    "@tsconfig/node-lts": "^20.1.3",
-    "@types/node": "^20.12.8",
+    "@steiger/eslint-config": "workspace:*",
+    "@steiger/pretty-reporter": "workspace:*",
+    "@steiger/tsconfig": "workspace:*",
+    "@total-typescript/ts-reset": "^0.5.1",
     "@types/yargs": "^17.0.32",
-    "pretty-reporter": "workspace:*",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"

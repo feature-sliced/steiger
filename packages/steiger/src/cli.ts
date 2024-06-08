@@ -3,7 +3,7 @@ import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
-import { reportPretty } from 'pretty-reporter'
+import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 

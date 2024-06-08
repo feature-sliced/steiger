@@ -2,11 +2,9 @@ import { exec } from 'child_process'
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/cli.ts', 'src/app.ts'],
+  entry: ['src/index.ts'],
   format: ['esm'],
-  dts: {
-    entry: 'src/app.ts',
-  },
+  dts: true,
   treeshake: true,
   clean: true,
   esbuildOptions(options) {
