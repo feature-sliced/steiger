@@ -11,7 +11,7 @@ declare module 'precinct' {
    * @return {String[]}
    */
   declare function precinct(
-    content: string | any,
+    content: string | Record<string, unknown>,
     options?: {
       type?: string
     },
@@ -30,7 +30,7 @@ declare module 'precinct' {
       filename: string,
       options?: {
         includeCore?: boolean
-        fileSystem?: any
+        fileSystem?: Record<string, unknown>
       },
     ): string[]
   }

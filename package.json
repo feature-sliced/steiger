@@ -2,8 +2,11 @@
   "name": "@steiger/root",
   "private": true,
   "scripts": {
-    "format": "prettier --write .",
-    "check-monorepo": "manypkg check"
+    "lint": "eslint .",
+    "format": "prettier --write . --cache",
+    "check-formatting": "prettier --check .",
+    "check-monorepo": "manypkg check",
+    "prepare": "husky"
   },
   "engines": {
     "node": ">= 20"
@@ -14,6 +17,16 @@
     "prettier": "^3.2.5"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.5"
+    "@changesets/cli": "^2.27.5",
+    "@eslint/js": "^9.4.0",
+    "eslint": "^9.4.0",
+    "globals": "^15.4.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
+    "typescript-eslint": "^8.0.0-alpha"
+  },
+  "lint-staged": {
+    "*": "prettier --ignore-unknown --write",
+    "*.ts": "eslint --fix"
   }
 }

@@ -39,12 +39,14 @@ export async function createWatcher(path: string) {
 
 /** Scan a folder once without watching and return its virtual file system. */
 export function scan(path: string): Promise<Folder> {
-  return new Promise<Folder>(async (resolve) => {
-    const { vfs, watcher } = await createWatcher(path)
-
-    watcher.on('ready', () => {
-      watcher.close()
-      resolve(vfs.$tree.getState())
-    })
-  })
+  return new Promise<Folder>((resolve, reject) =>
+    createWatcher(path)
+      .then(({ vfs, watcher }) => {
+        watcher.on('ready', () => {
+          watcher.close()
+          resolve(vfs.$tree.getState())
+        })
+      })
+      .catch(reject),
+  )
 }
