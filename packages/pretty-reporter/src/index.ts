@@ -22,11 +22,12 @@ export function formatPretty(diagnostics: Array<AugmentedDiagnostic>) {
     '\n' +
     diagnostics
       .map((d) => {
-        let message = ` ${chalk.red(figures.cross)} ${chalk.reset(d.message)}  ${chalk.gray(`// ${d.ruleName}`)}`
+        const message = ` ${chalk.red(figures.cross)} ${chalk.reset(d.message)}  ${chalk.gray(`// ${d.ruleName}`)}`
 
-        if ((d.fixes?.length ?? 0) > 0) {
-          message += chalk.green(`\n   (${figures.tick} auto-fix available)`)
-        }
+        // TODO: enable when we have auto-fixes
+        // if ((d.fixes?.length ?? 0) > 0) {
+        //   message += chalk.green(`\n   (${figures.tick} auto-fix available)`)
+        // }
 
         return message
       })
