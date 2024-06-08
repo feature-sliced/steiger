@@ -45,8 +45,8 @@ export default defineConfig({
 
 # Contribution
 
-Feel free to report an issue or open a discussion. Ensure you read the [Contributor Covenant Code of Conduct](code_of_conduct.md) first though :)
+Feel free to report an issue or open a discussion. Ensure you read the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) first though :)
 
 # Legal info
 
-Project licensed under [MIT License](license.md). [Here's what it means](https://choosealicense.com/licenses/mit/)
+Project licensed under [MIT License](LICENSE.md). [Here's what it means](https://choosealicense.com/licenses/mit/)
