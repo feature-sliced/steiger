@@ -8,4 +8,5 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
+  { ignores: ['**/node_modules', '**/dist'] },
 ]

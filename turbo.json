@@ -9,7 +9,7 @@
       "outputs": ["dist/**"]
     },
     "typecheck": {
-      "dependsOn": ["transit"],
+      "dependsOn": ["transit", "build"],
       "outputs": ["node_modules/.cache/tsbuildinfo.json"]
     },
     "lint": {

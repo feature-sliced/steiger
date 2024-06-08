@@ -4,8 +4,8 @@
   "version": "0.0.2",
   "scripts": {
     "lint": "eslint .",
-    "format": "prettier --write .",
-    "check-formatting": "prettier --check .",
+    "format": "prettier --write . --cache",
+    "check-formatting": "prettier --check . --cache",
     "dev": "tsup --watch",
     "build": "tsup",
     "test": "vitest run",

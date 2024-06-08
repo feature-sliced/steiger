@@ -5,8 +5,8 @@
   "version": "0.0.0",
   "scripts": {
     "lint": "eslint .",
-    "format": "prettier --write .",
-    "check-formatting": "prettier --check .",
+    "format": "prettier --write . --cache",
+    "check-formatting": "prettier --check . --cache",
     "typecheck": "tsc --noEmit"
   },
   "exports": {

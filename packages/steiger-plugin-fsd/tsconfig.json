@@ -1,7 +1,8 @@
 {
   "extends": "@steiger/tsconfig/base.json",
   "compilerOptions": {
-    "types": ["vitest/importMeta"]
+    "types": ["vitest/importMeta"],
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
   "include": ["./src", "./reset.d.ts"]
 }
