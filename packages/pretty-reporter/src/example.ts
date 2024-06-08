@@ -18,7 +18,7 @@ reportPretty([
       },
     ],
   },
-  { message: 'Layer "shared" should not have an index file', ruleName: 'no-layer-public-api'},
+  { message: 'Layer "shared" should not have an index file', ruleName: 'no-layer-public-api' },
   { message: 'Layer "pages" should not have an index file', ruleName: 'no-layer-public-api' },
 ])
 

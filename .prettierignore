@@ -1,7 +1,2 @@
-# Prettier will also follow rules specified in the ".gitignore" file
-# if it exists in the same directory from which it is run
-# https://prettier.io/docs/en/ignore
-
-/*/
-!/packages/
-!/examples/
+pnpm-lock.yaml
+.changeset/*

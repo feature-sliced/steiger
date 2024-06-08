@@ -115,7 +115,7 @@ if (import.meta.vitest) {
               ],
             },
           ],
-        }
+        },
       ],
     })
   })

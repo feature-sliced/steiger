@@ -20,7 +20,7 @@ const ambiguousSliceNames = {
 
     for (const [sliceName, slice] of Object.entries(getAllSlices(root))) {
       const pathSegments = sliceName.split(sep)
-      const matchingSegment = segmentNamesInShared.find(segmentName => pathSegments.includes(segmentName))
+      const matchingSegment = segmentNamesInShared.find((segmentName) => pathSegments.includes(segmentName))
       if (matchingSegment !== undefined) {
         if (matchingSegment === sliceName) {
           diagnostics.push({

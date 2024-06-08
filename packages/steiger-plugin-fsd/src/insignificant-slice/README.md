@@ -75,7 +75,7 @@ flowchart BT
   pages/editor/ui/Editor.tsx --❗️--> entities/user/index.ts
   pages/editor/ui/EditorPage.tsx --> shared/ui/index.ts
   pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
-  
+
   style entities/user fill:pink
   style entities/user/ui fill:pink
   style entities/product fill:pink

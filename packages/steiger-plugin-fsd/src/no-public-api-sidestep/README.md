@@ -5,17 +5,17 @@ Forbid going around the public API of a slice to import directly from an interna
 Examples of imports that satisfy this rule:
 
 ```ts
-import { Button } from '@/shared/ui';
-import { UserAvatar } from '@/entities/user';
-import { EditorPage } from '@/pages/editor';
+import { Button } from '@/shared/ui'
+import { UserAvatar } from '@/entities/user'
+import { EditorPage } from '@/pages/editor'
 ```
 
 Examples of imports that violate this rule:
 
 ```ts
-import { Button } from '@/shared/ui/Button';
-import { UserAvatar } from '@/entities/user/ui/UserAvatar';
-import { EditorPage } from '@/pages/editor/ui/EditorPage';
+import { Button } from '@/shared/ui/Button'
+import { UserAvatar } from '@/entities/user/ui/UserAvatar'
+import { EditorPage } from '@/pages/editor/ui/EditorPage'
 ```
 
 ## Rationale

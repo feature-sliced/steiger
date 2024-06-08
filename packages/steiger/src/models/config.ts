@@ -2,24 +2,26 @@ import z from 'zod'
 import { createEvent, createStore } from 'effector'
 
 export const schema = z.object({
-  rules: z.record(
-    z.enum([
-      'ambiguous-slice-names',
-      'excessive-slicing',
-      'forbidden-imports',
-      'inconsistent-naming',
-      'insignificant-slice',
-      'no-layer-public-api',
-      'no-public-api-sidestep',
-      'no-reserved-folder-names',
-      'no-segmentless-slices',
-      'public-api',
-      'repetitive-naming',
-      'segments-by-purpose',
-      'shared-lib-grouping',
-    ]),
-    z.literal('off'),
-  ).optional(),
+  rules: z
+    .record(
+      z.enum([
+        'ambiguous-slice-names',
+        'excessive-slicing',
+        'forbidden-imports',
+        'inconsistent-naming',
+        'insignificant-slice',
+        'no-layer-public-api',
+        'no-public-api-sidestep',
+        'no-reserved-folder-names',
+        'no-segmentless-slices',
+        'public-api',
+        'repetitive-naming',
+        'segments-by-purpose',
+        'shared-lib-grouping',
+      ]),
+      z.literal('off'),
+    )
+    .optional(),
 })
 
 export type Config = z.infer<typeof schema>

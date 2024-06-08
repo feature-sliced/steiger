@@ -34,13 +34,13 @@ steiger ./src --watch
 Steiger is configurable via `cosmiconfig`. That means that you can create a `steiger.config.ts` or `steiger.config.js` file in the root of your project to configure the rules. Import `{ defineConfig } from "steiger"` to get autocompletion.
 
 ```ts
-import { defineConfig } from "steiger";
+import { defineConfig } from 'steiger'
 
 export default defineConfig({
   rules: {
-    "no-public-api": "off"
+    'no-public-api': 'off',
   },
-});
+})
 ```
 
 # Contribution

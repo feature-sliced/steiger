@@ -38,7 +38,7 @@ const yargsProgram = yargs(hideBin(process.argv))
 
 const consoleArgs = yargsProgram.parseSync()
 
-const { config, filepath } = await cosmiconfig('steiger').search() ?? { config: null, filepath: undefined }
+const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
 
 try {
   setConfig(configSchema.parse(config))

@@ -45,5 +45,8 @@ it('reports errors on a project with index files on layer level', () => {
   `)
 
   const diagnostics = noLayerPublicApi.check(root).diagnostics
-  expect(diagnostics).toEqual([{ message: 'Layer "shared" should not have an index file' }, { message: 'Layer "pages" should not have an index file'}])
+  expect(diagnostics).toEqual([
+    { message: 'Layer "shared" should not have an index file' },
+    { message: 'Layer "pages" should not have an index file' },
+  ])
 })

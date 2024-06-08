@@ -22,7 +22,7 @@ if (import.meta.vitest) {
   test('groupSlices', () => {
     expect(groupSlices(['a/b/c', 'a/b/d', 'a/e', 'f', 'g'])).toEqual({
       'a/b': ['c', 'd'],
-      'a': ['e'],
+      a: ['e'],
       '': ['f', 'g'],
     })
   })

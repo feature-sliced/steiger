@@ -3,6 +3,7 @@
 Discourage repetitive parts in slice names (e.g. adding page to every slice on Pages).
 
 Examples of project structures that pass this rule:
+
 ```
 📂 pages
   📂 home
@@ -17,6 +18,7 @@ Examples of project structures that pass this rule:
 ```
 
 Examples of project structures that fail this rule:
+
 ```
 📂 pages
   📂 homePage  // ❌

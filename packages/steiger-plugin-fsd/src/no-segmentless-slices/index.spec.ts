@@ -1,7 +1,7 @@
-import { expect, it } from "vitest"
+import { expect, it } from 'vitest'
 
-import noSegmentlessSlices from "./index.js"
-import { parseIntoFsdRoot } from "../_lib/prepare-test.js"
+import noSegmentlessSlices from './index.js'
+import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project where every slice has at least one segment', () => {
   const root = parseIntoFsdRoot(`
