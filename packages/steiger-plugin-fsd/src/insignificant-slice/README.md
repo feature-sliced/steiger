@@ -80,3 +80,7 @@ flowchart BT
   style entities/user/ui fill:pink
   style entities/product fill:pink
 ```
+
+## Rationale
+
+Trying to decompose everything into as many layers and slices as possible leads to the logic spreading out needlessly, which negates the high cohesion benefit of Feature-Sliced Design. That's why if a slice is only used once, it's probably not worth having it as a separate slice.

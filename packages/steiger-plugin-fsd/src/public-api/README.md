@@ -1,6 +1,6 @@
-# `no-layer-public-api`
+# `public-api`
 
-Forbid index files on the layer level. 
+Require slices (and segments on sliceless layers like Shared) to have a public API definition.
 
 According to the _public API rule on slices_:
 
@@ -8,8 +8,6 @@ According to the _public API rule on slices_:
 > 
 > Modules outside of this slice/segment can only reference the public API, not the internal file structure of the slice/segment.
 > https://feature-sliced.design/docs/reference/slices-segments#public-api-rule-on-slices
-
-A corollary to this rule is that the layer itself should not have an index file.
 
 Examples of project structures that pass this rule:
 ```md
@@ -32,23 +30,20 @@ Examples of project structures that pass this rule:
 Examples of project structures that fail this rule:
 ```md
 📂 shared
-  📂 ui
+  📂 ui  // ❌ 
+    📄 Button.tsx
+  📂 lib
     📄 index.ts
-  📄 index.ts // ❌
 📂 entities
-  📂 user
+  📂 user  // ❌ 
     📂 ui
-    📄 index.ts
+    📂 model
 📂 pages
   📂 home
     📂 ui
     📄 index.ts
-  📂 editor
-    📂 ui
-    📄 index.ts
-  📄 index.ts // ❌
 ```
 
 ## Rationale
 
-Layers contain slices, and slices are meant to be independent partitions of code by their business domain. It doesn't make much sense to import things from two different business domains from the same place. In addition to that, index files cause issues with tree-shaking for some bundlers, so having as little of them as possible helps to keep the bundle size down.
+The public API for slices exists as the only entrypoint into a slice, and that ensures that the internal structure of the slice can change freely as long as the public API stays the same. This ensures stability of the codebase during refactors. A slice that doesn't have one becomes a weak point for refactoring.

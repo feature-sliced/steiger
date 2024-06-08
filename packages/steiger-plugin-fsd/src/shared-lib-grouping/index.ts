@@ -1,6 +1,5 @@
-import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
+import { getLayers, getSegments } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '../types.js'
-import { groupSlices } from '../_lib/group-slices.js'
 
 const THRESHOLD = 15
 

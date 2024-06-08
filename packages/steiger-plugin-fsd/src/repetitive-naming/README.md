@@ -29,3 +29,7 @@ Examples of project structures that fail this rule:
     📂 ui
     📄 index.ts
 ```
+
+## Rationale
+
+Suffixes that appear in the name every slice don't add much meaning and instead get in the way of understanding the difference between the slices.
