@@ -1,0 +1,30 @@
+name: Quality
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-checks:
+    name: Quality checks
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Run checks
+        run: |
+          turbo run check-formatting lint typecheck test
+          pnpm check-monorepo
+
+      - name: Try building
+        run: turbo run build
