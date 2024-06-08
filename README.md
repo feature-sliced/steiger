@@ -45,7 +45,9 @@ export default defineConfig({
 
 # Contribution
 
-Feel free to report an issue or open a discussion. Ensure you read the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) first though :)
+Feel free to report an issue or open a discussion. Ensure you read our [Code of Conduct](CODE_OF_CONDUCT.md) first though :)
+
+To get started with the codebase, see our [Contributing guide](CONTRIBUTING.md).
 
 # Legal info
 
