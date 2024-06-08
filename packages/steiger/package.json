@@ -40,7 +40,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@feature-sliced/filesystem": "^2.2.3",
+    "@feature-sliced/filesystem": "^2.2.4",
     "@feature-sliced/steiger-plugin": "workspace:*",
     "chokidar": "^3.6.0",
     "cosmiconfig": "^9.0.0",

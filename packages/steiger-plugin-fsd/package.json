@@ -30,7 +30,7 @@
     }
   ],
   "dependencies": {
-    "@feature-sliced/filesystem": "^2.2.3",
+    "@feature-sliced/filesystem": "^2.2.4",
     "lodash-es": "^4.17.21",
     "pluralize": "^8.0.0",
     "precinct": "^12.1.1",
