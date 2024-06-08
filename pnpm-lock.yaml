@@ -15,7 +15,7 @@ importers:
         specifier: ^0.21.4
         version: 0.21.4
       '@steiger/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:tooling/eslint-config
       '@tsconfig/node-lts':
         specifier: ^20.1.3
