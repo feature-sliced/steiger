@@ -36,7 +36,8 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md"
   ],
   "dependencies": {
     "@feature-sliced/filesystem": "^2.2.3",
