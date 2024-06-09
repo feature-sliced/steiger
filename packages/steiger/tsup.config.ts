@@ -1,9 +1,10 @@
-import { exec } from 'child_process'
+import { exec } from 'node:child_process'
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: ['src/cli.ts', 'src/app.ts'],
   format: ['esm'],
+  outExtension: () => ({ js: '.mjs' }),
   dts: {
     entry: 'src/app.ts',
   },

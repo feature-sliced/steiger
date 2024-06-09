@@ -25,13 +25,13 @@
   },
   "type": "module",
   "bin": {
-    "steiger": "dist/cli.js"
+    "steiger": "dist/cli.mjs"
   },
   "exports": {
     ".": {
       "typescript": "./src/app.ts",
       "types": "./dist/app.d.ts",
-      "import": "./dist/app.js"
+      "import": "./dist/app.mjs"
     }
   },
   "files": [
