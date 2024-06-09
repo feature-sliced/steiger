@@ -4,7 +4,7 @@ import { type Store, type Unit, merge, sample } from 'effector'
 import { combineEvents, not } from 'patronum'
 
 export interface DeferArgs {
-  clock: Unit<unknown>
+  clock: Array<Unit<unknown>>
   until: Store<boolean>
 }
 

@@ -1,4 +1,4 @@
-import { combine, createEffect, sample } from 'effector'
+import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
 import fsdRules, { type Rule } from '@feature-sliced/steiger-plugin'
 import type { Folder } from '@feature-sliced/filesystem'
@@ -40,7 +40,7 @@ export const linter = {
     const runRulesFx = createEffect(runRules)
 
     sample({
-      clock: defer({ clock: combine(treeChanged, enabledRules), until: not(runRulesFx.pending) }),
+      clock: defer({ clock: [treeChanged, enabledRules], until: not(runRulesFx.pending) }),
       source: { vfs: vfs.$tree, rules: enabledRules },
       target: runRulesFx,
     })
