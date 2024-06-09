@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 import chokidar from 'chokidar'
 import type { Folder } from '@feature-sliced/filesystem'
 import { isGitIgnored } from 'globby'
@@ -15,7 +15,7 @@ export async function createWatcher(path: string) {
   const isIgnored = await isGitIgnored({ cwd: path })
 
   const watcher = chokidar.watch(path, {
-    ignored: isIgnored,
+    ignored: (path) => path.split(sep).includes('node_modules') || isIgnored(path),
     ignoreInitial: false,
     alwaysStat: true,
     awaitWriteFinish: true,
