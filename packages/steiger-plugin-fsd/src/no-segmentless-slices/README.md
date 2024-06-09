@@ -4,39 +4,39 @@ Forbid slices that don't have any segments.
 
 Examples of project structures that pass this rule:
 
-```md
+```
 📂 shared
-📂 ui
-📄 index.ts
-📂 lib
-📄 index.ts
+  📂 ui
+    📄 index.ts
+  📂 lib
+    📄 index.ts
 📂 entities
-📂 user
-📂 ui
-📂 model
-📄 index.ts
+  📂 user
+    📂 ui
+    📂 model
+    📄 index.ts
 📂 pages
-📂 home
-📂 ui
-📄 index.ts
+  📂 home
+    📂 ui
+    📄 index.ts
 ```
 
 Examples of project structures that fail this rule:
 
-```md
+```
 📂 shared
-📂 ui
-📄 index.ts
-📂 lib
-📄 index.ts
+  📂 ui
+    📄 index.ts
+  📂 lib
+    📄 index.ts
 📂 entities
-📂 user
-📂 ui
-📂 model
-📄 index.ts
+  📂 user
+    📂 ui
+    📂 model
+    📄 index.ts
 📂 pages
-📂 home // ❌
-📄 HomePage.tsx
+  📂 home  // ❌
+    📄 HomePage.tsx
 ```
 
 ## Rationale

@@ -7,26 +7,26 @@ This rule ensures that all entities are named consistently in terms of pluraliza
 
 Example of a project structure that passes this rule:
 
-```md
+```
 📂 entities
-📂 users
-📂 ui
-📄 index.ts
-📂 posts
-📂 ui
-📄 index.ts
+  📂 users
+    📂 ui
+    📄 index.ts
+  📂 posts
+    📂 ui
+    📄 index.ts
 ```
 
 Example of a project structure that fails this rule:
 
-```md
+```
 📂 entities
-📂 users // ❗️
-📂 ui
-📄 index.ts
-📂 post // ❌
-📂 ui
-📄 index.ts
+  📂 users // ❗️
+    📂 ui
+    📄 index.ts
+  📂 post // ❌
+    📂 ui
+    📄 index.ts
 ```
 
 ## Rationale

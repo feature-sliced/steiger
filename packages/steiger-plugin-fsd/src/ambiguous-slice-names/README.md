@@ -4,44 +4,44 @@ Forbid slice names that that match some segment’s name in the Shared layer. Fo
 
 Examples of project structures that pass this rule:
 
-```md
+```
 📂 shared
-📂 ui
-📄 index.ts
-📂 i18n
-📄 index.ts
+  📂 ui
+    📄 index.ts
+  📂 i18n
+    📄 index.ts
 📂 entities
-📂 user
-📂 ui
-📂 model
-📄 index.ts
+  📂 user
+    📂 ui
+    📂 model
+    📄 index.ts
 📂 pages
-📂 home
-📂 ui
-📄 index.ts
+  📂 home
+    📂 ui
+    📄 index.ts
 ```
 
 Examples of project structures that fail this rule:
 
-```md
+```
 📂 shared
-📂 ui
-📄 index.ts
-📂 i18n // ❗️
-📄 index.ts
+  📂 ui
+    📄 index.ts
+  📂 i18n // ❗️
+    📄 index.ts
 📂 entities
-📂 user
-📂 ui
-📂 model
-📄 index.ts
+  📂 user
+    📂 ui
+    📂 model
+    📄 index.ts
 📂 features
-📂 i18n // ❌
-📂 ui
-📄 index.ts
+  📂 i18n // ❌
+    📂 ui
+    📄 index.ts
 📂 pages
-📂 home
-📂 ui
-📄 index.ts
+  📂 home
+    📂 ui
+    📄 index.ts
 ```
 
 ## Rationale

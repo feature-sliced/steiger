@@ -7,18 +7,18 @@ This rule forbids having too many ungrouped modules in `shared/lib`.
 
 Examples of project structures that pass this rule:
 
-```md
+```
 📂 entities
-📂 users
-📂 ui
-📄 index.ts
-📂 posts
-📂 ui
-📄 index.ts
+  📂 users
+    📂 ui
+    📄 index.ts
+  📂 posts
+    📂 ui
+    📄 index.ts
 📂 shared
-📂 ui
-📄 index.ts
-📄 Button.tsx
+  📂 ui
+    📄 index.ts
+    📄 Button.tsx
 ```
 
 ```
@@ -41,38 +41,38 @@ Examples of project structures that pass this rule:
 
 (Cartoonish) Example of a project structure that fails this rule:
 
-```md
+```
 📂 entities
-📂 users
-📂 ui
-📄 index.ts
-📂 posts
-📂 ui
-📄 index.ts
+  📂 users
+    📂 ui
+    📄 index.ts
+  📂 posts
+    📂 ui
+    📄 index.ts
 📂 shared
-📂 ui
-📄 index.ts
-📄 Button.tsx
-📂 lib // ❌
-📄 index.ts
-📄 dates.ts
-📄 collections.ts
-📄 utils.ts
-📄 helpers.ts
-📄 constants.ts
-📄 types.ts
-📄 api.ts
-📄 hooks.ts
-📄 selectors.ts
-📄 actions.ts
-📄 reducers.ts
-📄 sagas.ts
-📄 middleware.ts
-📄 components.ts
-📄 hell.ts
-📄 is.ts
-📄 other.ts
-📄 people.ts
+  📂 ui
+    📄 index.ts
+    📄 Button.tsx
+  📂 lib  // ❌
+    📄 index.ts
+    📄 dates.ts
+    📄 collections.ts
+    📄 utils.ts
+    📄 helpers.ts
+    📄 constants.ts
+    📄 types.ts
+    📄 api.ts
+    📄 hooks.ts
+    📄 selectors.ts
+    📄 actions.ts
+    📄 reducers.ts
+    📄 sagas.ts
+    📄 middleware.ts
+    📄 components.ts
+    📄 hell.ts
+    📄 is.ts
+    📄 other.ts
+    📄 people.ts
 ```
 
 ## Rationale

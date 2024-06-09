@@ -7,55 +7,55 @@ This rule forbids having too many ungrouped slices or too many slices in a group
 
 Example of a project structure that passes this rule:
 
-```md
+```
 📂 shared
-📂 ui
-📄 index.ts
-📂 i18n
-📄 index.ts
+  📂 ui
+    📄 index.ts
+  📂 i18n
+    📄 index.ts
 📂 entities
-📂 user
-📂 ui
-📂 model
-📄 index.ts
+  📂 user
+    📂 ui
+    📂 model
+    📄 index.ts
 📂 pages
-📂 home
-📂 ui
-📄 index.ts
+  📂 home
+    📂 ui
+    📄 index.ts
 ```
 
 (Cartoonish) Example of a project structure that fails this rule:
 
-```md
+```
 📂 shared
-📂 ui
-📄 index.ts
-📂 i18n
-📄 index.ts
+  📂 ui
+    📄 index.ts
+  📂 i18n
+    📄 index.ts
 📂 features // ❌
-📂 comments
-📂 posts
-📂 users
-📂 cars
-📂 alligators
-📂 whales
-📂 giraffes
-📂 buses
-📂 trains
-📂 planes
-📂 boats
-📂 submarines
-📂 helicopters
-📂 rockets
-📂 satellites
-📂 space-stations
-📂 planets
-📂 galaxies
-📂 universes
-📂 multiverses
-📂 metaverses
-📂 ai
-📂 bitcoin
+  📂 comments
+  📂 posts
+  📂 users
+  📂 cars
+  📂 alligators
+  📂 whales
+  📂 giraffes
+  📂 buses
+  📂 trains
+  📂 planes
+  📂 boats
+  📂 submarines
+  📂 helicopters
+  📂 rockets
+  📂 satellites
+  📂 space-stations
+  📂 planets
+  📂 galaxies
+  📂 universes
+  📂 multiverses
+  📂 metaverses
+  📂 ai
+  📂 bitcoin
 ```
 
 ## Rationale
