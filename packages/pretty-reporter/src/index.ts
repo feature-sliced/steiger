@@ -7,16 +7,17 @@ export function formatPretty(diagnostics: Array<AugmentedDiagnostic>) {
     return chalk.green(`${figures.tick} No problems found!`)
   }
 
-  let footer = chalk.red.bold(`Found ${diagnostics.length} problem${diagnostics.length > 1 ? 's' : ''}`)
+  const footer = chalk.red.bold(`Found ${diagnostics.length} problem${diagnostics.length > 1 ? 's' : ''}`)
 
-  const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
-  if (autofixable.length === diagnostics.length) {
-    footer += ' (all can be fixed automatically)'
-  } else if (autofixable.length > 0) {
-    footer += ` (${autofixable.length} can be fixed automatically)`
-  } else {
-    footer += ' (none can be fixed automatically)'
-  }
+  // TODO: enable when we have auto-fixes
+  // const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
+  // if (autofixable.length === diagnostics.length) {
+  //   footer += ' (all can be fixed automatically)'
+  // } else if (autofixable.length > 0) {
+  //   footer += ` (${autofixable.length} can be fixed automatically)`
+  // } else {
+  //   footer += ' (none can be fixed automatically)'
+  // }
 
   return (
     '\n' +
