@@ -1,5 +1,12 @@
 # steiger
 
+## 0.1.2
+
+### Patch Changes
+
+- 5b7cba4: Fixed the crash in watch mode
+- a4427c6: Fixed the file watcher crashing due to symlinks in node_modules
+
 ## 0.1.1
 
 ### Patch Changes
