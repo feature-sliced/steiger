@@ -1,6 +1,6 @@
 # `shared-lib-grouping`
 
-This rule forbids having too many ungrouped modules in `shared/lib`.
+Forbid having too many ungrouped modules in `shared/lib`.
 
 > [!NOTE]
 > For now, the threshold has been set to 15 arbitrarily. If this rule is too strict or too lenient, please open an issue.

@@ -1,6 +1,6 @@
 # `excessive-slicing`
 
-This rule forbids having too many ungrouped slices or too many slices in a group.
+Forbid having too many ungrouped slices or too many slices in a group.
 
 > [!NOTE]
 > For now, the threshold has been set to 20 arbitrarily. If this rule is too strict or too lenient, please open an issue.
