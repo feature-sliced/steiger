@@ -67,7 +67,7 @@ Currently, Steiger is not configurable, though that will change in the near futu
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/public-api/README.md"><code>public-api</code></a></td> <td>Require slices (and segments on sliceless layers like Shared) to have a public API definition.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/repetitive-naming/README.md"><code>repetitive-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/segments-by-purpose/README.md"><code>segments-by-purpose</code></a></td> <td>Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/shared-lib-grouping/README.md"><code>shared-lib-grouping</code></a></td> <td>Forbid having too many ungrouped modules in `shared/lib`.</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/shared-lib-grouping/README.md"><code>shared-lib-grouping</code></a></td> <td>Forbid having too many ungrouped modules in <code>shared/lib</code>.</td> </tr>
 </tbody>
 </table>
 
