@@ -99,26 +99,6 @@ it('reports errors on segments that are missing a public API', () => {
   const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
-      message: 'On the "app" layer, segment "providers" is missing a public API.',
-      fixes: [
-        {
-          type: 'create-file',
-          path: '/app/providers/index.ts',
-          content: '',
-        },
-      ],
-    },
-    {
-      message: 'On the "app" layer, segment "styles" is missing a public API.',
-      fixes: [
-        {
-          type: 'create-file',
-          path: '/app/styles/index.ts',
-          content: '',
-        },
-      ],
-    },
-    {
       message: 'On the "shared" layer, segment "ui" is missing a public API.',
       fixes: [
         {
@@ -129,32 +109,4 @@ it('reports errors on segments that are missing a public API', () => {
       ],
     },
   ])
-})
-
-it('reports no errors when the App layer is missing a public API', () => {
-  const root = parseIntoFsdRoot(`
-    📂 shared
-      📂 ui
-        📄 index.ts
-    📂 entities
-      📂 users
-        📂 ui
-        📄 index.ts
-      📂 posts
-        📂 ui
-        📄 index.ts
-    📂 features
-      📂 comments
-        📂 ui
-        📄 index.ts
-    📂 pages
-      📂 editor
-        📂 ui
-        📄 index.ts
-    📂 app
-      📂 providers
-      📂 styles
-  `)
-
-  expect(publicApi.check(root, { sourceFileExtension: 'ts' })).toEqual({ diagnostics: [] })
 })
