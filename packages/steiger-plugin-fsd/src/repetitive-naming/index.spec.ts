@@ -55,3 +55,36 @@ it('recognizes words in different naming conventions', () => {
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([{ message: 'Repetitive word "folder" in slice names on layer "entities"' }])
 })
+
+it('does not complain about layers with just one slice', () => {
+  const root = parseIntoFsdRoot(`
+    📂 pages
+      📂 create-post
+        📂 ui
+          📄 index.tsx
+        📄 index.ts
+      📂 home
+        📂 ui
+          📄 index.tsx
+        📄 index.ts
+      📂 post
+        📂 ui
+          📄 index.tsx
+        📄 index.ts
+    📂 features
+      📂 create-post
+        📂 api
+        📂 ui
+          📄 index.tsx
+        📄 index.ts
+    📂 entities
+      📂 post
+        📂 api
+        📂 model
+        📂 ui
+          📄 index.tsx
+        📄 index.ts
+  `)
+
+  expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
+})

@@ -35,7 +35,11 @@ const repetitiveNaming = {
       }, new Map<string, number>())
 
       for (const [word, count] of mostCommonWords.entries()) {
-        if (count >= sliceNames.length && wordsInSliceNames.every((words) => words.includes(word))) {
+        if (
+          sliceNames.length > 2 &&
+          count >= sliceNames.length &&
+          wordsInSliceNames.every((words) => words.includes(word))
+        ) {
           diagnostics.push({ message: `Repetitive word "${word}" in slice names on layer "${layerName}"` })
         }
       }
