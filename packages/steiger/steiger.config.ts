@@ -1,5 +1,5 @@
 export default {
   rules: {
-    'public-api': 'off',
+    // 'public-api': 'off',
   },
 }

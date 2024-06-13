@@ -130,3 +130,31 @@ it('reports errors on segments that are missing a public API', () => {
     },
   ])
 })
+
+it('reports no errors when the App layer is missing a public API', () => {
+  const root = parseIntoFsdRoot(`
+    📂 shared
+      📂 ui
+        📄 index.ts
+    📂 entities
+      📂 users
+        📂 ui
+        📄 index.ts
+      📂 posts
+        📂 ui
+        📄 index.ts
+    📂 features
+      📂 comments
+        📂 ui
+        📄 index.ts
+    📂 pages
+      📂 editor
+        📂 ui
+        📄 index.ts
+    📂 app
+      📂 providers
+      📂 styles
+  `)
+
+  expect(publicApi.check(root, { sourceFileExtension: 'ts' })).toEqual({ diagnostics: [] })
+})

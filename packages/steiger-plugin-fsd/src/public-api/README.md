@@ -1,6 +1,6 @@
 # `public-api`
 
-Require slices (and segments on sliceless layers like Shared) to have a public API definition.
+Require slices (and segments on Shared) to have a public API definition.
 
 According to the _public API rule on slices_:
 

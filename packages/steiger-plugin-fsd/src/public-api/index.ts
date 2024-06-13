@@ -11,6 +11,10 @@ const publicApi = {
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
       if (!isSliced(layer)) {
+        if (layerName === 'app') {
+          // The app layer is the top-level layer, there's no need for public API.
+          continue
+        }
         for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
           if (getIndex(segment) === undefined) {
             diagnostics.push({
