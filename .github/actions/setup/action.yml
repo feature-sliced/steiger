@@ -1,5 +1,10 @@
 name: 'Setup and install'
 description: 'Common setup steps for Actions'
+inputs:
+  node-version:
+    description: 'Version of Node.js'
+    required: true
+    default: 20
 
 runs:
   using: composite
@@ -9,7 +14,7 @@ runs:
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: ${{ inputs.node-version }}
         cache: 'pnpm'
 
     - uses: actions/checkout@v4
