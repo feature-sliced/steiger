@@ -33,7 +33,7 @@ export function parseIntoFsdRoot(fsMarkup: string): FsdRoot {
     .map((line, _i, lines) => line.slice(lines[0].search(/\S/)))
     .filter(Boolean)
 
-  return parseFolder(lines, '/')
+  return parseFolder(lines, joinFromRoot())
 }
 
 export function compareMessages(a: Diagnostic, b: Diagnostic): number {

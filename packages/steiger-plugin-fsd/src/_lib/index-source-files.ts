@@ -8,7 +8,7 @@ import {
   type Folder,
   type LayerName,
 } from '@feature-sliced/filesystem'
-import { parseIntoFsdRoot } from './prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot } from './prepare-test.js'
 
 type SourceFile = {
   file: File
@@ -80,90 +80,90 @@ if (import.meta.vitest) {
     `)
 
     expect(indexSourceFiles(root)).toEqual({
-      '/features/comments/index.ts': {
+      [joinFromRoot('features', 'comments', 'index.ts')]: {
         file: {
-          path: '/features/comments/index.ts',
+          path: joinFromRoot('features', 'comments', 'index.ts'),
           type: 'file',
         },
         layerName: 'features',
         segmentName: null,
         sliceName: 'comments',
       },
-      '/features/comments/ui/CommentCard.tsx': {
+      [joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx')]: {
         file: {
-          path: '/features/comments/ui/CommentCard.tsx',
+          path: joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx'),
           type: 'file',
         },
         layerName: 'features',
         segmentName: 'ui',
         sliceName: 'comments',
       },
-      '/pages/editor/index.ts': {
+      [joinFromRoot('pages', 'editor', 'index.ts')]: {
         file: {
-          path: '/pages/editor/index.ts',
+          path: joinFromRoot('pages', 'editor', 'index.ts'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: null,
         sliceName: 'editor',
       },
-      '/pages/editor/ui/Editor.tsx': {
+      [joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx')]: {
         file: {
-          path: '/pages/editor/ui/Editor.tsx',
+          path: joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: 'ui',
         sliceName: 'editor',
       },
-      '/pages/editor/ui/EditorPage.tsx': {
+      [joinFromRoot('pages', 'editor', 'ui', 'EditorPage.tsx')]: {
         file: {
-          path: '/pages/editor/ui/EditorPage.tsx',
+          path: joinFromRoot('pages', 'editor', 'ui', 'EditorPage.tsx'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: 'ui',
         sliceName: 'editor',
       },
-      '/pages/editor/ui/styles.ts': {
+      [joinFromRoot('pages', 'editor', 'ui', 'styles.ts')]: {
         file: {
-          path: '/pages/editor/ui/styles.ts',
+          path: joinFromRoot('pages', 'editor', 'ui', 'styles.ts'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: 'ui',
         sliceName: 'editor',
       },
-      '/shared/ui/Button.tsx': {
+      [joinFromRoot('shared', 'ui', 'Button.tsx')]: {
         file: {
-          path: '/shared/ui/Button.tsx',
+          path: joinFromRoot('shared', 'ui', 'Button.tsx'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      '/shared/ui/TextField.tsx': {
+      [joinFromRoot('shared', 'ui', 'TextField.tsx')]: {
         file: {
-          path: '/shared/ui/TextField.tsx',
+          path: joinFromRoot('shared', 'ui', 'TextField.tsx'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      '/shared/ui/index.ts': {
+      [joinFromRoot('shared', 'ui', 'index.ts')]: {
         file: {
-          path: '/shared/ui/index.ts',
+          path: joinFromRoot('shared', 'ui', 'index.ts'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      '/shared/ui/styles.ts': {
+      [joinFromRoot('shared', 'ui', 'styles.ts')]: {
         file: {
-          path: '/shared/ui/styles.ts',
+          path: joinFromRoot('shared', 'ui', 'styles.ts'),
           type: 'file',
         },
         layerName: 'shared',
