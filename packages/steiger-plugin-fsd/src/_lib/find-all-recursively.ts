@@ -1,7 +1,7 @@
 import { basename } from 'node:path'
 import type { Folder, File } from '@feature-sliced/filesystem'
 
-import { parseIntoFsdRoot as parseIntoFolder } from './prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot as parseIntoFolder } from './prepare-test.js'
 
 /** Recursively walk through a folder and return all entries that satisfy the predicate in a flat array. */
 export function findAllRecursively(folder: Folder, predicate: (entry: Folder | File) => boolean): Array<Folder | File> {
@@ -54,9 +54,9 @@ if (import.meta.vitest) {
     )
 
     expect(result.map((entry) => entry.path)).toEqual([
-      '/folder1/directory1',
-      '/folder2/folder3/directory2',
-      '/directory3',
+      joinFromRoot('folder1', 'directory1'),
+      joinFromRoot('folder2', 'folder3', 'directory2'),
+      joinFromRoot('directory3'),
     ])
   })
 }

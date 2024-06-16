@@ -1,4 +1,5 @@
 import { expect, it } from 'vitest'
+import { join } from 'node:path'
 
 import noReservedFolderNames from './index.js'
 import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
@@ -43,5 +44,7 @@ it('reports errors on a project with subfolders in segments that use reserved na
   `)
 
   const diagnostics = noReservedFolderNames.check(root).diagnostics
-  expect(diagnostics).toEqual([{ message: 'Folder name "lib" in "shared/ui" is reserved for segment names' }])
+  expect(diagnostics).toEqual([
+    { message: `Folder name "lib" in "${join('shared', 'ui')}" is reserved for segment names` },
+  ])
 })

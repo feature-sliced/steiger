@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import publicApi from './index.js'
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project with all the required public APIs', () => {
   const root = parseIntoFsdRoot(`
@@ -54,7 +54,7 @@ it('reports errors on slices that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: '/entities/posts/index.ts',
+          path: joinFromRoot('entities', 'posts', 'index.ts'),
           content: '',
         },
       ],
@@ -64,7 +64,7 @@ it('reports errors on slices that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: '/pages/editor/index.ts',
+          path: joinFromRoot('pages', 'editor', 'index.ts'),
           content: '',
         },
       ],
@@ -103,7 +103,7 @@ it('reports errors on segments that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: '/shared/ui/index.ts',
+          path: joinFromRoot('shared', 'ui', 'index.ts'),
           content: '',
         },
       ],

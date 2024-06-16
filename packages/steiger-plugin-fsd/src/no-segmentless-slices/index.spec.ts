@@ -1,4 +1,5 @@
 import { expect, it } from 'vitest'
+import { join } from 'node:path'
 
 import noSegmentlessSlices from './index.js'
 import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
@@ -53,6 +54,6 @@ it('reports errors on a project where some slices have no segments', () => {
   const diagnostics = noSegmentlessSlices.check(root).diagnostics
   expect(diagnostics).toEqual([
     { message: 'Slice "user" on layer "entities" has no segments' },
-    { message: 'Slice "settings/profile" on layer "pages" has no segments' },
+    { message: `Slice "${join('settings', 'profile')}" on layer "pages" has no segments` },
   ])
 })

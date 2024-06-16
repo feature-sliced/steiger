@@ -1,4 +1,4 @@
-import { sep } from 'node:path'
+import { sep, join } from 'node:path'
 
 export function groupSlices(sliceNames: Array<string>): Record<string, Array<string>> {
   const groups: Record<string, Array<string>> = {}
@@ -20,8 +20,8 @@ export function groupSlices(sliceNames: Array<string>): Record<string, Array<str
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
   test('groupSlices', () => {
-    expect(groupSlices(['a/b/c', 'a/b/d', 'a/e', 'f', 'g'])).toEqual({
-      'a/b': ['c', 'd'],
+    expect(groupSlices([join('a', 'b', 'c'), join('a', 'b', 'd'), join('a', 'e'), 'f', 'g'])).toEqual({
+      [join('a', 'b')]: ['c', 'd'],
       a: ['e'],
       '': ['f', 'g'],
     })
