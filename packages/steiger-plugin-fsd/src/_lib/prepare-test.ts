@@ -38,6 +38,10 @@ export function compareMessages(a: Diagnostic, b: Diagnostic): number {
   return a.message.localeCompare(b.message)
 }
 
+export function joinFromRoot(...segments: Array<string>) {
+  return join('/', ...segments)
+}
+
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 

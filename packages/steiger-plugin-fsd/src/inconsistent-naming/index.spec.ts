@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, parseIntoFsdRoot, joinFromRoot } from '../_lib/prepare-test.js'
 import inconsistentNaming from './index.js'
 
 it('reports no errors on slice names that are pluralized consistently', () => {
@@ -35,7 +35,7 @@ it('reports an error on slice names that are not pluralized consistently', () =>
       fixes: [
         {
           type: 'rename',
-          path: '/entities/user',
+          path: joinFromRoot('entities', 'user'),
           newName: 'users',
         },
       ],
@@ -64,7 +64,7 @@ it('prefers the singular form when there are more singular slices', () => {
       fixes: [
         {
           type: 'rename',
-          path: '/entities/comments',
+          path: joinFromRoot('entities', 'comments'),
           newName: 'comment',
         },
       ],
