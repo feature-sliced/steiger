@@ -11,6 +11,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  static-checks:
+    name: Static checks
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Run checks
+        run: |
+          turbo run check-formatting lint typecheck
+          pnpm check-monorepo
+
   quality-checks:
     name: Quality checks
     timeout-minutes: 10
@@ -27,10 +42,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Run checks
+      - name: Run tests
         run: |
-          turbo run check-formatting lint typecheck test
-          pnpm check-monorepo
+          turbo run test
 
       - name: Try building
         run: turbo run build
