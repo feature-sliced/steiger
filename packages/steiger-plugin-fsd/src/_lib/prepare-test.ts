@@ -44,7 +44,7 @@ export function joinFromRoot(...segments: Array<string>) {
   return join('/', ...segments)
 }
 
-export function createFsMocks(mockedFiles: Record<string, string>, original: typeof import('fs')) {
+export function createFsMocks(mockedFiles: Record<string, string>, original: typeof import('fs')): typeof import('fs') {
   const normalizedMockedFiles = Object.fromEntries(
     Object.entries(mockedFiles).map(([path, content]) => [path.replace(/\//g, sep), content]),
   )
@@ -65,7 +65,7 @@ export function createFsMocks(mockedFiles: Record<string, string>, original: typ
         (key) => key === normalizedPath || key.startsWith(normalizedPath + sep),
       )
     }) as typeof existsSync),
-  }
+  } as typeof import('fs')
 }
 
 if (import.meta.vitest) {
