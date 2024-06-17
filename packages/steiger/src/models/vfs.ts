@@ -78,43 +78,43 @@ if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest
   describe('createVfsRoot', () => {
     it('allows adding files and creates folders automatically', () => {
-      const { $tree, fileAdded } = createVfsRoot('/project/src')
+      const { $tree, fileAdded } = createVfsRoot(join('/', 'project', 'src'))
 
-      expect($tree.getState()).toEqual({ type: 'folder', path: '/project/src', children: [] })
+      expect($tree.getState()).toEqual({ type: 'folder', path: join('/', 'project', 'src'), children: [] })
 
-      fileAdded('/project/src/index.ts')
-      fileAdded('/project/src/components/button.ts')
-      fileAdded('/project/src/components/input.ts')
-      fileAdded('/project/src/components/input/styles.ts')
+      fileAdded(join('/', 'project', 'src', 'index.ts'))
+      fileAdded(join('/', 'project', 'src', 'components', 'button.ts'))
+      fileAdded(join('/', 'project', 'src', 'components', 'input.ts'))
+      fileAdded(join('/', 'project', 'src', 'components', 'input', 'styles.ts'))
 
       expect($tree.getState()).toEqual({
         type: 'folder',
-        path: '/project/src',
+        path: join('/', 'project', 'src'),
         children: [
           {
             type: 'file',
-            path: '/project/src/index.ts',
+            path: join('/', 'project', 'src', 'index.ts'),
           },
           {
             type: 'folder',
-            path: '/project/src/components',
+            path: join('/', 'project', 'src', 'components'),
             children: [
               {
                 type: 'file',
-                path: '/project/src/components/button.ts',
+                path: join('/', 'project', 'src', 'components', 'button.ts'),
               },
               {
                 type: 'file',
-                path: '/project/src/components/input.ts',
+                path: join('/', 'project', 'src', 'components', 'input.ts'),
               },
 
               {
                 type: 'folder',
-                path: '/project/src/components/input',
+                path: join('/', 'project', 'src', 'components', 'input'),
                 children: [
                   {
                     type: 'file',
-                    path: '/project/src/components/input/styles.ts',
+                    path: join('/', 'project', 'src', 'components', 'input', 'styles.ts'),
                   },
                 ],
               },
@@ -125,30 +125,30 @@ if (import.meta.vitest) {
     })
 
     it('allows removing files and deletes empty folders automatically', () => {
-      const { $tree, fileAdded, fileRemoved } = createVfsRoot('/project/src')
+      const { $tree, fileAdded, fileRemoved } = createVfsRoot(join('/', 'project', 'src'))
 
-      fileAdded('/project/src/index.ts')
-      fileAdded('/project/src/components/input/styles.ts')
+      fileAdded(join('/', 'project', 'src', 'index.ts'))
+      fileAdded(join('/', 'project', 'src', 'components', 'input', 'styles.ts'))
 
       expect($tree.getState()).toEqual({
         type: 'folder',
-        path: '/project/src',
+        path: join('/', 'project', 'src'),
         children: [
           {
             type: 'file',
-            path: '/project/src/index.ts',
+            path: join('/', 'project', 'src', 'index.ts'),
           },
           {
             type: 'folder',
-            path: '/project/src/components',
+            path: join('/', 'project', 'src', 'components'),
             children: [
               {
                 type: 'folder',
-                path: '/project/src/components/input',
+                path: join('/', 'project', 'src', 'components', 'input'),
                 children: [
                   {
                     type: 'file',
-                    path: '/project/src/components/input/styles.ts',
+                    path: join('/', 'project', 'src', 'components', 'input', 'styles.ts'),
                   },
                 ],
               },
@@ -157,63 +157,63 @@ if (import.meta.vitest) {
         ],
       })
 
-      fileRemoved('/project/src/components/input/styles.ts')
+      fileRemoved(join('/', 'project', 'src', 'components', 'input', 'styles.ts'))
 
       expect($tree.getState()).toEqual({
         type: 'folder',
-        path: '/project/src',
+        path: join('/', 'project', 'src'),
         children: [
           {
             type: 'file',
-            path: '/project/src/index.ts',
+            path: join('/', 'project', 'src', 'index.ts'),
           },
         ],
       })
 
-      fileRemoved('/project/src/index.ts')
+      fileRemoved(join('/', 'project', 'src', 'index.ts'))
 
-      expect($tree.getState()).toEqual({ type: 'folder', path: '/project/src', children: [] })
+      expect($tree.getState()).toEqual({ type: 'folder', path: join('/', 'project', 'src'), children: [] })
     })
 
     it('allows tracking two separate roots independently', () => {
-      const root1 = createVfsRoot('/project1/src')
-      const root2 = createVfsRoot('/project2/src')
+      const root1 = createVfsRoot(join('/', 'project1', 'src'))
+      const root2 = createVfsRoot(join('/', 'project2', 'src'))
 
-      root1.fileAdded('/project1/src/index.ts')
+      root1.fileAdded(join('/', 'project1', 'src', 'index.ts'))
 
       expect(root1.$tree.getState()).toEqual({
         type: 'folder',
-        path: '/project1/src',
+        path: join('/', 'project1', 'src'),
         children: [
           {
             type: 'file',
-            path: '/project1/src/index.ts',
+            path: join('/', 'project1', 'src', 'index.ts'),
           },
         ],
       })
       expect(root2.$tree.getState()).toEqual({
         type: 'folder',
-        path: '/project2/src',
+        path: join('/', 'project2', 'src'),
         children: [],
       })
 
-      root2.fileAdded('/project2/src/shared/ui/button.ts')
+      root2.fileAdded(join('/', 'project2', 'src', 'shared', 'ui', 'button.ts'))
 
       expect(root2.$tree.getState()).toEqual({
         type: 'folder',
-        path: '/project2/src',
+        path: join('/', 'project2', 'src'),
         children: [
           {
             type: 'folder',
-            path: '/project2/src/shared',
+            path: join('/', 'project2', 'src', 'shared'),
             children: [
               {
                 type: 'folder',
-                path: '/project2/src/shared/ui',
+                path: join('/', 'project2', 'src', 'shared', 'ui'),
                 children: [
                   {
                     type: 'file',
-                    path: '/project2/src/shared/ui/button.ts',
+                    path: join('/', 'project2', 'src', 'shared', 'ui', 'button.ts'),
                   },
                 ],
               },
