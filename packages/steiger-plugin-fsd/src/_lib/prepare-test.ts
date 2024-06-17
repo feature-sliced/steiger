@@ -52,16 +52,19 @@ export function createFsMocks(mockedFiles: Record<string, string>, original: typ
   return {
     ...original,
     readFileSync: vi.fn(((path, options) => {
-      if (typeof path === 'string' && path in normalizedMockedFiles) {
-        return normalizedMockedFiles[path as keyof typeof normalizedMockedFiles]
+      const normalizedPath = typeof path === 'string' ? path.replace(/\//g, sep) : path
+      if (typeof normalizedPath === 'string' && normalizedPath in normalizedMockedFiles) {
+        return normalizedMockedFiles[normalizedPath as keyof typeof normalizedMockedFiles]
       } else {
-        return original.readFileSync(path, options)
+        return original.readFileSync(normalizedPath, options)
       }
     }) as typeof readFileSync),
-    existsSync: vi.fn(((path) =>
-      Object.keys(normalizedMockedFiles).some(
-        (key) => key === path || key.startsWith(path + sep),
-      )) as typeof existsSync),
+    existsSync: vi.fn(((path) => {
+      const normalizedPath = typeof path === 'string' ? path.replace(/\//g, sep) : path
+      return Object.keys(normalizedMockedFiles).some(
+        (key) => key === normalizedPath || key.startsWith(normalizedPath + sep),
+      )
+    }) as typeof existsSync),
   }
 }
 
