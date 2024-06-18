@@ -11,6 +11,7 @@ import publicApi from './public-api/index.js'
 import repetitiveNaming from './repetitive-naming/index.js'
 import segmentsByPurpose from './segments-by-purpose/index.js'
 import sharedLibGrouping from './shared-lib-grouping/index.js'
+import noProcesses from './no-processes/index.js'
 
 export default [
   ambiguousSliceNames,
@@ -26,6 +27,7 @@ export default [
   repetitiveNaming,
   segmentsByPurpose,
   sharedLibGrouping,
+  noProcesses,
 ]
 
 export type { Diagnostic, Context, Fix, Rule, RuleResult } from './types.js'
