@@ -11,6 +11,7 @@ import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
 import { setConfig, schema as configSchema } from './models/config'
+import { applyAutofixes } from './features/autofix'
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('steiger')
@@ -19,6 +20,11 @@ const yargsProgram = yargs(hideBin(process.argv))
     alias: 'w',
     demandOption: false,
     describe: 'watch filesystem changes',
+    type: 'boolean',
+  })
+  .option('fix', {
+    demandOption: false,
+    describe: 'apply auto-fixes',
     type: 'boolean',
   })
   .string('_')
@@ -58,11 +64,19 @@ if (consoleArgs.watch) {
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
     reportPretty(state)
+    if (consoleArgs.fix) {
+      applyAutofixes(state)
+    }
   })
   prexit(() => {
     stopWatching()
     unsubscribe()
   })
 } else {
-  await linter.run(resolve(consoleArgs._[0])).then(reportPretty)
+  const diagnostics = await linter.run(resolve(consoleArgs._[0]))
+
+  reportPretty(diagnostics)
+  if (consoleArgs.fix) {
+    applyAutofixes(diagnostics)
+  }
 }
