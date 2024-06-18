@@ -56,7 +56,7 @@ const importLocality = {
           const layerAndSlice = join(...[dependencyLocation.layerName, dependencyLocation.sliceName].filter(Boolean))
 
           diagnostics.push({
-            message: `Import from "${sourceRelativePath}" to "${dependencyRelativePath}" on "${layerAndSlice}" should be relative.`,
+            message: `Import on "${layerAndSlice}" from "${sourceRelativePath}" to "${dependencyRelativePath}" should be relative.`,
           })
         }
       }
