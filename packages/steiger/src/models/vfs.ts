@@ -1,5 +1,5 @@
 import { basename, sep, join, relative } from 'node:path'
-import type { Folder } from '@feature-sliced/filesystem'
+import type { Folder } from '@steiger/types'
 import { createEvent, createStore } from 'effector'
 import { produce } from 'immer'
 

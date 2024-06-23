@@ -1,5 +1,5 @@
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 const THRESHOLD = 15
 

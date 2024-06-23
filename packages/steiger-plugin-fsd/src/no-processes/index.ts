@@ -1,5 +1,5 @@
 import { basename } from 'node:path'
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 const noProcesses = {
   name: 'no-processes',

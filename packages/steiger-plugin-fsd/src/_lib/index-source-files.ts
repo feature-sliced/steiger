@@ -1,13 +1,6 @@
-import {
-  getIndex,
-  getLayers,
-  getSegments,
-  getSlices,
-  isSliced,
-  type File,
-  type Folder,
-  type LayerName,
-} from '@feature-sliced/filesystem'
+import { getIndex, getLayers, getSegments, getSlices, isSliced, type LayerName } from '@feature-sliced/filesystem'
+import type { File, Folder } from '@steiger/types'
+
 import { joinFromRoot, parseIntoFsdRoot } from './prepare-test.js'
 
 type SourceFile = {

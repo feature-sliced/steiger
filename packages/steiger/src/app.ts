@@ -1,7 +1,7 @@
 import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import fsdRules, { type Rule } from '@feature-sliced/steiger-plugin'
-import type { Folder } from '@feature-sliced/filesystem'
+import fsdRules from '@feature-sliced/steiger-plugin'
+import type { Rule, Folder } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'

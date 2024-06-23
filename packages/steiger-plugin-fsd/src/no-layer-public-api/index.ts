@@ -1,5 +1,5 @@
 import { getIndex, getLayers } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 /** Forbid index files on layer level. */
 const noLayerPublicApi = {

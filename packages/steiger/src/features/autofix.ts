@@ -1,6 +1,6 @@
 import { dirname, join } from 'node:path'
 import { rename, open, mkdir, rm } from 'node:fs/promises'
-import type { Diagnostic } from '@feature-sliced/steiger-plugin'
+import type { Diagnostic } from '@steiger/types'
 
 export async function applyAutofixes(diagnostics: Array<Diagnostic>) {
   return Promise.all(

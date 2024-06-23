@@ -3,18 +3,10 @@ import { relative } from 'node:path'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
+import { getIndex, getLayers, getSegments, isSliced, resolveImport } from '@feature-sliced/filesystem'
+import type { Folder, File, Diagnostic, Rule } from '@steiger/types'
 
-import type { Diagnostic, Rule } from '../types.js'
 import { indexSourceFiles } from '../_lib/index-source-files.js'
-import {
-  getIndex,
-  getLayers,
-  getSegments,
-  isSliced,
-  resolveImport,
-  type Folder,
-  type File,
-} from '@feature-sliced/filesystem'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {

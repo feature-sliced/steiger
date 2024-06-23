@@ -4,8 +4,8 @@ import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
+import type { Diagnostic, Rule } from '@steiger/types'
 
-import type { Diagnostic, Rule } from '../types.js'
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 
 const forbiddenImports = {

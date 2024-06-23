@@ -1,5 +1,5 @@
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 import { groupSlices } from '../_lib/group-slices.js'
 
 const THRESHOLDS = {

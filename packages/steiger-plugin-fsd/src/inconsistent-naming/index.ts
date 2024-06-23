@@ -3,8 +3,8 @@ import { partition } from 'lodash-es'
 import pluralize from 'pluralize'
 const { isPlural, plural, singular } = pluralize
 import { getLayers, getSlices } from '@feature-sliced/filesystem'
+import type { Diagnostic, Rule } from '@steiger/types'
 
-import type { Diagnostic, Rule } from '../types.js'
 import { groupSlices } from '../_lib/group-slices.js'
 
 /** Detect inconsistent naming of slices on layers (singular vs plural) */

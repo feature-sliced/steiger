@@ -1,7 +1,6 @@
 import { sep } from 'node:path'
 import { getAllSlices, getLayers, getSegments } from '@feature-sliced/filesystem'
-
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 /** Forbid slice names that match some segment’s name in shared (e.g., theme, i18n) */
 const ambiguousSliceNames = {

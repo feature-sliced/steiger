@@ -1,6 +1,6 @@
 import { join, sep } from 'node:path'
 import chokidar from 'chokidar'
-import type { Folder } from '@feature-sliced/filesystem'
+import type { Folder } from '@steiger/types'
 import { isGitIgnored } from 'globby'
 
 import { createVfsRoot } from '../models/vfs'

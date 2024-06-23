@@ -1,6 +1,5 @@
 import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
-
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals', 'types', 'constants', 'consts', 'const']
 

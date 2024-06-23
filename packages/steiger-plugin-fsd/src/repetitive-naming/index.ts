@@ -1,6 +1,5 @@
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 /**
  * Pattern that matches one word in different naming conventions.

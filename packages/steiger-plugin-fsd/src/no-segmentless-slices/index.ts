@@ -1,7 +1,6 @@
 import { relative } from 'node:path'
-import { getLayers, isSlice, isSliced, type Folder } from '@feature-sliced/filesystem'
-
-import type { Diagnostic, Rule } from '../types.js'
+import { getLayers, isSlice, isSliced } from '@feature-sliced/filesystem'
+import type { Folder, Diagnostic, Rule } from '@steiger/types'
 
 const noSegmentlessSlices = {
   name: 'no-segmentless-slices',

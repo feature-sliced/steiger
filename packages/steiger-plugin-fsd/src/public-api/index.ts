@@ -1,7 +1,6 @@
 import { join } from 'node:path'
 import { getLayers, getSegments, isSliced, getIndex, getSlices } from '@feature-sliced/filesystem'
-
-import type { Diagnostic, Rule } from '../types.js'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {

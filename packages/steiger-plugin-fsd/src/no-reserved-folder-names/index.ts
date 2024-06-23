@@ -1,7 +1,7 @@
 import { basename, join, relative } from 'node:path'
 import { getAllSegments, conventionalSegmentNames } from '@feature-sliced/filesystem'
+import type { Diagnostic, Rule } from '@steiger/types'
 
-import type { Diagnostic, Rule } from '../types.js'
 import { findAllRecursively } from '../_lib/find-all-recursively.js'
 
 /** Forbid subfolders in segments that have names of common segments (e.g., shared/lib/ui). */

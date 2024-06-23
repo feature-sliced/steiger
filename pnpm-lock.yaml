@@ -54,6 +54,9 @@ importers:
       '@steiger/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
+      '@steiger/types':
+        specifier: workspace:*
+        version: link:../types
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -118,6 +121,9 @@ importers:
       '@steiger/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
+      '@steiger/types':
+        specifier: workspace:*
+        version: link:../types
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -158,6 +164,9 @@ importers:
       '@steiger/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
+      '@steiger/types':
+        specifier: workspace:*
+        version: link:../types
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -176,6 +185,15 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.14.2)
+
+  packages/types:
+    devDependencies:
+      '@steiger/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
 
   tooling/eslint-config:
     dependencies:

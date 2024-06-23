@@ -1,7 +1,7 @@
 import { join, sep } from 'node:path'
 import type { readFileSync, existsSync } from 'node:fs'
-import type { Folder, File, FsdRoot } from '@feature-sliced/filesystem'
-import type { Diagnostic } from '../types.js'
+import type { FsdRoot } from '@feature-sliced/filesystem'
+import type { Folder, File, Diagnostic } from '@steiger/types'
 import { vi } from 'vitest'
 
 /** Parse a multi-line indented string with emojis for files and folders into an FSD root. */

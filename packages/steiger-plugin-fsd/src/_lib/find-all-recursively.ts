@@ -1,5 +1,5 @@
 import { basename } from 'node:path'
-import type { Folder, File } from '@feature-sliced/filesystem'
+import type { Folder, File } from '@steiger/types'
 
 import { joinFromRoot, parseIntoFsdRoot as parseIntoFolder } from './prepare-test.js'
 

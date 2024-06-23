@@ -29,5 +29,3 @@ export default [
   sharedLibGrouping,
   noProcesses,
 ]
-
-export type { Diagnostic, Context, Fix, Rule, RuleResult } from './types.js'
