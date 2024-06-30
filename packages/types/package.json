@@ -1,5 +1,6 @@
 {
   "name": "@steiger/types",
+  "private": true,
   "description": "Type definitions for Steiger",
   "version": "0.1.0",
   "scripts": {
