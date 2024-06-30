@@ -1,5 +1,7 @@
 # Steiger
 
+[![NPM Version](https://img.shields.io/npm/v/steiger)](https://www.npmjs.com/package/steiger)
+
 Universal file structure and project architecture linter.
 
 > [!NOTE]
