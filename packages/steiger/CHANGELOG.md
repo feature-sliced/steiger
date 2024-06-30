@@ -1,5 +1,11 @@
 # steiger
 
+## 0.2.0
+
+### Minor Changes
+
+- Implement a rudimentary auto-fix engine
+
 ## 0.1.2
 
 ### Patch Changes
