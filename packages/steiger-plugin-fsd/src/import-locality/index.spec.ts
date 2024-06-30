@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import { expect, it, vi } from 'vitest'
 
 import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
@@ -79,7 +80,7 @@ it('reports errors on a project with absolute imports within a slice', async () 
 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
-      message: 'Import on "entities/user" from "ui/UserAvatar.tsx" to "ui/Name.tsx" should be relative.',
+      message: `Import on "${join('entities', 'user')}" from "${join('ui', 'UserAvatar.tsx')}" to "${join('ui', 'Name.tsx')}" should be relative.`,
     },
   ])
 })
@@ -108,7 +109,7 @@ it('reports errors on a project with absolute imports from the index within a sl
 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
-      message: 'Import on "entities/user" from "ui/Status.tsx" to "index.ts" should be relative.',
+      message: `Import on "${join('entities', 'user')}" from "${join('ui', 'Status.tsx')}" to "index.ts" should be relative.`,
     },
   ])
 })
@@ -141,7 +142,7 @@ it('reports errors on a project with relative imports between slices', async () 
 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
-      message: 'Import from "features/comments/ui/CommentCard.tsx" to "entities/user/index.ts should not be relative.',
+      message: `Import from "${join('features', 'comments', 'ui', 'CommentCard.tsx')}" to "${join('entities', 'user', 'index.ts')} should not be relative.`,
     },
   ])
 })

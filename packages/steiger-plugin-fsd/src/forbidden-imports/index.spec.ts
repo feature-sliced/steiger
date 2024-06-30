@@ -1,4 +1,5 @@
 import { expect, it, vi } from 'vitest'
+import { join } from 'node:path'
 
 import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
 import forbiddenImports from './index.js'
@@ -81,7 +82,7 @@ it('reports errors on a project with cross-imports in entities', async () => {
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
-      message: 'Forbidden cross-import on layer "entities" from "product/ui/ProductCard.tsx" to slice "user".',
+      message: `Forbidden cross-import on layer "entities" from "${join('product', 'ui', 'ProductCard.tsx')}" to slice "user".`,
     },
   ])
 })
@@ -110,7 +111,7 @@ it('reports errors on a project where a feature imports from a page', async () =
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
-      message: 'Forbidden import from "features/comments/ui/CommentCard.tsx" to higher layer "pages".',
+      message: `Forbidden import from "${join('features', 'comments', 'ui', 'CommentCard.tsx')}" to higher layer "pages".`,
     },
   ])
 })
