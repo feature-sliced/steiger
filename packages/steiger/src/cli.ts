@@ -63,7 +63,7 @@ if (consoleArgs.watch) {
   const [diagnosticsChanged, stopWatching] = await linter.watch(resolve(consoleArgs._[0]))
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
-    reportPretty(state)
+    reportPretty(state, process.cwd())
     if (consoleArgs.fix) {
       applyAutofixes(state)
     }
@@ -75,7 +75,7 @@ if (consoleArgs.watch) {
 } else {
   const diagnostics = await linter.run(resolve(consoleArgs._[0]))
 
-  reportPretty(diagnostics)
+  reportPretty(diagnostics, process.cwd())
   if (consoleArgs.fix) {
     applyAutofixes(diagnostics)
   }

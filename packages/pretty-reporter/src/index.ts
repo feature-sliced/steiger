@@ -1,39 +1,31 @@
 import chalk from 'chalk'
 import figures from 'figures'
-import type { AugmentedDiagnostic } from './types.js'
 
-export function formatPretty(diagnostics: Array<AugmentedDiagnostic>) {
+import type { AugmentedDiagnostic } from './types.js'
+import { formatSingleDiagnostic } from './format-single-diagnostic.js'
+import { s } from './pluralization.js'
+
+export function formatPretty(diagnostics: Array<AugmentedDiagnostic>, cwd: string) {
   if (diagnostics.length === 0) {
     return chalk.green(`${figures.tick} No problems found!`)
   }
 
-  const footer = chalk.red.bold(`Found ${diagnostics.length} problem${diagnostics.length > 1 ? 's' : ''}`)
+  let footer = chalk.red.bold(`Found ${diagnostics.length} problem${s(diagnostics.length)}`)
 
-  // TODO: enable when we have auto-fixes
-  // const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
-  // if (autofixable.length === diagnostics.length) {
-  //   footer += ' (all can be fixed automatically)'
-  // } else if (autofixable.length > 0) {
-  //   footer += ` (${autofixable.length} can be fixed automatically)`
-  // } else {
-  //   footer += ' (none can be fixed automatically)'
-  // }
+  const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
+  if (autofixable.length === diagnostics.length) {
+    footer += ` (all can be fixed automatically with ${chalk.green.bold('--fix')})`
+  } else if (autofixable.length > 0) {
+    footer += ` (${autofixable.length} can be fixed automatically with ${chalk.green.bold('--fix')})`
+  } else {
+    footer += ' (none can be fixed automatically)'
+  }
 
   return (
     '\n' +
-    diagnostics
-      .map((d) => {
-        const message = ` ${chalk.red(figures.cross)} ${chalk.reset(d.message)}  ${chalk.gray(`// ${d.ruleName}`)}`
-
-        // TODO: enable when we have auto-fixes
-        // if ((d.fixes?.length ?? 0) > 0) {
-        //   message += chalk.green(`\n   (${figures.tick} auto-fix available)`)
-        // }
-
-        return message
-      })
-      .join('\n\n') +
+    diagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
     '\n\n' +
+    // Due to formatting characters, it won't be exactly the size of the footer, that is okay
     chalk.gray(figures.line.repeat(footer.length)) +
     '\n ' +
     footer +
@@ -41,8 +33,8 @@ export function formatPretty(diagnostics: Array<AugmentedDiagnostic>) {
   )
 }
 
-export function reportPretty(diagnostics: Array<AugmentedDiagnostic>) {
-  console.error(formatPretty(diagnostics))
+export function reportPretty(diagnostics: Array<AugmentedDiagnostic>, cwd: string) {
+  console.error(formatPretty(diagnostics, cwd))
 }
 
 export type { AugmentedDiagnostic }

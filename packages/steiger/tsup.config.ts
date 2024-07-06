@@ -10,6 +10,7 @@ export default defineConfig({
   },
   treeshake: true,
   clean: true,
+  inject: ['./cjs-shim.ts'],
   esbuildOptions(options) {
     options.define = { 'import.meta.vitest': 'undefined' }
   },

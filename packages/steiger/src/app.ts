@@ -8,6 +8,10 @@ import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $config, type Config } from './models/config'
 
+function getRuleDescriptionUrl(ruleName: string) {
+  return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
+}
+
 const enabledRules = $config.map((config) => {
   const ruleConfigs = config?.rules
 
@@ -24,7 +28,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const ruleResults = await Promise.all(
     rules.map((rule) =>
       Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
-        diagnostics.map((d) => ({ ...d, ruleName: rule.name }) as AugmentedDiagnostic),
+        diagnostics.map<AugmentedDiagnostic>((d) => ({ ...d, ruleName: rule.name, getRuleDescriptionUrl })),
       ),
     ),
   )
