@@ -2,7 +2,7 @@
   "name": "@steiger/types",
   "private": true,
   "description": "Type definitions for Steiger",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "format": "prettier --write . --cache",
     "check-formatting": "prettier --check . --cache",
