@@ -9,23 +9,27 @@ const segmentsByPurpose = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const [layerName, layer] of Object.entries(getLayers(root))) {
+    for (const layer of Object.values(getLayers(root))) {
       if (layer === null) {
         continue
       }
 
       if (!isSliced(layer)) {
-        for (const segmentName of Object.keys(getSegments(layer))) {
+        for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
           if (BAD_NAMES.includes(segmentName)) {
-            diagnostics.push({ message: `Non-descriptive segment name "${segmentName}" on layer "${layerName}"` })
+            diagnostics.push({
+              message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+              location: { path: segment.path },
+            })
           }
         }
       } else {
-        for (const [sliceName, slice] of Object.entries(getSlices(layer))) {
-          for (const segmentName of Object.keys(getSegments(slice))) {
+        for (const slice of Object.values(getSlices(layer))) {
+          for (const [segmentName, segment] of Object.entries(getSegments(slice))) {
             if (BAD_NAMES.includes(segmentName)) {
               diagnostics.push({
-                message: `Non-descriptive segment name "${segmentName}" on slice "${sliceName}" on layer "${layerName}"`,
+                message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+                location: { path: segment.path },
               })
             }
           }

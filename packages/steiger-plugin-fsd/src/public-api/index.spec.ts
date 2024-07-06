@@ -50,7 +50,7 @@ it('reports errors on slices that are missing a public API', () => {
   const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
-      message: 'On the "entities" layer, slice "posts" is missing a public API.',
+      message: 'This slice is missing a public API.',
       fixes: [
         {
           type: 'create-file',
@@ -58,9 +58,10 @@ it('reports errors on slices that are missing a public API', () => {
           content: '',
         },
       ],
+      location: { path: joinFromRoot('entities', 'posts') },
     },
     {
-      message: 'On the "pages" layer, slice "editor" is missing a public API.',
+      message: 'This slice is missing a public API.',
       fixes: [
         {
           type: 'create-file',
@@ -68,6 +69,7 @@ it('reports errors on slices that are missing a public API', () => {
           content: '',
         },
       ],
+      location: { path: joinFromRoot('pages', 'editor') },
     },
   ])
 })
@@ -99,7 +101,7 @@ it('reports errors on segments that are missing a public API', () => {
   const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
-      message: 'On the "shared" layer, segment "ui" is missing a public API.',
+      message: 'This segment is missing a public API.',
       fixes: [
         {
           type: 'create-file',
@@ -107,6 +109,7 @@ it('reports errors on segments that are missing a public API', () => {
           content: '',
         },
       ],
+      location: { path: joinFromRoot('shared', 'ui') },
     },
   ])
 })

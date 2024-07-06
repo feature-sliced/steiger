@@ -1,4 +1,3 @@
-import { relative } from 'node:path'
 import { getLayers, isSlice, isSliced } from '@feature-sliced/filesystem'
 import type { Folder, Diagnostic, Rule } from '@steiger/types'
 
@@ -7,7 +6,7 @@ const noSegmentlessSlices = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const [layerName, layer] of Object.entries(getLayers(root))) {
+    for (const layer of Object.values(getLayers(root))) {
       if (!isSliced(layer)) {
         continue
       }
@@ -26,7 +25,8 @@ const noSegmentlessSlices = {
           // The slice detection algorithm relies on the presence of a conventional segment
           if (!isSlice(sliceCandidate)) {
             diagnostics.push({
-              message: `Slice "${relative(layer.path, sliceCandidate.path)}" on layer "${layerName}" has no segments`,
+              message: 'This slice has no segments. Consider dividing the code inside into segments.',
+              location: { path: sliceCandidate.path },
             })
           }
         }

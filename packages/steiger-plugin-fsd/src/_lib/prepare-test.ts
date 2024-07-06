@@ -37,7 +37,7 @@ export function parseIntoFsdRoot(fsMarkup: string): FsdRoot {
 }
 
 export function compareMessages(a: Diagnostic, b: Diagnostic): number {
-  return a.message.localeCompare(b.message)
+  return a.message.localeCompare(b.message) || a.location.path.localeCompare(b.location.path)
 }
 
 export function joinFromRoot(...segments: Array<string>) {

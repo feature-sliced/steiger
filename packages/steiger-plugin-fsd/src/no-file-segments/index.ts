@@ -1,4 +1,4 @@
-import { basename, relative } from 'node:path'
+import { basename } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
 
@@ -7,12 +7,13 @@ const noFileSegments = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const [layerName, layer] of Object.entries(getLayers(root))) {
+    for (const layer of Object.values(getLayers(root))) {
       if (!isSliced(layer)) {
         for (const child of layer.children) {
           if (child.type === 'file') {
             diagnostics.push({
-              message: `On layer "${layerName}", "${basename(child.path)}" is a file segment. Prefer folder segments.`,
+              message: 'This segment is a file. Prefer folder segments.',
+              location: { path: child.path },
             })
           }
         }
@@ -21,7 +22,8 @@ const noFileSegments = {
           for (const child of slice.children) {
             if (child.type === 'file' && withoutExtension(basename(child.path)) !== 'index') {
               diagnostics.push({
-                message: `In "${relative(root.path, slice.path)}", "${basename(child.path)}" is a file segment. Prefer folder segments.`,
+                message: 'This segment is a file. Prefer folder segments.',
+                location: { path: child.path },
               })
             }
           }

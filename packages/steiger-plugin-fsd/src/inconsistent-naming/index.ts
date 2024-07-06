@@ -24,11 +24,7 @@ const inconsistentNaming = {
       const [pluralNames, singularNames] = partition(group, isPlural)
 
       if (pluralNames.length > 0 && singularNames.length > 0) {
-        let message = `Inconsistent pluralization on layer "entities"`
-
-        if (groupPrefix.length > 0) {
-          message += ` for slice group "${groupPrefix}"`
-        }
+        const message = 'Inconsistent pluralization of slice names'
 
         if (pluralNames.length >= singularNames.length) {
           diagnostics.push({
@@ -38,6 +34,7 @@ const inconsistentNaming = {
               path: join(entities.path, groupPrefix, name),
               newName: plural(name),
             })),
+            location: { path: join(entities.path, groupPrefix) },
           })
         } else {
           diagnostics.push({
@@ -47,6 +44,7 @@ const inconsistentNaming = {
               path: join(entities.path, groupPrefix, name),
               newName: singular(name),
             })),
+            location: { path: join(entities.path, groupPrefix) },
           })
         }
       }

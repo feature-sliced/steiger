@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { relative, join } from 'node:path'
 import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
@@ -38,14 +37,15 @@ const forbiddenImports = {
           sourceFile.layerName === dependencyLocation.layerName &&
           sourceFile.sliceName !== dependencyLocation.sliceName
         ) {
-          const relativePath = relative(join(root.path, sourceFile.layerName), sourceFile.file.path)
           if (dependencyLocation.sliceName === null) {
             diagnostics.push({
-              message: `Forbidden cross-import on layer "${dependencyLocation.layerName}" from "${relativePath}" to segment "${dependencyLocation.segmentName}".`,
+              message: `Forbidden cross-import from segment "${dependencyLocation.segmentName}".`,
+              location: { path: sourceFile.file.path },
             })
           } else {
             diagnostics.push({
-              message: `Forbidden cross-import on layer "${dependencyLocation.layerName}" from "${relativePath}" to slice "${dependencyLocation.sliceName}".`,
+              message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
+              location: { path: sourceFile.file.path },
             })
           }
         } else {
@@ -54,7 +54,8 @@ const forbiddenImports = {
 
           if (thisLayerIndex < dependencyLayerIndex) {
             diagnostics.push({
-              message: `Forbidden import from "${relative(root.path, sourceFile.file.path)}" to higher layer "${dependencyLocation.layerName}".`,
+              message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
+              location: { path: sourceFile.file.path },
             })
           }
         }

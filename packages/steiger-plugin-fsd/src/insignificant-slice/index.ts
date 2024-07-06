@@ -1,5 +1,5 @@
 import * as fs from 'node:fs'
-import { sep } from 'node:path'
+import { sep, join } from 'node:path'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import { isSliced, resolveImport, unslicedLayers, type LayerName } from '@feature-sliced/filesystem'
 import type { Folder, Diagnostic, Rule } from '@steiger/types'
@@ -25,16 +25,19 @@ const insignificantSlice = {
         const referenceLocationKey = [...targetLocationKeys][0]
         if (unslicedLayers.includes(referenceLocationKey)) {
           diagnostics.push({
-            message: `Slice "${sourceLocationKey}" has only one reference on layer "${referenceLocationKey}". Consider merging them.`,
+            message: `This slice has only one reference on layer "${referenceLocationKey}". Consider moving this code to "${referenceLocationKey}".`,
+            location: { path: join(root.path, sourceLocationKey) },
           })
         } else {
           diagnostics.push({
-            message: `Slice "${sourceLocationKey}" has only one reference in slice "${[...targetLocationKeys][0]}". Consider merging them.`,
+            message: `This slice has only one reference in slice "${referenceLocationKey}". Consider merging them.`,
+            location: { path: join(root.path, sourceLocationKey) },
           })
         }
       } else if (targetLocationKeys.size === 0) {
         diagnostics.push({
-          message: `Slice "${sourceLocationKey}" has no references. Consider removing it.`,
+          message: `This slice has no references. Consider removing it.`,
+          location: { path: join(root.path, sourceLocationKey) },
         })
       }
     }

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import repetitiveNaming from './index.js'
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project with no repetitive words in slices', () => {
   const root = parseIntoFsdRoot(`
@@ -35,7 +35,9 @@ it('reports errors on a project with repetition of "page"', () => {
   `)
 
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
-  expect(diagnostics).toEqual([{ message: 'Repetitive word "page" in slice names on layer "pages"' }])
+  expect(diagnostics).toEqual([
+    { message: 'Repetitive word "page" in slice names.', location: { path: joinFromRoot('pages') } },
+  ])
 })
 
 it('recognizes words in different naming conventions', () => {
@@ -53,7 +55,9 @@ it('recognizes words in different naming conventions', () => {
   `)
 
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
-  expect(diagnostics).toEqual([{ message: 'Repetitive word "folder" in slice names on layer "entities"' }])
+  expect(diagnostics).toEqual([
+    { message: 'Repetitive word "folder" in slice names.', location: { path: joinFromRoot('entities') } },
+  ])
 })
 
 it('does not complain about layers with just one slice', () => {

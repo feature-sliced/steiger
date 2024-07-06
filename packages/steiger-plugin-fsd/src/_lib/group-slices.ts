@@ -1,5 +1,12 @@
 import { sep, join } from 'node:path'
 
+/**
+ * Groups slice names that share the same parent path segments.
+ *
+ * @example
+ * groupSlices(['a/b/c', 'a/b/d', 'a/e', 'f', 'g'])
+ * // => { 'a/b': ['c', 'd'], a: ['e'], '': ['f', 'g'] }
+ */
 export function groupSlices(sliceNames: Array<string>): Record<string, Array<string>> {
   const groups: Record<string, Array<string>> = {}
 

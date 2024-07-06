@@ -31,7 +31,7 @@ it('reports an error on slice names that are not pluralized consistently', () =>
   const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
-      message: 'Inconsistent pluralization on layer "entities". Prefer all plural names',
+      message: 'Inconsistent pluralization of slice names. Prefer all plural names',
       fixes: [
         {
           type: 'rename',
@@ -39,6 +39,7 @@ it('reports an error on slice names that are not pluralized consistently', () =>
           newName: 'users',
         },
       ],
+      location: { path: joinFromRoot('entities') },
     },
   ])
 })
@@ -60,7 +61,7 @@ it('prefers the singular form when there are more singular slices', () => {
   const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
-      message: 'Inconsistent pluralization on layer "entities". Prefer all singular names',
+      message: 'Inconsistent pluralization of slice names. Prefer all singular names',
       fixes: [
         {
           type: 'rename',
@@ -68,6 +69,7 @@ it('prefers the singular form when there are more singular slices', () => {
           newName: 'comment',
         },
       ],
+      location: { path: joinFromRoot('entities') },
     },
   ])
 })

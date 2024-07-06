@@ -1,8 +1,7 @@
 import { expect, it } from 'vitest'
-import { join } from 'node:path'
 
 import noSegmentlessSlices from './index.js'
-import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project where every slice has at least one segment', () => {
   const root = parseIntoFsdRoot(`
@@ -53,7 +52,13 @@ it('reports errors on a project where some slices have no segments', () => {
 
   const diagnostics = noSegmentlessSlices.check(root).diagnostics
   expect(diagnostics).toEqual([
-    { message: 'Slice "user" on layer "entities" has no segments' },
-    { message: `Slice "${join('settings', 'profile')}" on layer "pages" has no segments` },
+    {
+      message: 'This slice has no segments. Consider dividing the code inside into segments.',
+      location: { path: joinFromRoot('entities', 'user') },
+    },
+    {
+      message: 'This slice has no segments. Consider dividing the code inside into segments.',
+      location: { path: joinFromRoot('pages', 'settings', 'profile') },
+    },
   ])
 })

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import segmentsByPurpose from './index.js'
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project with good segments', () => {
   const root = parseIntoFsdRoot(`
@@ -50,10 +50,25 @@ it('reports errors on a project with bad segments', () => {
 
   const diagnostics = segmentsByPurpose.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
-    { message: 'Non-descriptive segment name "components" on slice "user" on layer "entities"' },
-    { message: 'Non-descriptive segment name "helpers" on layer "shared"' },
-    { message: 'Non-descriptive segment name "hooks" on layer "shared"' },
-    { message: 'Non-descriptive segment name "modals" on layer "shared"' },
-    { message: 'Non-descriptive segment name "utils" on layer "shared"' },
+    {
+      message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+      location: { path: joinFromRoot('entities', 'user', 'components') },
+    },
+    {
+      message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+      location: { path: joinFromRoot('shared', 'helpers') },
+    },
+    {
+      message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+      location: { path: joinFromRoot('shared', 'hooks') },
+    },
+    {
+      message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+      location: { path: joinFromRoot('shared', 'modals') },
+    },
+    {
+      message: "This segment's name should describe the purpose of its contents, not what the contents are.",
+      location: { path: joinFromRoot('shared', 'utils') },
+    },
   ])
 })

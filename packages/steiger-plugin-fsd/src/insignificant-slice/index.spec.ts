@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 import { join } from 'node:path'
 
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 import insignificantSlice from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
@@ -123,10 +123,12 @@ it('reports errors on a project with insignificant slices', async () => {
 
   expect((await insignificantSlice.check(root)).diagnostics.sort(compareMessages)).toEqual([
     {
-      message: `Slice "${join('entities', 'product')}" has no references. Consider removing it.`,
+      message: `This slice has no references. Consider removing it.`,
+      location: { path: joinFromRoot('entities', 'product') },
     },
     {
-      message: `Slice "${join('entities', 'user')}" has only one reference in slice "${join('pages', 'editor')}". Consider merging them.`,
+      message: `This slice has only one reference in slice "${join('pages', 'editor')}". Consider merging them.`,
+      location: { path: joinFromRoot('entities', 'user') },
     },
   ])
 })

@@ -44,6 +44,29 @@ Examples of project structures that fail this rule:
     📄 index.ts
 ```
 
+```
+📂 shared
+  📂 ui
+    📄 index.ts
+  📂 i18n // ❗️ (1)
+    📄 index.ts
+  📂 store // ❗️ (2)
+    📄 index.ts
+📂 features
+  📂 i18n // ❌ (1)
+    📂 grouped
+      📂 ui
+      📄 index.ts
+  📂 test
+    📂 store // ❌ (2)
+      📂 ui
+      📄 index.ts
+📂 pages
+  📂 home
+    📂 ui
+    📄 index.ts
+```
+
 ## Rationale
 
 When there is a segment in shared with the same name as a slice, it becomes ambiguous where new code should be written, and also obscures the search for code.

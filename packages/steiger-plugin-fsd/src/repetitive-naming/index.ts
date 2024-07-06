@@ -19,7 +19,7 @@ const repetitiveNaming = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const [layerName, layer] of Object.entries(getLayers(root))) {
+    for (const layer of Object.values(getLayers(root))) {
       if (!isSliced(layer)) {
         continue
       }
@@ -39,7 +39,7 @@ const repetitiveNaming = {
           count >= sliceNames.length &&
           wordsInSliceNames.every((words) => words.includes(word))
         ) {
-          diagnostics.push({ message: `Repetitive word "${word}" in slice names on layer "${layerName}"` })
+          diagnostics.push({ message: `Repetitive word "${word}" in slice names.`, location: { path: layer.path } })
         }
       }
     }

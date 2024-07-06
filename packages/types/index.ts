@@ -26,6 +26,12 @@ export interface RuleResult {
 export interface Diagnostic {
   message: string
   fixes?: Array<Fix>
+  location: {
+    /** Absolute path to a folder or a file that contains the issue. */
+    path: string
+    line?: number
+    column?: number
+  }
 }
 
 export type Fix =

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import noLayerPublicApi from './index.js'
-import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project without index files on layer level', () => {
   const root = parseIntoFsdRoot(`
@@ -46,7 +46,7 @@ it('reports errors on a project with index files on layer level', () => {
 
   const diagnostics = noLayerPublicApi.check(root).diagnostics
   expect(diagnostics).toEqual([
-    { message: 'Layer "shared" should not have an index file' },
-    { message: 'Layer "pages" should not have an index file' },
+    { message: 'Layer "shared" should not have an index file', location: { path: joinFromRoot('shared', 'index.ts') } },
+    { message: 'Layer "pages" should not have an index file', location: { path: joinFromRoot('pages', 'index.ts') } },
   ])
 })

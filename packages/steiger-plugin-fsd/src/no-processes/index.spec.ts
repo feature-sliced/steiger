@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import noProcesses from './index.js'
-import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project without the Processes layer', () => {
   const root = parseIntoFsdRoot(`
@@ -47,5 +47,7 @@ it('reports errors on a project with the Processes layer', () => {
   `)
 
   const diagnostics = noProcesses.check(root).diagnostics
-  expect(diagnostics).toEqual([{ message: 'Layer "processes" is deprecated, avoid using it' }])
+  expect(diagnostics).toEqual([
+    { message: 'Layer "processes" is deprecated, avoid using it', location: { path: joinFromRoot('processes') } },
+  ])
 })

@@ -1,7 +1,6 @@
 import { expect, it } from 'vitest'
-import { join } from 'node:path'
 
-import { compareMessages, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 import noFileSegments from './index.js'
 
 it('reports no errors on a project with only folder segments', async () => {
@@ -47,10 +46,12 @@ it('reports no errors on a project with folder segments on sliced layers', async
 
   expect(noFileSegments.check(root).diagnostics).toEqual([
     {
-      message: `In "${join('features', 'comments')}", "ui.tsx" is a file segment. Prefer folder segments.`,
+      message: 'This segment is a file. Prefer folder segments.',
+      location: { path: joinFromRoot('features', 'comments', 'ui.tsx') },
     },
     {
-      message: `In "${join('pages', 'editor')}", "ui.tsx" is a file segment. Prefer folder segments.`,
+      message: 'This segment is a file. Prefer folder segments.',
+      location: { path: joinFromRoot('pages', 'editor', 'ui.tsx') },
     },
   ])
 })
@@ -92,7 +93,8 @@ it('reports errors on a project with folder segments in Shared', async () => {
 
   expect(noFileSegments.check(root).diagnostics.sort(compareMessages)).toEqual([
     {
-      message: `On layer "shared", "routes.ts" is a file segment. Prefer folder segments.`,
+      message: 'This segment is a file. Prefer folder segments.',
+      location: { path: joinFromRoot('shared', 'routes.ts') },
     },
   ])
 })

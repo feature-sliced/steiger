@@ -14,10 +14,10 @@ const publicApi = {
           // The app layer is the top-level layer, there's no need for public API.
           continue
         }
-        for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
+        for (const segment of Object.values(getSegments(layer))) {
           if (getIndex(segment) === undefined) {
             diagnostics.push({
-              message: `On the "${layerName}" layer, segment "${segmentName}" is missing a public API.`,
+              message: 'This segment is missing a public API.',
               fixes: [
                 {
                   type: 'create-file',
@@ -26,14 +26,15 @@ const publicApi = {
                   content: '',
                 },
               ],
+              location: { path: segment.path },
             })
           }
         }
       } else {
-        for (const [sliceName, slice] of Object.entries(getSlices(layer))) {
+        for (const slice of Object.values(getSlices(layer))) {
           if (getIndex(slice) === undefined) {
             diagnostics.push({
-              message: `On the "${layerName}" layer, slice "${sliceName}" is missing a public API.`,
+              message: 'This slice is missing a public API.',
               fixes: [
                 {
                   type: 'create-file',
@@ -42,6 +43,7 @@ const publicApi = {
                   content: '',
                 },
               ],
+              location: { path: slice.path },
             })
           }
         }

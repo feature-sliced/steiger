@@ -10,7 +10,10 @@ const noLayerPublicApi = {
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
       const index = getIndex(layer)
       if (index !== undefined) {
-        diagnostics.push({ message: `Layer "${layerName}" should not have an index file` })
+        diagnostics.push({
+          message: `Layer "${layerName}" should not have an index file`,
+          location: { path: index.path },
+        })
       }
     }
 

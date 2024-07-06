@@ -1,4 +1,4 @@
-import { basename, join, relative } from 'node:path'
+import { basename } from 'node:path'
 import { getAllSegments, conventionalSegmentNames } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
 
@@ -10,7 +10,7 @@ const noReservedFolderNames = {
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
-    for (const { segment, layerName, sliceName, segmentName } of getAllSegments(root)) {
+    for (const { segment } of getAllSegments(root)) {
       if (segment.type === 'file') {
         continue
       }
@@ -24,9 +24,9 @@ const noReservedFolderNames = {
           child,
           (entry) => entry.type === 'folder' && conventionalSegmentNames.includes(basename(entry.path)),
         )) {
-          const semanticLocation = join(...[layerName, sliceName, segmentName].filter(Boolean))
           diagnostics.push({
-            message: `Folder name "${relative(segment.path, violatingFolder.path)}" in "${semanticLocation}" is reserved for segment names`,
+            message: `Having a folder with the name "${basename(violatingFolder.path)}" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.`,
+            location: { path: violatingFolder.path },
           })
         }
       }

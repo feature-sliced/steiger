@@ -1,7 +1,6 @@
 import { expect, it, vi } from 'vitest'
-import { join } from 'node:path'
 
-import { parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 import noPublicApiSidestep from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
@@ -87,7 +86,8 @@ it('reports errors on a project with a public API sidestep on entities', async (
 
   expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
     {
-      message: `Forbidden sidestep of public API when importing "${join('entities', 'product', 'ui', 'ProductCard.tsx')}" from "${join('pages', 'editor', 'ui', 'Editor.tsx')}".`,
+      message: `Forbidden sidestep of public API when importing from "@/entities/product/ui/ProductCard.tsx".`,
+      location: { path: joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx') },
     },
   ])
 })
@@ -110,7 +110,8 @@ it('reports errors on a project with a public API sidestep on shared', async () 
 
   expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
     {
-      message: `Forbidden sidestep of public API when importing "${join('shared', 'ui', 'Button.tsx')}" from "${join('pages', 'editor', 'ui', 'SubmitButton.tsx')}".`,
+      message: `Forbidden sidestep of public API when importing from "@/shared/ui/Button".`,
+      location: { path: joinFromRoot('pages', 'editor', 'ui', 'SubmitButton.tsx') },
     },
   ])
 })

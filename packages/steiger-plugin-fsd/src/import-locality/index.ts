@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { relative, join } from 'node:path'
 import { resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
@@ -39,24 +38,14 @@ const importLocality = {
           sourceFile.layerName === dependencyLocation.layerName && sourceFile.sliceName === dependencyLocation.sliceName
 
         if (isRelative && !isWithinSameSlice) {
-          const sourceRelativePath = relative(root.path, sourceFile.file.path)
-          const dependencyRelativePath = relative(root.path, dependencyLocation.file.path)
           diagnostics.push({
-            message: `Import from "${sourceRelativePath}" to "${dependencyRelativePath} should not be relative.`,
+            message: `Import from "${dependency}" should not be relative.`,
+            location: { path: sourceFile.file.path },
           })
         } else if (!isRelative && isWithinSameSlice) {
-          const sourceRelativePath = relative(
-            join(...[root.path, sourceFile.layerName, sourceFile.sliceName].filter(Boolean)),
-            sourceFile.file.path,
-          )
-          const dependencyRelativePath = relative(
-            join(...[root.path, dependencyLocation.layerName, dependencyLocation.sliceName].filter(Boolean)),
-            dependencyLocation.file.path,
-          )
-          const layerAndSlice = join(...[dependencyLocation.layerName, dependencyLocation.sliceName].filter(Boolean))
-
           diagnostics.push({
-            message: `Import on "${layerAndSlice}" from "${sourceRelativePath}" to "${dependencyRelativePath}" should be relative.`,
+            message: `Import from "${dependency}" should be relative.`,
+            location: { path: sourceFile.file.path },
           })
         }
       }

@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { relative } from 'node:path'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
@@ -46,7 +45,8 @@ const noPublicApiSidestep = {
         if (isSliced(dependencyLocation.layerName)) {
           if (dependencyLocation.segmentName !== null) {
             diagnostics.push({
-              message: `Forbidden sidestep of public API when importing "${relative(root.path, resolvedDependency)}" from "${relative(root.path, sourceFile.file.path)}".`,
+              message: `Forbidden sidestep of public API when importing from "${dependency}".`,
+              location: { path: sourceFile.file.path },
             })
           }
         } else if (dependencyLocation.segmentName !== null) {
@@ -63,7 +63,8 @@ const noPublicApiSidestep = {
           const index = getIndex(segment)
           if (resolvedDependency !== index?.path) {
             diagnostics.push({
-              message: `Forbidden sidestep of public API when importing "${relative(root.path, resolvedDependency)}" from "${relative(root.path, sourceFile.file.path)}".`,
+              message: `Forbidden sidestep of public API when importing from "${dependency}".`,
+              location: { path: sourceFile.file.path },
             })
           }
         }
