@@ -30,7 +30,7 @@ describe('no-segments-on-sliced-layers rule', () => {
     expect(noSegmentsOnSlicedLayers.check(root)).toEqual({ diagnostics: [] })
   })
 
-  it('reports errors on a project where the "Entities" layer has segments in direct children', () => {
+  it('reports errors on a project where a sliced layer has segments among its direct children', () => {
     const root = parseIntoFsdRoot(`
       📂 shared
         📂 ui
