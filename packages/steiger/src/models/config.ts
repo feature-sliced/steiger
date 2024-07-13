@@ -14,6 +14,7 @@ export const schema = z.object({
         'no-public-api-sidestep',
         'no-reserved-folder-names',
         'no-segmentless-slices',
+        'no-segments-on-sliced-layers',
         'public-api',
         'repetitive-naming',
         'segments-by-purpose',
