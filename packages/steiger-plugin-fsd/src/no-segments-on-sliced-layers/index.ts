@@ -1,5 +1,7 @@
+import { sep } from 'node:path'
+
 import { getLayers, isSliced, conventionalSegmentNames } from '@feature-sliced/filesystem'
-import { type Diagnostic, Rule } from '@steiger/types'
+import type { Diagnostic, Rule } from '@steiger/types'
 
 const noSegmentsOnSlicedLayers = {
   name: 'no-segments-on-sliced-layers',
@@ -11,7 +13,7 @@ const noSegmentsOnSlicedLayers = {
       if (isSliced(layer)) {
         for (const directChild of layer.children) {
           if (directChild.type === 'folder') {
-            const folderName = directChild.path.split('/').pop()
+            const folderName = directChild.path.split(sep).pop()
             const isConventionalSegment = folderName && conventionalSegmentNames.includes(folderName)
 
             if (isConventionalSegment) {
