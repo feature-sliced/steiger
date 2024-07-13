@@ -27,8 +27,6 @@ describe('no-segments-on-sliced-layers rule', () => {
           📄 index.ts
     `)
 
-    console.log(noSegmentsOnSlicedLayers.check(root))
-
     expect(noSegmentsOnSlicedLayers.check(root)).toEqual({ diagnostics: [] })
   })
 
@@ -74,7 +72,7 @@ describe('no-segments-on-sliced-layers rule', () => {
     `)
 
     const diagnostics = noSegmentsOnSlicedLayers.check(root).diagnostics
-    console.log(diagnostics)
+
     expect(diagnostics).toEqual([
       {
         message:
