@@ -18,7 +18,7 @@ const noSegmentsOnSlicedLayers = {
 
             if (isConventionalSegment) {
               diagnostics.push({
-                message: `Conventional segment "${folderName}" found as a direct child of a sliced layer. Consider moving it inside a slice or to another layer.`,
+                message: `Conventional segment "${folderName}" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.`,
                 location: { path: directChild.path },
               })
             }
