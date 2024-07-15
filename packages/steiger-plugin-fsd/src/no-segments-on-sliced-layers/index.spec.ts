@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import noSegmentsOnSlicedLayers from './index.js'
-import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFsdRoot, compareMessages } from '../_lib/prepare-test.js'
 
 describe('no-segments-on-sliced-layers rule', () => {
   it('reports no errors on a project where the sliced layers has no segments in direct children', () => {
@@ -71,28 +71,28 @@ describe('no-segments-on-sliced-layers rule', () => {
           📄 index.ts
     `)
 
-    const diagnostics = noSegmentsOnSlicedLayers.check(root).diagnostics
+    const diagnostics = noSegmentsOnSlicedLayers.check(root).diagnostics.toSorted(compareMessages)
 
     expect(diagnostics).toEqual([
       {
         message:
-          'Conventional segment "ui" found as a direct child of a sliced layer. Consider moving it inside a slice or to another layer.',
-        location: { path: joinFromRoot('entities', 'ui') },
-      },
-      {
-        message:
-          'Conventional segment "api" found as a direct child of a sliced layer. Consider moving it inside a slice or to another layer.',
+          'Conventional segment "api" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
         location: { path: joinFromRoot('features', 'api') },
       },
       {
         message:
-          'Conventional segment "config" found as a direct child of a sliced layer. Consider moving it inside a slice or to another layer.',
+          'Conventional segment "config" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
         location: { path: joinFromRoot('widgets', 'config') },
       },
       {
         message:
-          'Conventional segment "lib" found as a direct child of a sliced layer. Consider moving it inside a slice or to another layer.',
+          'Conventional segment "lib" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
         location: { path: joinFromRoot('pages', 'lib') },
+      },
+      {
+        message:
+          'Conventional segment "ui" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
+        location: { path: joinFromRoot('entities', 'ui') },
       },
     ])
   })
