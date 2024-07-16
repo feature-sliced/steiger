@@ -42,6 +42,10 @@ it('reports errors on a project with index files on layer level', () => {
         📂 ui
         📄 index.ts
       📄 index.ts
+    📂 app
+      📂 ui
+        📄 index.ts
+      📄 index.ts
   `)
 
   const diagnostics = noLayerPublicApi.check(root).diagnostics

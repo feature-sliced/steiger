@@ -1,6 +1,9 @@
 import { getIndex, getLayers } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
 
+/** Layers that are allowed to have an index file. */
+const exceptionLayers = ['app']
+
 /** Forbid index files on layer level. */
 const noLayerPublicApi = {
   name: 'no-layer-public-api',
@@ -9,7 +12,9 @@ const noLayerPublicApi = {
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
       const index = getIndex(layer)
-      if (index !== undefined) {
+      const notAmongExceptions = !exceptionLayers.includes(layerName)
+
+      if (notAmongExceptions && index !== undefined) {
         diagnostics.push({
           message: `Layer "${layerName}" should not have an index file`,
           location: { path: index.path },
