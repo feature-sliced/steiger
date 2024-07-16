@@ -11,6 +11,8 @@ According to the _public API rule on slices_:
 
 A corollary to this rule is that the layer itself should not have an index file.
 
+**Exception:** index files are allowed on `app` layer because it's the entry point of the application.
+
 Examples of project structures that pass this rule:
 
 ```
