@@ -7,6 +7,7 @@ import noLayerPublicApi from './no-layer-public-api/index.js'
 import noPublicApiSidestep from './no-public-api-sidestep/index.js'
 import noReservedFolderNames from './no-reserved-folder-names/index.js'
 import noSegmentlessSlices from './no-segmentless-slices/index.js'
+import noSegmentsOnSlicedLayers from './no-segments-on-sliced-layers/index.js'
 import publicApi from './public-api/index.js'
 import repetitiveNaming from './repetitive-naming/index.js'
 import segmentsByPurpose from './segments-by-purpose/index.js'
@@ -23,6 +24,7 @@ export default [
   noPublicApiSidestep,
   noReservedFolderNames,
   noSegmentlessSlices,
+  noSegmentsOnSlicedLayers,
   publicApi,
   repetitiveNaming,
   segmentsByPurpose,
