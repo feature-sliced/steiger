@@ -71,7 +71,7 @@ describe('no-segments-on-sliced-layers rule', () => {
           📄 index.ts
     `)
 
-    const diagnostics = noSegmentsOnSlicedLayers.check(root).diagnostics.toSorted(compareMessages)
+    const diagnostics = noSegmentsOnSlicedLayers.check(root).diagnostics.sort(compareMessages)
 
     expect(diagnostics).toEqual([
       {
