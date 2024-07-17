@@ -74,9 +74,15 @@ if (consoleArgs.watch) {
   })
 } else {
   const diagnostics = await linter.run(resolve(consoleArgs._[0]))
+  let stillRelevantDiagnostics = diagnostics
 
   reportPretty(diagnostics, process.cwd())
+
   if (consoleArgs.fix) {
-    applyAutofixes(diagnostics)
+    stillRelevantDiagnostics = await applyAutofixes(diagnostics)
+  }
+
+  if (stillRelevantDiagnostics.length > 0) {
+    process.exit(1)
   }
 }
