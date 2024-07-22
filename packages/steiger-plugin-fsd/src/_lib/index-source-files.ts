@@ -31,7 +31,9 @@ export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
     // Even though files that are directly inside a layer are not encouraged by the FSD and are forbidden in most cases
     // (except for an index/root file for the app layer as an entry point to the application), users can still add them.
     // So, we need to index all files directly inside a layer to find errors.
-    walk(layer, { layerName: layerName as LayerName, sliceName: null, segmentName: null })
+    layer.children
+      .filter((child) => child.type === 'file')
+      .forEach((file) => walk(file, { layerName: layerName as LayerName, sliceName: null, segmentName: null }))
 
     if (!isSliced(layer)) {
       for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
