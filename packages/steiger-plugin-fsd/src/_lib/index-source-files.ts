@@ -77,6 +77,11 @@ if (import.meta.vitest) {
             📄 EditorPage.tsx
             📄 Editor.tsx
           📄 index.ts
+      📂 app
+        📂 ui
+          📄 index.ts
+        📄 root.ts
+        📄 index.ts
     `)
 
     expect(indexSourceFiles(root)).toEqual({
@@ -168,6 +173,33 @@ if (import.meta.vitest) {
         },
         layerName: 'shared',
         segmentName: 'ui',
+        sliceName: null,
+      },
+      [joinFromRoot('app', 'ui', 'index.ts')]: {
+        file: {
+          path: joinFromRoot('app', 'ui', 'index.ts'),
+          type: 'file',
+        },
+        layerName: 'app',
+        segmentName: 'ui',
+        sliceName: null,
+      },
+      [joinFromRoot('app', 'root.ts')]: {
+        file: {
+          path: joinFromRoot('app', 'root.ts'),
+          type: 'file',
+        },
+        layerName: 'app',
+        segmentName: 'root',
+        sliceName: null,
+      },
+      [joinFromRoot('app', 'index.ts')]: {
+        file: {
+          path: joinFromRoot('app', 'index.ts'),
+          type: 'file',
+        },
+        layerName: 'app',
+        segmentName: null,
         sliceName: null,
       },
     })
