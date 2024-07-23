@@ -1,12 +1,11 @@
 import * as fs from 'node:fs'
 import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
+const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { Diagnostic, Rule } from '@steiger/types'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
-
-const { paperwork } = precinct
 
 const forbiddenImports = {
   name: 'forbidden-imports',
