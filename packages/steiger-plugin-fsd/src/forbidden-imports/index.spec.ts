@@ -72,7 +72,7 @@ it('reports no errors on a project with only correct imports', async () => {
           📄 index.ts
   `)
 
-  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+  expect((await forbiddenImports.check(root.children[0] as Folder)).diagnostics).toEqual([])
 })
 
 it('reports errors on a project with cross-imports in entities', async () => {
