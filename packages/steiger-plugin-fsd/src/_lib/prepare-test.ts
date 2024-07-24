@@ -244,8 +244,10 @@ if (import.meta.vitest) {
             📄 index.ts
             📄 Button.tsx
     `
-    expect(() => parseIntoFsdRoot(markup, joinFromRoot('src', 'non-existent-folder'))).toThrowError(
-      'Path "/src/non-existent-folder" not found in the provided file system mock!',
+    const nonExistentPath = joinFromRoot('src', 'non-existent-folder')
+
+    expect(() => parseIntoFsdRoot(markup, nonExistentPath)).toThrowError(
+      `Path "${nonExistentPath}" not found in the provided file system mock!`,
     )
   })
 }
