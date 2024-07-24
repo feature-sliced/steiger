@@ -1,5 +1,4 @@
 import { expect, it, vi } from 'vitest'
-import { Folder } from '@steiger/types'
 
 import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 import forbiddenImports from './index.js'
@@ -56,52 +55,58 @@ vi.mock('node:fs', async (importOriginal) => {
 })
 
 it('reports no errors on a project with only correct imports', async () => {
-  const root = parseIntoFsdRoot(`
-    📂 src
-      📂 shared
-        📂 ui
-          📄 styles.ts
-          📄 Button.tsx
-          📄 TextField.tsx
-          📄 index.ts
-      📂 pages
-        📂 editor
+  const root = parseIntoFsdRoot(
+    `
+      📂 src
+        📂 shared
           📂 ui
-            📄 EditorPage.tsx
-            📄 Editor.tsx
-          📄 index.ts
-  `)
+            📄 styles.ts
+            📄 Button.tsx
+            📄 TextField.tsx
+            📄 index.ts
+        📂 pages
+          📂 editor
+            📂 ui
+              📄 EditorPage.tsx
+              📄 Editor.tsx
+            📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
 
-  expect((await forbiddenImports.check(root.children[0] as Folder)).diagnostics).toEqual([])
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
 })
 
 it('reports errors on a project with cross-imports in entities', async () => {
-  const root = parseIntoFsdRoot(`
-    📂 src
-      📂 shared
-        📂 ui
-          📄 styles.ts
-          📄 Button.tsx
-          📄 TextField.tsx
-          📄 index.ts
-      📂 entities
-        📂 user
+  const root = parseIntoFsdRoot(
+    `
+      📂 src
+        📂 shared
           📂 ui
-            📄 UserAvatar.tsx
-          📄 index.ts
-        📂 product
-          📂 ui
-            📄 ProductCard.tsx
-          📄 index.ts
-      📂 pages
-        📂 editor
-          📂 ui
-            📄 EditorPage.tsx
-            📄 Editor.tsx
-          📄 index.ts
-  `)
+            📄 styles.ts
+            📄 Button.tsx
+            📄 TextField.tsx
+            📄 index.ts
+        📂 entities
+          📂 user
+            📂 ui
+              📄 UserAvatar.tsx
+            📄 index.ts
+          📂 product
+            📂 ui
+              📄 ProductCard.tsx
+            📄 index.ts
+        📂 pages
+          📂 editor
+            📂 ui
+              📄 EditorPage.tsx
+              📄 Editor.tsx
+            📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
 
-  expect((await forbiddenImports.check(root.children[0] as Folder)).diagnostics).toEqual([
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
       location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx') },
@@ -110,29 +115,32 @@ it('reports errors on a project with cross-imports in entities', async () => {
 })
 
 it('reports errors on a project where a feature imports from a page', async () => {
-  const root = parseIntoFsdRoot(`
-    📂 src
-      📂 shared
-        📂 ui
-          📄 styles.ts
-          📄 Button.tsx
-          📄 TextField.tsx
-          📄 index.ts
-      📂 features
-        📂 comments
-          📂 ui
-            📄 CommentCard.tsx
-          📄 index.ts
-      📂 pages
-        📂 editor
+  const root = parseIntoFsdRoot(
+    `
+      📂 src
+        📂 shared
           📂 ui
             📄 styles.ts
-            📄 EditorPage.tsx
-            📄 Editor.tsx
-          📄 index.ts
-  `)
+            📄 Button.tsx
+            📄 TextField.tsx
+            📄 index.ts
+        📂 features
+          📂 comments
+            📂 ui
+              📄 CommentCard.tsx
+            📄 index.ts
+        📂 pages
+          📂 editor
+            📂 ui
+              📄 styles.ts
+              📄 EditorPage.tsx
+              📄 Editor.tsx
+            📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
 
-  expect((await forbiddenImports.check(root.children[0] as Folder)).diagnostics.sort()).toEqual([
+  expect((await forbiddenImports.check(root)).diagnostics.sort()).toEqual([
     {
       message: `Forbidden import from higher layer "pages".`,
       location: { path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx') },
@@ -141,37 +149,40 @@ it('reports errors on a project where a feature imports from a page', async () =
 })
 
 it('reports errors in a project where a lower level imports from files that are direct children of a higher level', async () => {
-  const root = parseIntoFsdRoot(`
-    📂 src
-      📂 shared
-        📂 ui
-          📄 styles.ts
-          📄 Button.tsx
-          📄 TextField.tsx
-          📄 index.ts
-      📂 entities
-        📂 cart
-          📄 index.ts
-          📂 lib
-            📄 count-cart-items.ts
-            📄 index.ts
-          📂 ui
-            📄 SmallCart.tsx
-      📂 pages
-        📂 editor
+  const root = parseIntoFsdRoot(
+    `
+      📂 src
+        📂 shared
           📂 ui
             📄 styles.ts
-            📄 EditorPage.tsx
-            📄 Editor.tsx
+            📄 Button.tsx
+            📄 TextField.tsx
+            📄 index.ts
+        📂 entities
+          📂 cart
+            📄 index.ts
+            📂 lib
+              📄 count-cart-items.ts
+              📄 index.ts
+            📂 ui
+              📄 SmallCart.tsx
+        📂 pages
+          📂 editor
+            📂 ui
+              📄 styles.ts
+              📄 EditorPage.tsx
+              📄 Editor.tsx
+            📄 index.ts
+        📂 app
+          📂 ui
+            📄 index.ts
           📄 index.ts
-      📂 app
-        📂 ui
-          📄 index.ts
-        📄 index.ts
-        📄 root.ts
-  `)
+          📄 root.ts
+    `,
+    joinFromRoot('src'),
+  )
 
-  const diagnostics = (await forbiddenImports.check(root.children[0] as Folder)).diagnostics
+  const diagnostics = (await forbiddenImports.check(root)).diagnostics
   expect(diagnostics).toEqual([
     {
       message: `Forbidden import from higher layer "app".`,
