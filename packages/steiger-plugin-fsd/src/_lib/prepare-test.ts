@@ -4,31 +4,11 @@ import type { FsdRoot } from '@feature-sliced/filesystem'
 import type { Folder, File, Diagnostic } from '@steiger/types'
 import { vi } from 'vitest'
 
-function findSubfolder(folder: Folder, path: string): Folder {
-  function checkFolder(folder: Folder): Folder {
-    if (folder.path === path) {
-      return folder
-    }
-
-    if (path.startsWith(folder.path)) {
-      for (const child of folder.children) {
-        if (child.type === 'folder') {
-          const result = checkFolder(child)
-          if (result) {
-            return result
-          }
-        }
-      }
-    }
-
-    throw new Error(`Path "${path}" not found in the provided file system mock!`)
-  }
-
-  return checkFolder(folder)
-}
-
-/** Parse a multi-line indented string with emojis for files and folders into an FSD root. */
-export function parseIntoFsdRoot(fsMarkup: string, rootPath?: string): FsdRoot {
+/** Parse a multi-line indented string with emojis for files and folders into an FSD root.
+ * @param fsMarkup - a file system tree represented in markup using file and folder emojis
+ * @param mountTo - virtually make the passed markup a subtree of the mountTo folder
+ * */
+export function parseIntoFsdRoot(fsMarkup: string, mountTo?: string): FsdRoot {
   function parseFolder(lines: Array<string>, path: string): Folder {
     const children: Array<Folder | File> = []
 
@@ -55,9 +35,8 @@ export function parseIntoFsdRoot(fsMarkup: string, rootPath?: string): FsdRoot {
     .filter(Boolean)
     .map((line, _i, lines) => line.slice(lines[0].search(/\S/)))
     .filter(Boolean)
-  const parsedFolder = parseFolder(lines, joinFromRoot())
 
-  return rootPath ? findSubfolder(parsedFolder, rootPath) : parsedFolder
+  return parseFolder(lines, mountTo ?? joinFromRoot())
 }
 
 export function compareMessages(a: Diagnostic, b: Diagnostic): number {
@@ -176,78 +155,81 @@ if (import.meta.vitest) {
 
   test('it should return a nested root folder when the optional rootPath argument is passed', () => {
     const markup = `
-      📂 src
-        📂 entities
-          📂 users
-            📂 ui
-            📄 index.ts
-          📂 posts
-            📂 ui
-            📄 index.ts
-        📂 shared
+      📂 entities
+        📂 users
           📂 ui
-            📄 index.ts
-            📄 Button.tsx
+          📄 index.ts
+        📂 posts
+          📂 ui
+          📄 index.ts
+      📂 shared
+        📂 ui
+          📄 index.ts
+          📄 Button.tsx
     `
-    const root = parseIntoFsdRoot(markup, joinFromRoot('src', 'entities'))
+    const root = parseIntoFsdRoot(markup, joinFromRoot('src'))
 
     expect(root).toEqual({
       type: 'folder',
-      path: joinFromRoot('src', 'entities'),
+      path: joinFromRoot('src'),
       children: [
         {
           type: 'folder',
-          path: joinFromRoot('src', 'entities', 'users'),
+          path: joinFromRoot('src', 'entities'),
           children: [
             {
               type: 'folder',
-              path: joinFromRoot('src', 'entities', 'users', 'ui'),
-              children: [],
+              path: joinFromRoot('src', 'entities', 'users'),
+              children: [
+                {
+                  type: 'folder',
+                  path: joinFromRoot('src', 'entities', 'users', 'ui'),
+                  children: [],
+                },
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'entities', 'users', 'index.ts'),
+                },
+              ],
             },
             {
-              type: 'file',
-              path: joinFromRoot('src', 'entities', 'users', 'index.ts'),
+              type: 'folder',
+              path: joinFromRoot('src', 'entities', 'posts'),
+              children: [
+                {
+                  type: 'folder',
+                  path: joinFromRoot('src', 'entities', 'posts', 'ui'),
+                  children: [],
+                },
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'entities', 'posts', 'index.ts'),
+                },
+              ],
             },
           ],
         },
         {
           type: 'folder',
-          path: joinFromRoot('src', 'entities', 'posts'),
+          path: joinFromRoot('src', 'shared'),
           children: [
             {
               type: 'folder',
-              path: joinFromRoot('src', 'entities', 'posts', 'ui'),
-              children: [],
-            },
-            {
-              type: 'file',
-              path: joinFromRoot('src', 'entities', 'posts', 'index.ts'),
+              path: joinFromRoot('src', 'shared', 'ui'),
+              children: [
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'shared', 'ui', 'index.ts'),
+                },
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'shared', 'ui', 'Button.tsx'),
+                },
+              ],
             },
           ],
         },
       ],
     })
-  })
-
-  test('it should throw an error when the path (from rootPath argument) is not found in the provided file system mock', () => {
-    const markup = `
-      📂 src
-        📂 entities
-          📂 users
-            📂 ui
-            📄 index.ts
-          📂 posts
-            📂 ui
-            📄 index.ts
-        📂 shared
-          📂 ui
-            📄 index.ts
-            📄 Button.tsx
-    `
-    const nonExistentPath = joinFromRoot('src', 'non-existent-folder')
-
-    expect(() => parseIntoFsdRoot(markup, nonExistentPath)).toThrowError(
-      `Path "${nonExistentPath}" not found in the provided file system mock!`,
-    )
   })
 }

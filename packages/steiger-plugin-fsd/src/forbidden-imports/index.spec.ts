@@ -57,19 +57,18 @@ vi.mock('node:fs', async (importOriginal) => {
 it('reports no errors on a project with only correct imports', async () => {
   const root = parseIntoFsdRoot(
     `
-      📂 src
-        📂 shared
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 pages
+        📂 editor
           📂 ui
-            📄 styles.ts
-            📄 Button.tsx
-            📄 TextField.tsx
-            📄 index.ts
-        📂 pages
-          📂 editor
-            📂 ui
-              📄 EditorPage.tsx
-              📄 Editor.tsx
-            📄 index.ts
+            📄 EditorPage.tsx
+            📄 Editor.tsx
+          📄 index.ts
     `,
     joinFromRoot('src'),
   )
@@ -80,28 +79,27 @@ it('reports no errors on a project with only correct imports', async () => {
 it('reports errors on a project with cross-imports in entities', async () => {
   const root = parseIntoFsdRoot(
     `
-      📂 src
-        📂 shared
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 entities
+        📂 user
           📂 ui
-            📄 styles.ts
-            📄 Button.tsx
-            📄 TextField.tsx
-            📄 index.ts
-        📂 entities
-          📂 user
-            📂 ui
-              📄 UserAvatar.tsx
-            📄 index.ts
-          📂 product
-            📂 ui
-              📄 ProductCard.tsx
-            📄 index.ts
-        📂 pages
-          📂 editor
-            📂 ui
-              📄 EditorPage.tsx
-              📄 Editor.tsx
-            📄 index.ts
+            📄 UserAvatar.tsx
+          📄 index.ts
+        📂 product
+          📂 ui
+            📄 ProductCard.tsx
+          📄 index.ts
+      📂 pages
+        📂 editor
+          📂 ui
+            📄 EditorPage.tsx
+            📄 Editor.tsx
+          📄 index.ts
     `,
     joinFromRoot('src'),
   )
@@ -117,25 +115,24 @@ it('reports errors on a project with cross-imports in entities', async () => {
 it('reports errors on a project where a feature imports from a page', async () => {
   const root = parseIntoFsdRoot(
     `
-      📂 src
-        📂 shared
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 features
+        📂 comments
+          📂 ui
+            📄 CommentCard.tsx
+          📄 index.ts
+      📂 pages
+        📂 editor
           📂 ui
             📄 styles.ts
-            📄 Button.tsx
-            📄 TextField.tsx
-            📄 index.ts
-        📂 features
-          📂 comments
-            📂 ui
-              📄 CommentCard.tsx
-            📄 index.ts
-        📂 pages
-          📂 editor
-            📂 ui
-              📄 styles.ts
-              📄 EditorPage.tsx
-              📄 Editor.tsx
-            📄 index.ts
+            📄 EditorPage.tsx
+            📄 Editor.tsx
+          📄 index.ts
     `,
     joinFromRoot('src'),
   )
@@ -151,33 +148,32 @@ it('reports errors on a project where a feature imports from a page', async () =
 it('reports errors in a project where a lower level imports from files that are direct children of a higher level', async () => {
   const root = parseIntoFsdRoot(
     `
-      📂 src
-        📂 shared
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 entities
+        📂 cart
+          📄 index.ts
+          📂 lib
+            📄 count-cart-items.ts
+            📄 index.ts
+          📂 ui
+            📄 SmallCart.tsx
+      📂 pages
+        📂 editor
           📂 ui
             📄 styles.ts
-            📄 Button.tsx
-            📄 TextField.tsx
-            📄 index.ts
-        📂 entities
-          📂 cart
-            📄 index.ts
-            📂 lib
-              📄 count-cart-items.ts
-              📄 index.ts
-            📂 ui
-              📄 SmallCart.tsx
-        📂 pages
-          📂 editor
-            📂 ui
-              📄 styles.ts
-              📄 EditorPage.tsx
-              📄 Editor.tsx
-            📄 index.ts
-        📂 app
-          📂 ui
-            📄 index.ts
+            📄 EditorPage.tsx
+            📄 Editor.tsx
           📄 index.ts
-          📄 root.ts
+      📂 app
+        📂 ui
+          📄 index.ts
+        📄 index.ts
+        📄 root.ts
     `,
     joinFromRoot('src'),
   )
