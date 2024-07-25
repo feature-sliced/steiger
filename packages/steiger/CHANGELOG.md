@@ -1,5 +1,15 @@
 # steiger
 
+## 0.4.0
+
+### Minor Changes
+
+- 5e7fa93: Add no-segments-on-sliced-layers rule
+
+### Patch Changes
+
+- 79f3552: Make Steiger exit with 1 if errors are reported
+
 ## 0.3.0
 
 ### Minor Changes

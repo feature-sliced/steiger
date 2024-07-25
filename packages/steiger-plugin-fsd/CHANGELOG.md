@@ -1,5 +1,16 @@
 # @feature-sliced/steiger-plugin
 
+## 0.4.0
+
+### Minor Changes
+
+- 5e7fa93: Add no-segments-on-sliced-layers rule
+
+### Patch Changes
+
+- b1866e8: Add an exception for app layer to no-layer-public-api rule
+- 4ed8d22: Make sure forbidden-imports rule checks files directly inside layers
+
 ## 0.3.0
 
 ### Minor Changes
