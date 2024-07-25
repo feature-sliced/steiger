@@ -4,8 +4,11 @@ import type { FsdRoot } from '@feature-sliced/filesystem'
 import type { Folder, File, Diagnostic } from '@steiger/types'
 import { vi } from 'vitest'
 
-/** Parse a multi-line indented string with emojis for files and folders into an FSD root. */
-export function parseIntoFsdRoot(fsMarkup: string): FsdRoot {
+/** Parse a multi-line indented string with emojis for files and folders into an FSD root.
+ * @param fsMarkup - a file system tree represented in markup using file and folder emojis
+ * @param mountTo - virtually make the passed markup a subtree of the mountTo folder
+ * */
+export function parseIntoFsdRoot(fsMarkup: string, mountTo?: string): FsdRoot {
   function parseFolder(lines: Array<string>, path: string): Folder {
     const children: Array<Folder | File> = []
 
@@ -33,7 +36,7 @@ export function parseIntoFsdRoot(fsMarkup: string): FsdRoot {
     .map((line, _i, lines) => line.slice(lines[0].search(/\S/)))
     .filter(Boolean)
 
-  return parseFolder(lines, joinFromRoot())
+  return parseFolder(lines, mountTo ?? joinFromRoot())
 }
 
 export function compareMessages(a: Diagnostic, b: Diagnostic): number {
@@ -141,6 +144,86 @@ if (import.meta.vitest) {
                 {
                   type: 'file',
                   path: joinFromRoot('shared', 'ui', 'Button.tsx'),
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+  })
+
+  test('it should return a nested root folder when the optional rootPath argument is passed', () => {
+    const markup = `
+      📂 entities
+        📂 users
+          📂 ui
+          📄 index.ts
+        📂 posts
+          📂 ui
+          📄 index.ts
+      📂 shared
+        📂 ui
+          📄 index.ts
+          📄 Button.tsx
+    `
+    const root = parseIntoFsdRoot(markup, joinFromRoot('src'))
+
+    expect(root).toEqual({
+      type: 'folder',
+      path: joinFromRoot('src'),
+      children: [
+        {
+          type: 'folder',
+          path: joinFromRoot('src', 'entities'),
+          children: [
+            {
+              type: 'folder',
+              path: joinFromRoot('src', 'entities', 'users'),
+              children: [
+                {
+                  type: 'folder',
+                  path: joinFromRoot('src', 'entities', 'users', 'ui'),
+                  children: [],
+                },
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'entities', 'users', 'index.ts'),
+                },
+              ],
+            },
+            {
+              type: 'folder',
+              path: joinFromRoot('src', 'entities', 'posts'),
+              children: [
+                {
+                  type: 'folder',
+                  path: joinFromRoot('src', 'entities', 'posts', 'ui'),
+                  children: [],
+                },
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'entities', 'posts', 'index.ts'),
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'folder',
+          path: joinFromRoot('src', 'shared'),
+          children: [
+            {
+              type: 'folder',
+              path: joinFromRoot('src', 'shared', 'ui'),
+              children: [
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'shared', 'ui', 'index.ts'),
+                },
+                {
+                  type: 'file',
+                  path: joinFromRoot('src', 'shared', 'ui', 'Button.tsx'),
                 },
               ],
             },
