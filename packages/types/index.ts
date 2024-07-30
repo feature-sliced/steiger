@@ -58,3 +58,26 @@ export type Fix =
       path: string
       content: string
     }
+
+export type Config = Array<ConfigObject | Plugin>
+
+export interface ConfigObject {
+  /** Globs of files to check */
+  files?: Array<string>
+  /** Globs of files to ignore */
+  ignores?: Array<string>
+  /** Severity of rules and individual rule options. */
+  rules?: {
+    [ruleName: string]: Severity | [Severity, Record<string, unknown>]
+  }
+}
+
+export type Severity = 'off' | 'warn' | 'error'
+
+export interface Plugin {
+  meta: {
+    name: string
+    version: string
+  }
+  ruleDefinitions: Array<Rule>
+}
