@@ -1,25 +1,32 @@
 import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import fsdRules from '@feature-sliced/steiger-plugin'
 import type { Rule, Folder } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $config, type Config } from './models/config'
+import { $config, $rules } from './models/config'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
+type Config = typeof $config
+
 const enabledRules = $config.map((config) => {
   const ruleConfigs = config?.rules
+  const rules = $rules.getState()
+
+  console.log('ruleConfigs')
+  console.log(ruleConfigs)
+  console.log('rules')
+  console.log(rules)
 
   if (ruleConfigs === undefined) {
-    return fsdRules
+    return rules || []
   }
 
-  return fsdRules.filter(
+  return rules.filter(
     (rule) => !(rule.name in ruleConfigs) || ruleConfigs[rule.name as keyof typeof ruleConfigs] !== 'off',
   )
 })

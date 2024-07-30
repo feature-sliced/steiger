@@ -10,8 +10,9 @@ import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
-import { setConfig, schema as configSchema } from './models/config'
+import { processConfiguration } from './models/config'
 import { applyAutofixes } from './features/autofix'
+import { configs } from '@feature-sliced/steiger-plugin'
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('steiger')
@@ -47,9 +48,11 @@ const yargsProgram = yargs(hideBin(process.argv))
 const consoleArgs = yargsProgram.parseSync()
 
 const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
+const defaultConfig = configs.recommended
 
 try {
-  setConfig(configSchema.parse(config))
+  // use FSD recommended config as a default
+  processConfiguration(config || defaultConfig)
 } catch (err) {
   if (filepath !== undefined) {
     console.error(
@@ -73,6 +76,7 @@ if (consoleArgs.watch) {
     unsubscribe()
   })
 } else {
+  console.log('qwerty')
   const diagnostics = await linter.run(resolve(consoleArgs._[0]))
   let stillRelevantDiagnostics = diagnostics
 
