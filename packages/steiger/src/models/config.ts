@@ -13,11 +13,15 @@ $rules.on(setRules, (_state, payload) => payload)
 function processPlugins(config: Config) {
   const plugins = config.filter((item) => 'ruleDefinitions' in item) as Array<Plugin>
   const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
-  const ruleNames = new Set<string>(allRules.map((rule) => rule.name))
+  const ruleNames = allRules.map((rule) => rule.name)
+  const uniqueNames = new Set<string>(ruleNames)
 
   // Check collisions in rule names
-  if (ruleNames.size !== allRules.length) {
-    throw new Error('Rule names must be unique')
+  if (uniqueNames.size !== allRules.length) {
+    const duplicates = ruleNames.filter((name, index) => ruleNames.indexOf(name) !== index)
+    throw new Error(
+      `Conflicting rule definitions found: ${duplicates.join(', ')}. Rules must be unique! Please check your plugins.`,
+    )
   }
 
   return allRules

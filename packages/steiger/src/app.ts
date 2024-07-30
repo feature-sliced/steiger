@@ -17,11 +17,6 @@ const enabledRules = $config.map((config) => {
   const ruleConfigs = config?.rules
   const rules = $rules.getState()
 
-  console.log('ruleConfigs')
-  console.log(ruleConfigs)
-  console.log('rules')
-  console.log(rules)
-
   if (ruleConfigs === undefined) {
     return rules || []
   }
