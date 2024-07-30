@@ -17,7 +17,7 @@ const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
 
   if (ruleConfigs === undefined) {
-    return rules || []
+    return rules
   }
 
   return rules.filter(
