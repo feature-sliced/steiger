@@ -16,7 +16,7 @@ function processPlugins(config: Config) {
   const ruleNames = allRules.map((rule) => rule.name)
   const uniqueNames = new Set<string>(ruleNames)
 
-  // Check collisions in rule names
+  // Check conflicts in rule names
   if (uniqueNames.size !== allRules.length) {
     const duplicates = ruleNames.filter((name, index) => ruleNames.indexOf(name) !== index)
     throw new Error(
@@ -47,12 +47,24 @@ function buildValidationScheme(rules: Array<Rule>) {
 
   // Ensure the array has at least one element
   if (ruleNames.length === 0) {
-    throw new Error('ruleNames array must have at least one element')
+    throw new Error('At least one rule must be provided by plugins!')
   }
 
   return z.object({
     // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-    rules: z.record(z.enum(ruleNames as [string, ...string[]]), z.enum(['off', 'error'])),
+    rules: z.record(z.enum(ruleNames as [string, ...string[]]), z.enum(['off', 'error'])).refine(
+      (value) => {
+        const ruleNames = Object.keys(value)
+        const offRules = ruleNames.filter((name) => value[name] === 'off')
+
+        if (offRules.length === ruleNames.length || ruleNames.length === 0) {
+          return false
+        }
+
+        return true
+      },
+      { message: 'At least one rule must be enabled' },
+    ),
   })
 }
 

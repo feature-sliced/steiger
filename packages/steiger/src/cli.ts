@@ -76,7 +76,6 @@ if (consoleArgs.watch) {
     unsubscribe()
   })
 } else {
-  console.log('qwerty')
   const diagnostics = await linter.run(resolve(consoleArgs._[0]))
   let stillRelevantDiagnostics = diagnostics
 

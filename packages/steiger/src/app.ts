@@ -1,4 +1,4 @@
-import { createEffect, sample } from 'effector'
+import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
 import type { Rule, Folder } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
@@ -13,9 +13,8 @@ function getRuleDescriptionUrl(ruleName: string) {
 
 type Config = typeof $config
 
-const enabledRules = $config.map((config) => {
+const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
-  const rules = $rules.getState()
 
   if (ruleConfigs === undefined) {
     return rules || []
@@ -38,7 +37,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
 }
 
 export const linter = {
-  run: (path: string) => scan(path).then((vfs) => runRules({ vfs, rules: enabledRules.getState() })),
+  run: (path: string) => scan(path).then((vfs) => runRules({ vfs, rules: $enabledRules.getState() })),
   watch: async (path: string) => {
     const { vfs, watcher } = await createWatcher(path)
 
@@ -46,8 +45,8 @@ export const linter = {
     const runRulesFx = createEffect(runRules)
 
     sample({
-      clock: defer({ clock: [treeChanged, enabledRules], until: not(runRulesFx.pending) }),
-      source: { vfs: vfs.$tree, rules: enabledRules },
+      clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
+      source: { vfs: vfs.$tree, rules: $enabledRules },
       target: runRulesFx,
     })
 
