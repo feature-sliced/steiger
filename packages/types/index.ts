@@ -61,6 +61,9 @@ export type Fix =
 
 export type Config = Array<ConfigObject | Plugin>
 
+// TODO: 'warn' is not supported yet, add it when it is
+export type Severity = 'off' | 'error'
+
 export interface ConfigObject {
   /** Globs of files to check */
   files?: Array<string>
@@ -68,11 +71,10 @@ export interface ConfigObject {
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
   rules?: {
-    [ruleName: string]: Severity | [Severity, Record<string, unknown>]
+    // TODO: add "| [Severity, Record<string, unknown>]" when individual rule options are supported
+    [ruleName: string]: Severity
   }
 }
-
-export type Severity = 'off' | 'warn' | 'error'
 
 export interface Plugin {
   meta: {
