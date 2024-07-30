@@ -1,6 +1,7 @@
 {
   "extends": "@steiger/tsconfig/base.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
     "types": ["vitest/importMeta"],
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },

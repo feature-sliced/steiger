@@ -14,7 +14,10 @@ import segmentsByPurpose from './segments-by-purpose/index.js'
 import sharedLibGrouping from './shared-lib-grouping/index.js'
 import noProcesses from './no-processes/index.js'
 
-export default [
+import packageJson from '../package.json'
+import { Config, Rule, Plugin, ConfigObject } from '@steiger/types'
+
+const allRules: Array<Rule> = [
   ambiguousSliceNames,
   excessiveSlicing,
   forbiddenImports,
@@ -31,3 +34,19 @@ export default [
   sharedLibGrouping,
   noProcesses,
 ]
+
+const allRulesEnabledConfig: ConfigObject = {
+  rules: allRules.reduce((acc, rule) => ({ ...acc, [rule.name]: 'error' }), {}),
+}
+
+export const plugin: Plugin = {
+  meta: {
+    name: 'steiger-plugin-fsd',
+    version: packageJson.version,
+  },
+  ruleDefinitions: allRules,
+}
+
+export const configs: Record<string, Config> = {
+  recommended: [plugin, allRulesEnabledConfig],
+}
