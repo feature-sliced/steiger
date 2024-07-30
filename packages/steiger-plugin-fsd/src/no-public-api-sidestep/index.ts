@@ -6,10 +6,11 @@ import { getIndex, getLayers, getSegments, isSliced, resolveImport } from '@feat
 import type { Folder, File, Diagnostic, Rule } from '@steiger/types'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
+import { NAMESPACE } from '../constants.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {
-  name: 'no-public-api-sidestep',
+  name: `${NAMESPACE}/no-public-api-sidestep`,
   async check(root) {
     const diagnostics: Array<Diagnostic> = []
     const { tsconfig } = await parseNearestTsConfig(root.path)

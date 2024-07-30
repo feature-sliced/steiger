@@ -1,11 +1,12 @@
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
+import { NAMESPACE } from '../constants.js'
 
 const THRESHOLD = 15
 
 /** Warn about too much stuff in shared/lib. */
 const sharedLibGrouping = {
-  name: 'shared-lib-grouping',
+  name: `${NAMESPACE}/shared-lib-grouping`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

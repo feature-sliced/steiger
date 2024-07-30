@@ -1,8 +1,9 @@
 import { basename } from 'node:path'
 import type { Diagnostic, Rule } from '@steiger/types'
+import { NAMESPACE } from '../constants.js'
 
 const noProcesses = {
-  name: 'no-processes',
+  name: `${NAMESPACE}/no-processes`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

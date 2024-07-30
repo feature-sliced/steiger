@@ -1,9 +1,10 @@
 import { basename } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
+import { NAMESPACE } from '../constants.js'
 
 const noFileSegments = {
-  name: 'no-file-segments',
+  name: `${NAMESPACE}/no-file-segments`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

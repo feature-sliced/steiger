@@ -6,9 +6,10 @@ import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { Diagnostic, Rule } from '@steiger/types'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
+import { NAMESPACE } from '../constants.js'
 
 const importLocality = {
-  name: 'import-locality',
+  name: `${NAMESPACE}/import-locality`,
   async check(root) {
     const diagnostics: Array<Diagnostic> = []
     const { tsconfig } = await parseNearestTsConfig(root.path)

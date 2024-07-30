@@ -3,6 +3,7 @@ import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
 
 import { groupSlices } from '../_lib/group-slices.js'
+import { NAMESPACE } from '../constants.js'
 
 const THRESHOLDS = {
   entities: 20,
@@ -13,7 +14,7 @@ const THRESHOLDS = {
 
 /** Warn about excessive amounts of ungrouped entities/features/widgets/pages. */
 const excessiveSlicing = {
-  name: 'excessive-slicing',
+  name: `${NAMESPACE}/excessive-slicing`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

@@ -3,10 +3,11 @@ import { getAllSegments, conventionalSegmentNames } from '@feature-sliced/filesy
 import type { Diagnostic, Rule } from '@steiger/types'
 
 import { findAllRecursively } from '../_lib/find-all-recursively.js'
+import { NAMESPACE } from '../constants.js'
 
 /** Forbid subfolders in segments that have names of common segments (e.g., shared/lib/ui). */
 const noReservedFolderNames = {
-  name: 'no-reserved-folder-names',
+  name: `${NAMESPACE}/no-reserved-folder-names`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
