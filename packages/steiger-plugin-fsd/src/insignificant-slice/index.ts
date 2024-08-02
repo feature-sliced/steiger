@@ -7,9 +7,10 @@ import precinct from 'precinct'
 const { paperwork } = precinct
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
+import { NAMESPACE } from '../constants.js'
 
 const insignificantSlice = {
-  name: 'insignificant-slice',
+  name: `${NAMESPACE}/insignificant-slice`,
   async check(root) {
     const diagnostics: Array<Diagnostic> = []
 

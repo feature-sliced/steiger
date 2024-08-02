@@ -1,25 +1,26 @@
-import { createEffect, sample } from 'effector'
+import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import fsdRules from '@feature-sliced/steiger-plugin'
 import type { Rule, Folder } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $config, type Config } from './models/config'
+import { $config, $rules } from './models/config'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
-const enabledRules = $config.map((config) => {
+type Config = typeof $config
+
+const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
 
   if (ruleConfigs === undefined) {
-    return fsdRules
+    return rules
   }
 
-  return fsdRules.filter(
+  return rules.filter(
     (rule) => !(rule.name in ruleConfigs) || ruleConfigs[rule.name as keyof typeof ruleConfigs] !== 'off',
   )
 })
@@ -36,7 +37,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
 }
 
 export const linter = {
-  run: (path: string) => scan(path).then((vfs) => runRules({ vfs, rules: enabledRules.getState() })),
+  run: (path: string) => scan(path).then((vfs) => runRules({ vfs, rules: $enabledRules.getState() })),
   watch: async (path: string) => {
     const { vfs, watcher } = await createWatcher(path)
 
@@ -44,8 +45,8 @@ export const linter = {
     const runRulesFx = createEffect(runRules)
 
     sample({
-      clock: defer({ clock: [treeChanged, enabledRules], until: not(runRulesFx.pending) }),
-      source: { vfs: vfs.$tree, rules: enabledRules },
+      clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
+      source: { vfs: vfs.$tree, rules: $enabledRules },
       target: runRulesFx,
     })
 

@@ -1,11 +1,12 @@
 import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
+import { NAMESPACE } from '../constants.js'
 
 const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals', 'types', 'constants', 'consts', 'const']
 
 /** Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose. */
 const segmentsByPurpose = {
-  name: 'segments-by-purpose',
+  name: `${NAMESPACE}/segments-by-purpose`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

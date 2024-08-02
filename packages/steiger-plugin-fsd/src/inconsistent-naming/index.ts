@@ -6,10 +6,11 @@ import { getLayers, getSlices } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
 
 import { groupSlices } from '../_lib/group-slices.js'
+import { NAMESPACE } from '../constants.js'
 
 /** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
-  name: 'inconsistent-naming',
+  name: `${NAMESPACE}/inconsistent-naming`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

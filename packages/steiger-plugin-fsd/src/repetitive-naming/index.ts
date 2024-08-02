@@ -1,5 +1,6 @@
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { Diagnostic, Rule } from '@steiger/types'
+import { NAMESPACE } from '../constants.js'
 
 /**
  * Pattern that matches one word in different naming conventions.
@@ -15,7 +16,7 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 
 /** Warn about repetitive parts in slice names (e.g. adding page to every slice on Pages) */
 const repetitiveNaming = {
-  name: 'repetitive-naming',
+  name: `${NAMESPACE}/repetitive-naming`,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

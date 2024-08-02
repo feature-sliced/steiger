@@ -58,3 +58,28 @@ export type Fix =
       path: string
       content: string
     }
+
+export type Config = Array<ConfigObject | Plugin>
+
+// TODO: 'warn' is not supported yet, add it when it is
+export type Severity = 'off' | 'error'
+
+export interface ConfigObject {
+  /** Globs of files to check */
+  files?: Array<string>
+  /** Globs of files to ignore */
+  ignores?: Array<string>
+  /** Severity of rules and individual rule options. */
+  rules?: {
+    // TODO: add "| [Severity, Record<string, unknown>]" when individual rule options are supported
+    [ruleName: string]: Severity
+  }
+}
+
+export interface Plugin {
+  meta: {
+    name: string
+    version: string
+  }
+  ruleDefinitions: Array<Rule>
+}
