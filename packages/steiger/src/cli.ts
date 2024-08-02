@@ -12,7 +12,7 @@ import { cosmiconfig } from 'cosmiconfig'
 import { linter } from './app'
 import { processConfiguration } from './models/config'
 import { applyAutofixes } from './features/autofix'
-import { configs } from '@feature-sliced/steiger-plugin'
+import fsd from '@feature-sliced/steiger-plugin'
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('steiger')
@@ -48,7 +48,7 @@ const yargsProgram = yargs(hideBin(process.argv))
 const consoleArgs = yargsProgram.parseSync()
 
 const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
-const defaultConfig = configs.recommended
+const defaultConfig = fsd.configs.recommended
 
 try {
   // use FSD recommended config as a default
