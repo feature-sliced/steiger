@@ -33,6 +33,8 @@ steiger ./src --watch
 
 # Configuration
 
+Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.
+
 Steiger is configurable via `cosmiconfig`. That means that you can create a `steiger.config.ts` or `steiger.config.js` file in the root of your project to configure the rules. Import `{ defineConfig } from "steiger"` to get autocompletion.
 
 ```ts
