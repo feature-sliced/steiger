@@ -40,7 +40,7 @@ import { defineConfig } from 'steiger'
 
 export default defineConfig({
   rules: {
-    'no-public-api': 'off',
+    'public-api': 'off',
   },
 })
 ```
