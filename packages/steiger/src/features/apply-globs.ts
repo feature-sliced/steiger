@@ -1,5 +1,8 @@
 import { minimatch } from 'minimatch'
 import { File, Folder } from '@steiger/types'
+import { isNegationPattern } from '../shared/globs'
+import { flattenFolder, copyFsEntity } from '../shared/file-system'
+import { sep } from 'node:path'
 
 interface ApplyGlobsOptions {
   inclusions?: string[]
@@ -8,53 +11,21 @@ interface ApplyGlobsOptions {
 
 type RequiredApplyGlobsOptions = Required<ApplyGlobsOptions>
 
-function isNegationPattern(pattern: string) {
-  return pattern.startsWith('!')
-}
-
-function copyFsEntity<T extends Folder | File>(fsEntity: T, deep: boolean = false) {
-  if (fsEntity.type === 'folder') {
-    const newChildren: Array<Folder | File> = deep
-      ? fsEntity.children.map((child) => (child.type === 'folder' ? copyFsEntity(child, true) : child))
-      : []
-
-    return {
-      ...fsEntity,
-      children: newChildren,
-    }
-  }
-
-  return { ...fsEntity }
-}
-
-/**
- * Turn a tree folder structure into a flat array of folders/files.
- * */
-function flattenFolder(folder: Folder): File[] {
-  return folder.children.reduce((acc, child) => {
-    if (child.type === 'file') {
-      return [...acc, child]
-    }
-
-    return [...acc, ...flattenFolder(child)]
-  }, [] as File[])
-}
-
 /**
  * Turns flat array of files and folders into a tree structure based on the paths.
  * */
 function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
-  function createPath(folder: Folder, nested: Folder | File) {
+  function getEntityBackToTree(folder: Folder, nested: Folder | File) {
     const pathDiff = nested.path.slice(folder.path.length + 1)
-    const pathParts = pathDiff.split('/').filter(Boolean)
+    const pathParts = pathDiff.split(sep).filter(Boolean)
     let currentFolder = folder
 
     for (let i = 0; i < pathParts.length; i++) {
       const pathPart = pathParts[i]
       const isLastPart = i === pathParts.length - 1
       const existingFolder = currentFolder.children.find(
-        (child) => child.type === 'folder' && child.path === `${currentFolder.path}/${pathPart}`,
-      )
+        (child) => child.type === 'folder' && child.path === `${currentFolder.path}${sep}${pathPart}`,
+      ) as Folder | undefined
 
       if (isLastPart && nested.type === 'file') {
         currentFolder.children.push(nested)
@@ -62,11 +33,11 @@ function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
       }
 
       if (existingFolder) {
-        currentFolder = existingFolder as Folder
+        currentFolder = existingFolder
       } else {
         const newFolder: Folder = {
           type: 'folder',
-          path: `${currentFolder.path}/${pathPart}`,
+          path: `${currentFolder.path}${sep}${pathPart}`,
           children: [],
         }
         currentFolder.children.push(newFolder)
@@ -76,7 +47,7 @@ function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
   }
 
   nodes.forEach((node) => {
-    createPath(folder, node)
+    getEntityBackToTree(folder, node)
   })
 }
 
