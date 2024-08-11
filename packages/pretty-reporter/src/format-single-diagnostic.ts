@@ -6,7 +6,8 @@ import chalk from 'chalk'
 import type { AugmentedDiagnostic } from './types.js'
 
 export function formatSingleDiagnostic(d: AugmentedDiagnostic, cwd: string): string {
-  const x = chalk.red(figures.cross)
+  const severityColor = d.severity === 'warn' ? chalk.yellow : chalk.red
+  const x = severityColor(figures.cross)
   const s = chalk.reset(figures.lineDownRight)
   const bar = chalk.reset(figures.lineVertical)
   const e = chalk.reset(figures.lineUpRight)

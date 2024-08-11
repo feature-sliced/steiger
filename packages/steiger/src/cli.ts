@@ -28,6 +28,11 @@ const yargsProgram = yargs(hideBin(process.argv))
     describe: 'apply auto-fixes',
     type: 'boolean',
   })
+  .option('fail-on-warnings', {
+    demandOption: false,
+    describe: 'exit with an error code if there are warnings',
+    type: 'boolean',
+  })
   .string('_')
   .check((argv) => {
     const filePaths = argv._
@@ -86,6 +91,9 @@ if (consoleArgs.watch) {
   }
 
   if (stillRelevantDiagnostics.length > 0) {
-    process.exit(1)
+    const onlyWarnings = stillRelevantDiagnostics.every(d => d.severity === 'warn')
+    if (consoleArgs['fail-on-warnings'] || !onlyWarnings) {
+      process.exit(1)
+    }
   }
 }

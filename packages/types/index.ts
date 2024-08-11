@@ -61,8 +61,7 @@ export type Fix =
 
 export type Config = Array<ConfigObject | Plugin>
 
-// TODO: 'warn' is not supported yet, add it when it is
-export type Severity = 'off' | 'error'
+export type Severity = 'off' | 'error' | 'warn'
 
 export interface ConfigObject {
   /** Globs of files to check */
