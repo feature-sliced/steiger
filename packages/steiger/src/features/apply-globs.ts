@@ -27,6 +27,9 @@ function copyFsEntity<T extends Folder | File>(fsEntity: T, deep: boolean = fals
   return { ...fsEntity }
 }
 
+/**
+ * Turn a tree folder structure into a flat array of folders/files.
+ * */
 function flattenFolder(folder: Folder): File[] {
   return folder.children.reduce((acc, child) => {
     if (child.type === 'file') {
@@ -37,6 +40,9 @@ function flattenFolder(folder: Folder): File[] {
   }, [] as File[])
 }
 
+/**
+ * Turns flat array of files and folders into a tree structure based on the paths.
+ * */
 function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
   function createPath(folder: Folder, nested: Folder | File) {
     const pathDiff = nested.path.slice(folder.path.length + 1)
@@ -104,7 +110,7 @@ function createFilterAccordingToGlobs({ inclusions, exclusions }: RequiredApplyG
   return filterAccordingToGlobs
 }
 
-// ! Don't use platform specific path separators in the glob patterns for globby
+// ! Don't use platform specific path separators in the glob patterns for globby/minimatch
 // as it only works with forward slashes!
 
 /**
