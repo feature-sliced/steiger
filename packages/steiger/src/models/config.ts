@@ -52,7 +52,7 @@ function buildValidationScheme(rules: Array<Rule>) {
 
   return z.object({
     // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-    rules: z.record(z.enum(ruleNames as [string, ...string[]]), z.enum(['off', 'error'])).refine(
+    rules: z.record(z.enum(ruleNames as [string, ...string[]]), z.enum(['off', 'error', 'warn'])).refine(
       (value) => {
         const ruleNames = Object.keys(value)
         const offRules = ruleNames.filter((name) => value[name] === 'off')

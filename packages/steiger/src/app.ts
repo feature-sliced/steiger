@@ -1,6 +1,6 @@
 import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import type { Rule, Folder } from '@steiger/types'
+import type { Rule, Folder, Severity } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
@@ -12,6 +12,7 @@ function getRuleDescriptionUrl(ruleName: string) {
 }
 
 type Config = typeof $config
+type SeverityMap = Record<string, Exclude<Severity, 'off'>>
 
 const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
@@ -25,11 +26,21 @@ const $enabledRules = combine($config, $rules, (config, rules) => {
   )
 })
 
-async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
+const $severities = $config.map(
+  (config) =>
+    Object.fromEntries(Object.entries(config?.rules ?? {}).filter(([, severity]) => severity !== 'off')) as SeverityMap,
+)
+
+async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<Rule>; severities: SeverityMap }) {
   const ruleResults = await Promise.all(
     rules.map((rule) =>
       Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
-        diagnostics.map<AugmentedDiagnostic>((d) => ({ ...d, ruleName: rule.name, getRuleDescriptionUrl })),
+        diagnostics.map<AugmentedDiagnostic>((d) => ({
+          ...d,
+          ruleName: rule.name,
+          getRuleDescriptionUrl,
+          severity: severities[rule.name],
+        })),
       ),
     ),
   )
@@ -37,7 +48,8 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
 }
 
 export const linter = {
-  run: (path: string) => scan(path).then((vfs) => runRules({ vfs, rules: $enabledRules.getState() })),
+  run: (path: string) =>
+    scan(path).then((vfs) => runRules({ vfs, rules: $enabledRules.getState(), severities: $severities.getState() })),
   watch: async (path: string) => {
     const { vfs, watcher } = await createWatcher(path)
 
@@ -46,7 +58,7 @@ export const linter = {
 
     sample({
       clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
-      source: { vfs: vfs.$tree, rules: $enabledRules },
+      source: { vfs: vfs.$tree, rules: $enabledRules, severities: $severities },
       target: runRulesFx,
     })
 

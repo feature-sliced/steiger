@@ -10,7 +10,17 @@ export function formatPretty(diagnostics: Array<AugmentedDiagnostic>, cwd: strin
     return chalk.green(`${figures.tick} No problems found!`)
   }
 
-  let footer = chalk.red.bold(`Found ${diagnostics.length} problem${s(diagnostics.length)}`)
+  const errors = diagnostics.filter((d) => d.severity === 'error')
+  const warnings = diagnostics.filter((d) => d.severity === 'warn')
+
+  let footer =
+    'Found ' +
+    [
+      errors.length > 0 && chalk.red.bold(`${errors.length} error${s(errors.length)}`),
+      warnings.length > 0 && chalk.yellow.bold(`${warnings.length} warning${s(warnings.length)}`),
+    ]
+      .filter(Boolean)
+      .join(' and ')
 
   const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
   if (autofixable.length === diagnostics.length) {
