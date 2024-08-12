@@ -1,8 +1,10 @@
+import { sep } from 'node:path'
+
 import { minimatch } from 'minimatch'
 import { File, Folder } from '@steiger/types'
+
 import { isNegationPattern } from '../shared/globs'
 import { flattenFolder, copyFsEntity } from '../shared/file-system'
-import { sep } from 'node:path'
 
 interface ApplyGlobsOptions {
   inclusions?: string[]
@@ -23,8 +25,9 @@ function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
     for (let i = 0; i < pathParts.length; i++) {
       const pathPart = pathParts[i]
       const isLastPart = i === pathParts.length - 1
+      const nextPath = `${currentFolder.path}${sep}${pathPart}`
       const existingFolder = currentFolder.children.find(
-        (child) => child.type === 'folder' && child.path === `${currentFolder.path}${sep}${pathPart}`,
+        (child) => child.type === 'folder' && child.path === nextPath,
       ) as Folder | undefined
 
       if (isLastPart && nested.type === 'file') {
@@ -37,7 +40,7 @@ function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
       } else {
         const newFolder: Folder = {
           type: 'folder',
-          path: `${currentFolder.path}${sep}${pathPart}`,
+          path: nextPath,
           children: [],
         }
         currentFolder.children.push(newFolder)

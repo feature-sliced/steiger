@@ -1,7 +1,7 @@
 import { expect, it, describe } from 'vitest'
 
 import applyGlobs from './apply-globs'
-import { joinFromRoot, parseIntoFsdRoot } from '../../../steiger-plugin-fsd/src/_lib/prepare-test'
+import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test'
 
 describe('applyGlobs', () => {
   it('should return the passed folder if no globs are provided', () => {
