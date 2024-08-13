@@ -46,6 +46,7 @@
     "effector": "^23.2.1",
     "globby": "^14.0.1",
     "immer": "^10.1.1",
+    "minimatch": "^10.0.1",
     "patronum": "^2.2.0",
     "prexit": "^2.2.0",
     "yargs": "^17.7.2",
