@@ -1,6 +1,6 @@
 import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import type { Rule, Folder, Severity } from '@steiger/types'
+import { Rule, Folder, Severity, Context } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
@@ -13,6 +13,9 @@ function getRuleDescriptionUrl(ruleName: string) {
 
 type Config = typeof $config
 type SeverityMap = Record<string, Exclude<Severity, 'off'>>
+
+// TODO: temporary dummy context. Will be provided by rule developers in the future
+const context: Context = { sourceFileExtension: 'js' }
 
 const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
@@ -34,7 +37,7 @@ const $severities = $config.map(
 async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<Rule>; severities: SeverityMap }) {
   const ruleResults = await Promise.all(
     rules.map((rule) =>
-      Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
+      Promise.resolve(rule.check.call(context, vfs)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({
           ...d,
           ruleName: rule.name,

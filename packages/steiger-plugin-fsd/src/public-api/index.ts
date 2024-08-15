@@ -6,7 +6,7 @@ import { NAMESPACE } from '../constants.js'
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {
   name: `${NAMESPACE}/public-api`,
-  check(root, context) {
+  check(root) {
     const diagnostics: Array<Diagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
@@ -22,7 +22,7 @@ const publicApi = {
               fixes: [
                 {
                   type: 'create-file',
-                  path: join(segment.path, `index.${context.sourceFileExtension}`),
+                  path: join(segment.path, `index.${this.sourceFileExtension}`),
                   // TODO: Infer better content for this file
                   content: '',
                 },
@@ -39,7 +39,7 @@ const publicApi = {
               fixes: [
                 {
                   type: 'create-file',
-                  path: join(slice.path, `index.${context.sourceFileExtension}`),
+                  path: join(slice.path, `index.${this.sourceFileExtension}`),
                   // TODO: Infer better content for this file
                   content: '',
                 },
