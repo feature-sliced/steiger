@@ -2,6 +2,9 @@ import { expect, it } from 'vitest'
 
 import publicApi from './index.js'
 import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { Context } from '@steiger/types'
+
+const dummyContext: Context = { sourceFileExtension: 'ts' }
 
 it('reports no errors on a project with all the required public APIs', () => {
   const root = parseIntoFsdRoot(`
@@ -24,7 +27,7 @@ it('reports no errors on a project with all the required public APIs', () => {
         📄 index.ts
   `)
 
-  expect(publicApi.check(root, { sourceFileExtension: 'ts' })).toEqual({ diagnostics: [] })
+  expect(publicApi.check.call(dummyContext, root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on slices that are missing a public API', () => {
@@ -47,7 +50,7 @@ it('reports errors on slices that are missing a public API', () => {
         📂 ui
   `)
 
-  const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
+  const diagnostics = publicApi.check.call(dummyContext, root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: 'This slice is missing a public API.',
@@ -98,7 +101,7 @@ it('reports errors on segments that are missing a public API', () => {
       📂 styles
   `)
 
-  const diagnostics = publicApi.check(root, { sourceFileExtension: 'ts' }).diagnostics.sort(compareMessages)
+  const diagnostics = publicApi.check.call(dummyContext, root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: 'This segment is missing a public API.',

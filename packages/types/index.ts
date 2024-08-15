@@ -24,7 +24,12 @@ export type RuleOptions = Record<string, unknown>
 export interface Rule {
   /** Short code name for the rule. */
   name: string
-  check: (this: Context, root: Folder, options?: Options, ruleOptions?: RuleOptions) => RuleResult | Promise<RuleResult>
+  check: (
+    this: Context | Rule,
+    root: Folder,
+    options?: Options,
+    ruleOptions?: RuleOptions,
+  ) => RuleResult | Promise<RuleResult>
 }
 
 export interface RuleResult {
