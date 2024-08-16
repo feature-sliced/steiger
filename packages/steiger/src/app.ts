@@ -14,6 +14,14 @@ function getRuleDescriptionUrl(ruleName: string) {
 type Config = typeof $config
 type SeverityMap = Record<string, Exclude<Severity, 'off'>>
 
+function getSeverity(value: Severity | [Severity, Record<string, unknown>]): Severity {
+  return Array.isArray(value) ? value[0] : value
+}
+
+function isEnabled([, value]: [string, Severity | [Severity, Record<string, unknown>]]): boolean {
+  return getSeverity(value) !== 'off'
+}
+
 // TODO: temporary dummy context. Will be provided by rule developers in the future
 const context: Context = { sourceFileExtension: 'js' }
 
@@ -31,21 +39,37 @@ const $enabledRules = combine($config, $rules, (config, rules) => {
 
 const $severities = $config.map(
   (config) =>
-    Object.fromEntries(Object.entries(config?.rules ?? {}).filter(([, severity]) => severity !== 'off')) as SeverityMap,
+    Object.fromEntries(
+      Object.entries(config?.rules ?? {})
+        .filter(isEnabled)
+        .map(([ruleName, severityOrTuple]) => [ruleName, getSeverity(severityOrTuple)]),
+    ) as SeverityMap,
+)
+
+const $ruleOptions = $config.map(
+  (config) =>
+    Object.fromEntries(
+      Object.entries(config?.rules ?? {})
+        .filter(isEnabled)
+        .map(([ruleName, severityOrTuple]) => [ruleName, Array.isArray(severityOrTuple) ? severityOrTuple[1] : {}]),
+    ) as Record<string, Record<string, unknown>>,
 )
 
 async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<Rule>; severities: SeverityMap }) {
   const ruleResults = await Promise.all(
-    rules.map((rule) =>
-      Promise.resolve(rule.check.call(context, vfs)).then(({ diagnostics }) =>
+    rules.map((rule) => {
+      const optionsForCurrentRule = $ruleOptions.getState()[rule.name]
+
+      // TODO: temporary pass undefined as global options because they are not yet implemented
+      return Promise.resolve(rule.check.call(context, vfs, undefined, optionsForCurrentRule)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({
           ...d,
           ruleName: rule.name,
           getRuleDescriptionUrl,
           severity: severities[rule.name],
         })),
-      ),
-    ),
+      )
+    }),
   )
   return ruleResults.flat()
 }
