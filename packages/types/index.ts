@@ -83,8 +83,7 @@ export interface ConfigObject {
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
   rules?: {
-    // TODO: add "| [Severity, Record<string, unknown>]" when individual rule options are supported
-    [ruleName: string]: Severity
+    [ruleName: string]: Severity | [Severity, Record<string, unknown>]
   }
 }
 
