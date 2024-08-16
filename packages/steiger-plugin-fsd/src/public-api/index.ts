@@ -1,12 +1,13 @@
 import { join } from 'node:path'
 import { getLayers, getSegments, isSliced, getIndex, getSlices } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { Context, Diagnostic, Rule } from '@steiger/types'
 import { NAMESPACE } from '../constants.js'
 
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {
   name: `${NAMESPACE}/public-api`,
   check(root) {
+    const context = this as Context
     const diagnostics: Array<Diagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
@@ -22,7 +23,7 @@ const publicApi = {
               fixes: [
                 {
                   type: 'create-file',
-                  path: join(segment.path, `index.${this.sourceFileExtension}`),
+                  path: join(segment.path, `index.${context.sourceFileExtension}`),
                   // TODO: Infer better content for this file
                   content: '',
                 },
@@ -39,7 +40,7 @@ const publicApi = {
               fixes: [
                 {
                   type: 'create-file',
-                  path: join(slice.path, `index.${this.sourceFileExtension}`),
+                  path: join(slice.path, `index.${context.sourceFileExtension}`),
                   // TODO: Infer better content for this file
                   content: '',
                 },
