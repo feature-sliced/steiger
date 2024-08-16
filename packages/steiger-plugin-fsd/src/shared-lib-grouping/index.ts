@@ -11,7 +11,7 @@ export interface SharedLibGroupingOptions extends RuleOptions {
 /** Warn about too much stuff in shared/lib. */
 const sharedLibGrouping = {
   name: `${NAMESPACE}/shared-lib-grouping`,
-  check(root, _, ruleOptions?: SharedLibGroupingOptions) {
+  check(root, _?, ruleOptions?: SharedLibGroupingOptions) {
     const threshold = ruleOptions?.threshold ?? DEFAULT_THRESHOLD
     const diagnostics: Array<Diagnostic> = []
 
