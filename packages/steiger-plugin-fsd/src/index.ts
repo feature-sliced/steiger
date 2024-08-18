@@ -17,8 +17,6 @@ import sharedLibGrouping from './shared-lib-grouping/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json'
 
-export { SharedLibGroupingOptions } from './shared-lib-grouping/index.js'
-
 const allRules: Array<Rule> = [
   ambiguousSliceNames,
   excessiveSlicing,
