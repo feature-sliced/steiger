@@ -57,8 +57,7 @@ async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<
     rules.map((rule) => {
       const optionsForCurrentRule = $ruleOptions.getState()[rule.name]
 
-      // TODO: temporary pass undefined as global options because they are not yet implemented
-      return Promise.resolve(rule.check(vfs, undefined, optionsForCurrentRule)).then(({ diagnostics }) =>
+      return Promise.resolve(rule.check(vfs, optionsForCurrentRule)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({
           ...d,
           ruleName: rule.name,
