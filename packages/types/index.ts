@@ -74,7 +74,7 @@ export interface ConfigObject {
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
   rules?: {
-    [ruleName: string]: Severity | [Severity, Record<string, unknown>]
+    [ruleName: string]: Severity | [Severity, RuleOptions]
   }
 }
 
