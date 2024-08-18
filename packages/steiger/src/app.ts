@@ -1,6 +1,6 @@
 import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import { Rule, Folder, Severity, Context } from '@steiger/types'
+import { Rule, Folder, Severity } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
@@ -21,9 +21,6 @@ function getSeverity(value: Severity | [Severity, Record<string, unknown>]): Sev
 function isEnabled([, value]: [string, Severity | [Severity, Record<string, unknown>]]): boolean {
   return getSeverity(value) !== 'off'
 }
-
-// TODO: temporary dummy context. Will be provided by rule developers in the future
-const context: Context = { sourceFileExtension: 'js' }
 
 const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
@@ -61,7 +58,7 @@ async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<
       const optionsForCurrentRule = $ruleOptions.getState()[rule.name]
 
       // TODO: temporary pass undefined as global options because they are not yet implemented
-      return Promise.resolve(rule.check.call(context, vfs, undefined, optionsForCurrentRule)).then(({ diagnostics }) =>
+      return Promise.resolve(rule.check(vfs, undefined, optionsForCurrentRule)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({
           ...d,
           ruleName: rule.name,
