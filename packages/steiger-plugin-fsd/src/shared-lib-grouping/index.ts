@@ -1,18 +1,13 @@
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule, RuleOptions } from '@steiger/types'
+import type { Diagnostic, Rule } from '@steiger/types'
 import { NAMESPACE } from '../constants.js'
 
-const DEFAULT_THRESHOLD = 15
-
-export interface SharedLibGroupingOptions extends RuleOptions {
-  threshold?: number
-}
+const THRESHOLD = 15
 
 /** Warn about too much stuff in shared/lib. */
 const sharedLibGrouping = {
   name: `${NAMESPACE}/shared-lib-grouping`,
-  check(root, _, ruleOptions?: SharedLibGroupingOptions) {
-    const threshold = ruleOptions?.threshold ?? DEFAULT_THRESHOLD
+  check(root) {
     const diagnostics: Array<Diagnostic> = []
 
     const { shared } = getLayers(root)
@@ -25,9 +20,9 @@ const sharedLibGrouping = {
       return { diagnostics }
     }
 
-    if (lib.type === 'folder' && lib.children.length > threshold) {
+    if (lib.type === 'folder' && lib.children.length > THRESHOLD) {
       diagnostics.push({
-        message: `Shared/lib has ${lib.children.length} modules, which is above the recommended threshold of ${threshold}. Consider grouping them.`,
+        message: `Shared/lib has ${lib.children.length} modules, which is above the recommended threshold of ${THRESHOLD}. Consider grouping them.`,
         location: { path: lib.path },
       })
     }
