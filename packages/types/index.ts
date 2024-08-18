@@ -9,12 +9,12 @@ export interface Folder {
   children: Array<File | Folder>
 }
 
-export type RuleOptions = Record<string, unknown>
+export type BaseRuleOptions = Record<string, unknown>
 
-export interface Rule {
+export interface Rule<Context = void, RuleOptions = BaseRuleOptions> {
   /** Short code name for the rule. */
   name: string
-  check: (this: Rule, root: Folder, ruleOptions?: RuleOptions) => RuleResult | Promise<RuleResult>
+  check: (this: Context, root: Folder, ruleOptions?: RuleOptions) => RuleResult | Promise<RuleResult>
 }
 
 export interface RuleResult {
@@ -68,7 +68,7 @@ export interface ConfigObject {
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
   rules?: {
-    [ruleName: string]: Severity | [Severity, RuleOptions]
+    [ruleName: string]: Severity | [Severity, BaseRuleOptions]
   }
 }
 
