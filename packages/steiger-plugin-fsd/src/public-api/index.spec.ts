@@ -54,7 +54,7 @@ it('reports errors on slices that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: joinFromRoot('entities', 'posts', 'index.ts'),
+          path: joinFromRoot('entities', 'posts', 'index.js'),
           content: '',
         },
       ],
@@ -65,7 +65,7 @@ it('reports errors on slices that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: joinFromRoot('pages', 'editor', 'index.ts'),
+          path: joinFromRoot('pages', 'editor', 'index.js'),
           content: '',
         },
       ],
@@ -105,7 +105,7 @@ it('reports errors on segments that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: joinFromRoot('shared', 'ui', 'index.ts'),
+          path: joinFromRoot('shared', 'ui', 'index.js'),
           content: '',
         },
       ],
