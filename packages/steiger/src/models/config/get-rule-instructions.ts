@@ -20,7 +20,14 @@ export default function getRuleInstructions(config: Config): Record<string, Rule
               : null
 
             if (ruleOptions && acc[ruleName].options) {
-              throw new Error(`Rule options for "${ruleName}" are already defined!`)
+              throw new Error(
+                `
+                Rule "${ruleName}" has multiple options provided! 
+                  ${JSON.stringify(acc[ruleName].options)} 
+                and
+                  ${JSON.stringify(ruleOptions)}.
+                You can only provide options for a rule once.`,
+              )
             }
 
             if (ruleOptions) {
