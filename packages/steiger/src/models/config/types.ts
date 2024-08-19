@@ -16,6 +16,6 @@ interface GlobGroup {
 
 export interface RuleInstructions {
   // TODO: Replace with RuleOptions once the corresponding PR is merged
-  options: Record<string, unknown>
+  options: Record<string, unknown> | null
   globGroups: Array<GlobGroup>
 }
