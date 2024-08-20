@@ -1,6 +1,6 @@
 import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import type { Rule, Folder, Severity } from '@steiger/types'
+import { Rule, Folder, Severity } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
@@ -13,6 +13,14 @@ function getRuleDescriptionUrl(ruleName: string) {
 
 type Config = typeof $config
 type SeverityMap = Record<string, Exclude<Severity, 'off'>>
+
+function getSeverity(value: Severity | [Severity, Record<string, unknown>]): Severity {
+  return Array.isArray(value) ? value[0] : value
+}
+
+function isEnabled([, value]: [string, Severity | [Severity, Record<string, unknown>]]): boolean {
+  return getSeverity(value) !== 'off'
+}
 
 const $enabledRules = combine($config, $rules, (config, rules) => {
   const ruleConfigs = config?.rules
@@ -28,21 +36,36 @@ const $enabledRules = combine($config, $rules, (config, rules) => {
 
 const $severities = $config.map(
   (config) =>
-    Object.fromEntries(Object.entries(config?.rules ?? {}).filter(([, severity]) => severity !== 'off')) as SeverityMap,
+    Object.fromEntries(
+      Object.entries(config?.rules ?? {})
+        .filter(isEnabled)
+        .map(([ruleName, severityOrTuple]) => [ruleName, getSeverity(severityOrTuple)]),
+    ) as SeverityMap,
+)
+
+const $ruleOptions = $config.map(
+  (config) =>
+    Object.fromEntries(
+      Object.entries(config?.rules ?? {})
+        .filter(isEnabled)
+        .map(([ruleName, severityOrTuple]) => [ruleName, Array.isArray(severityOrTuple) ? severityOrTuple[1] : {}]),
+    ) as Record<string, Record<string, unknown>>,
 )
 
 async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<Rule>; severities: SeverityMap }) {
   const ruleResults = await Promise.all(
-    rules.map((rule) =>
-      Promise.resolve(rule.check(vfs, { sourceFileExtension: 'js' })).then(({ diagnostics }) =>
+    rules.map((rule) => {
+      const optionsForCurrentRule = $ruleOptions.getState()[rule.name]
+
+      return Promise.resolve(rule.check(vfs, optionsForCurrentRule)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({
           ...d,
           ruleName: rule.name,
           getRuleDescriptionUrl,
           severity: severities[rule.name],
         })),
-      ),
-    ),
+      )
+    }),
   )
   return ruleResults.flat()
 }

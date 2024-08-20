@@ -42,7 +42,7 @@ function mergeConfigObjects(config: Config) {
 /**
  * Dynamically build a validation scheme based on the rules provided by plugins.
  * */
-function buildValidationScheme(rules: Array<Rule>) {
+export function buildValidationScheme(rules: Array<Rule>) {
   const ruleNames = rules.map((rule) => rule.name)
 
   // Ensure the array has at least one element
@@ -52,19 +52,24 @@ function buildValidationScheme(rules: Array<Rule>) {
 
   return z.object({
     // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-    rules: z.record(z.enum(ruleNames as [string, ...string[]]), z.enum(['off', 'error', 'warn'])).refine(
-      (value) => {
-        const ruleNames = Object.keys(value)
-        const offRules = ruleNames.filter((name) => value[name] === 'off')
+    rules: z
+      .record(
+        z.enum(ruleNames as [string, ...string[]]),
+        z.union([z.enum(['off', 'error', 'warn']), z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()])]),
+      )
+      .refine(
+        (value) => {
+          const ruleNames = Object.keys(value)
+          const offRules = ruleNames.filter((name) => value[name] === 'off')
 
-        if (offRules.length === ruleNames.length || ruleNames.length === 0) {
-          return false
-        }
+          if (offRules.length === ruleNames.length || ruleNames.length === 0) {
+            return false
+          }
 
-        return true
-      },
-      { message: 'At least one rule must be enabled' },
-    ),
+          return true
+        },
+        { message: 'At least one rule must be enabled' },
+      ),
   })
 }
 

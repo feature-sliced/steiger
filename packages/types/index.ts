@@ -9,14 +9,12 @@ export interface Folder {
   children: Array<File | Folder>
 }
 
-export interface Context {
-  sourceFileExtension: 'js' | 'ts'
-}
+export type BaseRuleOptions = Record<string, unknown>
 
-export interface Rule {
+export interface Rule<Context = void, RuleOptions = BaseRuleOptions> {
   /** Short code name for the rule. */
   name: string
-  check: (root: Folder, context: Context) => RuleResult | Promise<RuleResult>
+  check: (this: Context, root: Folder, ruleOptions?: RuleOptions) => RuleResult | Promise<RuleResult>
 }
 
 export interface RuleResult {
@@ -70,8 +68,7 @@ export interface ConfigObject {
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
   rules?: {
-    // TODO: add "| [Severity, Record<string, unknown>]" when individual rule options are supported
-    [ruleName: string]: Severity
+    [ruleName: string]: Severity | [Severity, BaseRuleOptions]
   }
 }
 
