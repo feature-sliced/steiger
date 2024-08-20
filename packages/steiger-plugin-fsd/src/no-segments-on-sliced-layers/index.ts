@@ -1,11 +1,11 @@
 import { basename } from 'node:path'
 
 import { getLayers, isSliced, conventionalSegmentNames } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { Diagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 const noSegmentsOnSlicedLayers = {
-  name: `${NAMESPACE}/no-segments-on-sliced-layers`,
+  name: `${NAMESPACE}/no-segments-on-sliced-layers` as const,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
     const layers = Object.values(getLayers(root))

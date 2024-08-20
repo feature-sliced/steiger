@@ -11,9 +11,9 @@ export interface Folder {
 
 export type BaseRuleOptions = Record<string, unknown>
 
-export interface Rule<Context = void, RuleOptions = BaseRuleOptions> {
+export interface Rule<Context = void, RuleOptions = BaseRuleOptions, Rules extends string = string> {
   /** Short code name for the rule. */
-  name: string
+  name: Rules
   check: (this: Context, root: Folder, ruleOptions?: RuleOptions) => RuleResult | Promise<RuleResult>
 }
 
@@ -61,21 +61,32 @@ export type Config = Array<ConfigObject | Plugin>
 
 export type Severity = 'off' | 'warn' | 'error'
 
-export interface ConfigObject {
-  /** Globs of files to check */
+export interface ConfigObject<Rules extends string = string> {
+  /** Globs of files to check. */
   files?: Array<string>
-  /** Globs of files to ignore */
+  /** Globs of files to ignore. */
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
-  rules?: {
-    [ruleName: string]: Severity | [Severity, BaseRuleOptions]
-  }
+  rules?: Partial<Record<Rules, Severity | [Severity, BaseRuleOptions]>>
 }
 
-export interface Plugin {
+export interface Plugin<Rules extends string = string> {
   meta: {
     name: string
     version: string
   }
-  ruleDefinitions: Array<Rule>
+  ruleDefinitions: Array<Rule<unknown, BaseRuleOptions, Rules>>
 }
+
+// export interface Plugin<
+//   Context = unknown,
+//   Rules extends string = string,
+//   RuleOptions extends Record<Rules, BaseRuleOptions> = Record<Rules, BaseRuleOptions>,
+// > {
+//   meta: {
+//     name: string
+//     version: string
+//   }
+//   // CONTINUE: figure out how to type each individual rule's options
+//   ruleDefinitions: Array<Rule<Context, RuleOptions, Rules>>
+// }

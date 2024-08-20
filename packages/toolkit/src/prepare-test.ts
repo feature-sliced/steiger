@@ -1,14 +1,14 @@
 import { join, sep } from 'node:path'
 import type { readFileSync, existsSync } from 'node:fs'
-import type { FsdRoot } from '@feature-sliced/filesystem'
 import type { Folder, File, Diagnostic } from '@steiger/types'
 import { vi } from 'vitest'
 
 /** Parse a multi-line indented string with emojis for files and folders into an FSD root.
- * @param fsMarkup - a file system tree represented in markup using file and folder emojis
- * @param mountTo - virtually make the passed markup a subtree of the mountTo folder
- * */
-export function parseIntoFsdRoot(fsMarkup: string, mountTo?: string): FsdRoot {
+ *
+ * @param fsMarkup a file system tree represented in markup using file and folder emojis
+ * @param mountTo virtually make the passed markup a subtree of the mountTo folder
+ */
+export function parseIntoFolder(fsMarkup: string, mountTo?: string): Folder {
   function parseFolder(lines: Array<string>, path: string): Folder {
     const children: Array<Folder | File> = []
 
@@ -74,8 +74,8 @@ export function createFsMocks(mockedFiles: Record<string, string>, original: typ
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
 
-  test('parseIntoFsdRoot', () => {
-    const root = parseIntoFsdRoot(`
+  test('parseIntoFolder', () => {
+    const root = parseIntoFolder(`
       📂 entities
         📂 users
           📂 ui
@@ -167,7 +167,7 @@ if (import.meta.vitest) {
           📄 index.ts
           📄 Button.tsx
     `
-    const root = parseIntoFsdRoot(markup, joinFromRoot('src'))
+    const root = parseIntoFolder(markup, joinFromRoot('src'))
 
     expect(root).toEqual({
       type: 'folder',

@@ -3,14 +3,14 @@ import { partition } from 'lodash-es'
 import pluralize from 'pluralize'
 const { isPlural, plural, singular } = pluralize
 import { getLayers, getSlices } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { Diagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
 import { NAMESPACE } from '../constants.js'
 
 /** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
-  name: `${NAMESPACE}/inconsistent-naming`,
+  name: `${NAMESPACE}/inconsistent-naming` as const,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

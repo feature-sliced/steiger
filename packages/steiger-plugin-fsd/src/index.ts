@@ -1,4 +1,4 @@
-import { Config, Rule, Plugin, ConfigObject } from '@steiger/types'
+import { enableAllRules, type Config, type ConfigObjectOf, type Plugin } from '@steiger/toolkit'
 
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
@@ -17,41 +17,53 @@ import sharedLibGrouping from './shared-lib-grouping/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json'
 
-const allRules: Array<Rule> = [
-  ambiguousSliceNames,
-  excessiveSlicing,
-  forbiddenImports,
-  inconsistentNaming,
-  insignificantSlice,
-  noLayerPublicApi,
-  noPublicApiSidestep,
-  noReservedFolderNames,
-  noSegmentlessSlices,
-  noSegmentsOnSlicedLayers,
-  publicApi,
-  repetitiveNaming,
-  segmentsByPurpose,
-  sharedLibGrouping,
-  noProcesses,
-]
-
-const allRulesEnabledConfig: ConfigObject = {
-  rules: allRules.reduce((acc, rule) => ({ ...acc, [rule.name]: 'error' }), {}),
-}
-
-const plugin: Plugin = {
+const plugin = {
   meta: {
     name: 'steiger-plugin-fsd',
     version: packageJson.version,
   },
-  ruleDefinitions: allRules,
-}
+  ruleDefinitions: [
+    ambiguousSliceNames,
+    excessiveSlicing,
+    forbiddenImports,
+    inconsistentNaming,
+    insignificantSlice,
+    noLayerPublicApi,
+    noPublicApiSidestep,
+    noReservedFolderNames,
+    noSegmentlessSlices,
+    noSegmentsOnSlicedLayers,
+    publicApi,
+    repetitiveNaming,
+    segmentsByPurpose,
+    sharedLibGrouping,
+    noProcesses,
+  ],
+} satisfies Plugin
 
-const configs: Record<string, Config> = {
-  recommended: [plugin, allRulesEnabledConfig],
-}
+// export const anotherPlugin = createPlugin({
+//   meta: {
+//     name: 'steiger-plugin-hello',
+//     version: '0.0.0'
+//   },
+//   ruleDefinitions: [
+//     {
+//       name: 'hello/test',
+//       check(root, options: { foo: string }) {
+//         console.log(options.foo)
+//         return { diagnostics: [] }
+//       }
+//     }
+//   ]
+// })
+
+const configs = {
+  recommended: enableAllRules(plugin),
+} satisfies Record<string, Config>
 
 export default {
   plugin,
   configs,
 }
+
+export type FSDConfigObject = ConfigObjectOf<typeof plugin>

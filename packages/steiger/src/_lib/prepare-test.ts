@@ -1,8 +1,6 @@
-import { join, sep } from 'node:path'
-import type { readFileSync, existsSync } from 'node:fs'
+import { join } from 'node:path'
 import type { FsdRoot } from '@feature-sliced/filesystem'
 import type { Folder, File, Diagnostic } from '@steiger/types'
-import { vi } from 'vitest'
 
 /** Parse a multi-line indented string with emojis for files and folders into an FSD root.
  * @param fsMarkup - a file system tree represented in markup using file and folder emojis
@@ -45,30 +43,6 @@ export function compareMessages(a: Diagnostic, b: Diagnostic): number {
 
 export function joinFromRoot(...segments: Array<string>) {
   return join('/', ...segments)
-}
-
-export function createFsMocks(mockedFiles: Record<string, string>, original: typeof import('fs')): typeof import('fs') {
-  const normalizedMockedFiles = Object.fromEntries(
-    Object.entries(mockedFiles).map(([path, content]) => [path.replace(/\//g, sep), content]),
-  )
-
-  return {
-    ...original,
-    readFileSync: vi.fn(((path, options) => {
-      const normalizedPath = typeof path === 'string' ? path.replace(/\//g, sep) : path
-      if (typeof normalizedPath === 'string' && normalizedPath in normalizedMockedFiles) {
-        return normalizedMockedFiles[normalizedPath as keyof typeof normalizedMockedFiles]
-      } else {
-        return original.readFileSync(normalizedPath, options)
-      }
-    }) as typeof readFileSync),
-    existsSync: vi.fn(((path) => {
-      const normalizedPath = typeof path === 'string' ? path.replace(/\//g, sep) : path
-      return Object.keys(normalizedMockedFiles).some(
-        (key) => key === normalizedPath || key.startsWith(normalizedPath + sep),
-      )
-    }) as typeof existsSync),
-  } as typeof import('fs')
 }
 
 if (import.meta.vitest) {

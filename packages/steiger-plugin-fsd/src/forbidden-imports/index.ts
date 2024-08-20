@@ -3,13 +3,13 @@ import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { Diagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { NAMESPACE } from '../constants.js'
 
 const forbiddenImports = {
-  name: `${NAMESPACE}/forbidden-imports`,
+  name: `${NAMESPACE}/forbidden-imports` as const,
   async check(root) {
     const diagnostics: Array<Diagnostic> = []
     const { tsconfig } = await parseNearestTsConfig(root.path)

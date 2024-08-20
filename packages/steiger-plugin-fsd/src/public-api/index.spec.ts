@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import publicApi from './index.js'
-import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project with all the required public APIs', () => {
   const root = parseIntoFsdRoot(`

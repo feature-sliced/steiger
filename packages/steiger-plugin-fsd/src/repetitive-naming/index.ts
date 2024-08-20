@@ -1,5 +1,5 @@
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { Diagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 /**
@@ -16,7 +16,7 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 
 /** Warn about repetitive parts in slice names (e.g. adding page to every slice on Pages) */
 const repetitiveNaming = {
-  name: `${NAMESPACE}/repetitive-naming`,
+  name: `${NAMESPACE}/repetitive-naming` as const,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

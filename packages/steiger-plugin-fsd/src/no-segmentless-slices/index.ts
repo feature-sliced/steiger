@@ -1,9 +1,9 @@
 import { getLayers, isSlice, isSliced } from '@feature-sliced/filesystem'
-import type { Folder, Diagnostic, Rule } from '@steiger/types'
+import type { Folder, Diagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 const noSegmentlessSlices = {
-  name: `${NAMESPACE}/no-segmentless-slices`,
+  name: `${NAMESPACE}/no-segmentless-slices` as const,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 

@@ -1,11 +1,11 @@
 import { basename, sep } from 'node:path'
 import { getAllSlices, getLayers, getSegments, type LayerName } from '@feature-sliced/filesystem'
-import type { Diagnostic, Folder, Rule } from '@steiger/types'
+import type { Diagnostic, Folder, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 /** Forbid slice names that match some segment’s name in shared (e.g., theme, i18n) */
 const ambiguousSliceNames = {
-  name: `${NAMESPACE}/ambiguous-slice-names`,
+  name: `${NAMESPACE}/ambiguous-slice-names` as const,
   check(root) {
     const diagnostics: Array<Diagnostic> = []
 
