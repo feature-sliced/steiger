@@ -4,22 +4,48 @@ export default function transformer(file, api) {
   const root = j(file.source)
 
   // Add "fsd/" prefix to FSD rule names
-  root
-    .find(j.Literal)
-    .filter((path) => ruleNames.includes(path.node.value))
-    .replaceWith((path) => j.stringLiteral(`fsd/${path.node.value}`))
+  const fsdRuleSettings = root.find(j.Literal).filter((path) => ruleNames.includes(path.node.value))
+  fsdRuleSettings.replaceWith((path) => j.stringLiteral(`fsd/${path.node.value}`))
 
-  // Make the default export or the argument of `defineConfig` an array
+  // Add an import fsd from '@feature-sliced/steiger-plugin' after the last import or in the beginning
+  if (fsdRuleSettings.length > 0) {
+    const importDeclarations = root.find(j.ImportDeclaration)
+    const importFsdFromSteigerPlugin = j.importDeclaration(
+      [j.importDefaultSpecifier(j.identifier('fsd'))],
+      j.stringLiteral('@feature-sliced/steiger-plugin'),
+    )
+
+    if (importDeclarations.length > 0) {
+      importDeclarations.at(-1).insertAfter(importFsdFromSteigerPlugin)
+    } else {
+      root.find(j.Program).get('body', 0).insertBefore(importFsdFromSteigerPlugin)
+    }
+  }
+
+  // Make the default export or the argument of `defineConfig` an array unless it already is; include `...fsd.configs.recommended`
   const defineConfigCalls = root.find(j.CallExpression).filter((path) => path.node.callee.name === 'defineConfig')
-
+  const fsdConfigRecommended = j.spreadElement(
+    j.memberExpression(j.memberExpression(j.identifier('fsd'), j.identifier('configs')), j.identifier('recommended')),
+  )
   if (defineConfigCalls.length > 0) {
-    defineConfigCalls
-      .find(j.ObjectExpression)
-      .at(0)
-      .replaceWith((path) => j.arrayExpression([path.value]))
+    defineConfigCalls.forEach((path) => {
+      const config = path.node.arguments[0]
+
+      if (config.type === 'ArrayExpression') {
+        return
+      }
+
+      path.node.arguments[0] = j.arrayExpression([fsdConfigRecommended, config])
+    })
   } else {
     root.find(j.ExportDefaultDeclaration).forEach((path) => {
-      path.value.declaration = j.arrayExpression([path.value.declaration])
+      const config = path.node.declaration
+
+      if (config.type === 'ArrayExpression') {
+        return
+      }
+
+      path.node.declaration = j.arrayExpression([fsdConfigRecommended, config])
     })
   }
 
