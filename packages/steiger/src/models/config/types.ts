@@ -1,4 +1,10 @@
-import { Severity, File, Folder } from '@steiger/types'
+import { Severity, File, Folder, BaseRuleOptions } from '@steiger/types'
+
+export interface RuleRunEnvironment {
+  severityMap: Record<string, Severity>
+  vfs: Folder
+  ruleOptions: BaseRuleOptions
+}
 
 export interface SeverityMarkedFile extends File {
   severity: Severity
@@ -15,7 +21,6 @@ interface GlobGroup {
 }
 
 export interface RuleInstructions {
-  // TODO: Replace with RuleOptions once the corresponding PR is merged
-  options: Record<string, unknown> | null
+  options: BaseRuleOptions | null
   globGroups: Array<GlobGroup>
 }

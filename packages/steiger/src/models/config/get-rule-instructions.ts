@@ -3,8 +3,7 @@ import { RuleInstructions } from './types'
 
 export default function getRuleInstructions(config: Config): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = {}
-  // TODO: temporary simplified implementation.
-  //  Implement handling the "files" and "ignores" globs in further updates.
+
   return config.reduce((acc: Record<string, RuleInstructions>, item) => {
     if ('rules' in item) {
       Object.entries(item.rules!).forEach(
