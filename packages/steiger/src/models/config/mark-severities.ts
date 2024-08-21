@@ -9,7 +9,7 @@ function markDefault(file: File): SeverityMarkedFile {
   }
 }
 
-export function markSeverities(
+export default function markSeverities(
   ruleToInstructions: Record<string, RuleInstructions>,
   ruleToVfs: Record<string, Array<File>>,
 ): Record<string, Array<SeverityMarkedFile>> {

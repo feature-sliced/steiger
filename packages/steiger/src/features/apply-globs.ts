@@ -1,10 +1,8 @@
-import { sep } from 'node:path'
-
 import { minimatch } from 'minimatch'
 import { File, Folder } from '@steiger/types'
 
 import { isNegationPattern } from '../shared/globs'
-import { flattenFolder, copyFsEntity } from '../shared/file-system'
+import { flattenFolder, copyFsEntity, recomposeTree } from '../shared/file-system'
 
 interface ApplyGlobsOptions {
   inclusions?: string[]
@@ -12,47 +10,6 @@ interface ApplyGlobsOptions {
 }
 
 type RequiredApplyGlobsOptions = Required<ApplyGlobsOptions>
-
-/**
- * Turns flat array of files and folders into a tree structure based on the paths.
- * */
-function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
-  function getEntityBackToTree(folder: Folder, nested: Folder | File) {
-    const pathDiff = nested.path.slice(folder.path.length + 1)
-    const pathParts = pathDiff.split(sep).filter(Boolean)
-    let currentFolder = folder
-
-    for (let i = 0; i < pathParts.length; i++) {
-      const pathPart = pathParts[i]
-      const isLastPart = i === pathParts.length - 1
-      const nextPath = `${currentFolder.path}${sep}${pathPart}`
-      const existingFolder = currentFolder.children.find(
-        (child) => child.type === 'folder' && child.path === nextPath,
-      ) as Folder | undefined
-
-      if (isLastPart && nested.type === 'file') {
-        currentFolder.children.push(nested)
-        return
-      }
-
-      if (existingFolder) {
-        currentFolder = existingFolder
-      } else {
-        const newFolder: Folder = {
-          type: 'folder',
-          path: nextPath,
-          children: [],
-        }
-        currentFolder.children.push(newFolder)
-        currentFolder = newFolder
-      }
-    }
-  }
-
-  nodes.forEach((node) => {
-    getEntityBackToTree(folder, node)
-  })
-}
 
 export function createFilterAccordingToGlobs({ inclusions, exclusions }: RequiredApplyGlobsOptions) {
   const thereAreInclusions = inclusions.length > 0
