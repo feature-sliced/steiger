@@ -54,7 +54,7 @@ function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
   })
 }
 
-function createFilterAccordingToGlobs({ inclusions, exclusions }: RequiredApplyGlobsOptions) {
+export function createFilterAccordingToGlobs({ inclusions, exclusions }: RequiredApplyGlobsOptions) {
   const thereAreInclusions = inclusions.length > 0
   const thereAreExclusions = exclusions.length > 0
 
