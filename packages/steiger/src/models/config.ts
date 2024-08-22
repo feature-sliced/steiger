@@ -2,9 +2,14 @@ import z from 'zod'
 import { createEvent, createStore } from 'effector'
 import { Config, ConfigObject, Plugin, Rule } from '@steiger/types'
 
-export const $config = createStore<ConfigObject | null>(null)
-const setConfig = createEvent<ConfigObject>()
-$config.on(setConfig, (_state, payload) => payload)
+import getRuleInstructions from './config/get-rule-instructions'
+import { RuleInstructions } from './config/types'
+
+type RuleInstructionsPerRule = Record<string, RuleInstructions>
+
+export const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
+const setRuleInstructions = createEvent<RuleInstructionsPerRule>()
+$ruleInstructions.on(setRuleInstructions, (_state, payload) => payload)
 
 export const $rules = createStore<Array<Rule>>([])
 const setRules = createEvent<Array<Rule>>()
@@ -27,16 +32,10 @@ function processPlugins(config: Config) {
   return allRules
 }
 
-function mergeConfigObjects(config: Config) {
+function getConfigObjects(config: Config): Array<ConfigObject> {
   // TODO: temporary simplified implementation.
   //  Implement handling the "files" and "ignores" globs in further updates.
-  return config.reduce((acc: ConfigObject, item) => {
-    if ('rules' in item) {
-      return { ...acc, rules: { ...acc.rules, ...item.rules } }
-    }
-
-    return acc
-  }, {})
+  return config.filter((item) => 'rules' in item)
 }
 
 /**
@@ -50,37 +49,41 @@ export function buildValidationScheme(rules: Array<Rule>) {
     throw new Error('At least one rule must be provided by plugins!')
   }
 
-  return z.object({
-    // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-    rules: z
-      .record(
-        z.enum(ruleNames as [string, ...string[]]),
-        z.union([z.enum(['off', 'error', 'warn']), z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()])]),
-      )
-      .refine(
-        (value) => {
-          const ruleNames = Object.keys(value)
-          const offRules = ruleNames.filter((name) => value[name] === 'off')
+  return z
+    .array(
+      z.object({
+        files: z.optional(z.array(z.string())),
+        ignores: z.optional(z.array(z.string())),
+        // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
+        rules: z.record(
+          z.enum(ruleNames as [string, ...string[]]),
+          z.union([z.enum(['off', 'error', 'warn']), z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()])]),
+        ),
+      }),
+    )
+    .refine(
+      (value) => {
+        const configObjects = value.filter((item) => 'rules' in item)
 
-          if (offRules.length === ruleNames.length || ruleNames.length === 0) {
-            return false
-          }
+        if (configObjects.length === 0) {
+          return false
+        }
 
-          return true
-        },
-        { message: 'At least one rule must be enabled' },
-      ),
-  })
+        return true
+      },
+      { message: 'At least one config object must be provided!' },
+    )
 }
 
 export function processConfiguration(config: Config) {
   const allRules = processPlugins(config)
   const validationScheme = buildValidationScheme(allRules)
-  const mergedConfig = mergeConfigObjects(config)
-  const validatedConfig = validationScheme.parse(mergedConfig) as ConfigObject
+  const configObjects = getConfigObjects(config)
+  const validatedConfig = validationScheme.parse(configObjects)
+  const ruleInstructions = getRuleInstructions(validatedConfig)
 
   setRules(allRules)
-  setConfig(validatedConfig)
+  setRuleInstructions(ruleInstructions)
 
   return validatedConfig
 }
