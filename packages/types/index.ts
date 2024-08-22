@@ -67,7 +67,7 @@ export interface ConfigObject {
   /** Globs of files to ignore */
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
-  rules?: {
+  rules: {
     [ruleName: string]: Severity | [Severity, BaseRuleOptions]
   }
 }
