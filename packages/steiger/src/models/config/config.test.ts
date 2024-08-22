@@ -1,4 +1,4 @@
-import { buildValidationScheme } from './config'
+import { buildValidationScheme } from './index'
 import { describe, expect, it } from 'vitest'
 import { Config } from '@steiger/types'
 

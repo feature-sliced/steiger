@@ -2,8 +2,8 @@ import z from 'zod'
 import { createEvent, createStore } from 'effector'
 import { Config, ConfigObject, Plugin, Rule } from '@steiger/types'
 
-import getRuleInstructions from './config/get-rule-instructions'
-import { RuleInstructions } from './config/types'
+import getRuleInstructions from './get-rule-instructions'
+import { RuleInstructions } from './types'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
