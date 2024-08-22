@@ -1,5 +1,5 @@
-import { RuleInstructions, SeverityMarkedFile } from './types'
 import { File } from '@steiger/types'
+import { RuleInstructions, SeverityMarkedFile } from './types'
 import { createFilterAccordingToGlobs } from '../../shared/globs'
 
 function markDefault(file: File): SeverityMarkedFile {
