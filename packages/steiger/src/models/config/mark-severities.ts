@@ -1,6 +1,6 @@
 import { RuleInstructions, SeverityMarkedFile } from './types'
 import { File } from '@steiger/types'
-import { createFilterAccordingToGlobs } from '../../features/apply-globs'
+import { createFilterAccordingToGlobs } from '../../shared/globs'
 
 function markDefault(file: File): SeverityMarkedFile {
   return {
@@ -31,7 +31,7 @@ export default function markSeverities(
       const isApplied = createFilterAccordingToGlobs({ inclusions: files, exclusions: ignores })
 
       ruleToMarkedFiles[rule] = markedVfs.map((file) => {
-        const severityApplies = isApplied(file)
+        const severityApplies = isApplied(file.path)
         return severityApplies
           ? {
               ...file,
