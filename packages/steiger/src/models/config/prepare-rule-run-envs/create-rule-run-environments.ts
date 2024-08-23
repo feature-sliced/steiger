@@ -1,8 +1,8 @@
 import { pipe, filter, map } from 'ramda'
 import { Folder } from '@steiger/types'
-import { RuleInstructions, RuleRunEnvironment, SeverityMarkedFile } from './types'
+import { RuleInstructions, RuleRunEnvironment, SeverityMarkedFile } from '../types'
 
-import { copyFsEntity, recomposeTree } from '../../shared/file-system'
+import { recomposeTree } from '../../../shared/file-system'
 
 function isNotOff({ severity }: SeverityMarkedFile) {
   return severity !== 'off'
@@ -15,7 +15,7 @@ function toPlainFile({ path, type }: SeverityMarkedFile) {
   }
 }
 
-export default function getRuleRunEnvironments(
+export default function createRuleRunEnvironments(
   ruleToMarkedVfs: Record<string, Array<SeverityMarkedFile>>,
   ruleInstructions: Record<string, RuleInstructions>,
   root: Folder,
@@ -25,9 +25,7 @@ export default function getRuleRunEnvironments(
     const processVfs = pipe(filter(isNotOff), map(toPlainFile))
 
     const files = processVfs(markedVfs)
-    const finalVfs = copyFsEntity(root)
 
-    recomposeTree(finalVfs, files)
     const severityMap = markedVfs.reduce((acc, { path, severity }) => {
       return {
         ...acc,
@@ -39,7 +37,7 @@ export default function getRuleRunEnvironments(
       ...acc,
       [ruleName]: {
         severityMap,
-        vfs: finalVfs,
+        vfs: files.length ? recomposeTree(root, files) : null,
         ruleOptions: options,
       },
     }

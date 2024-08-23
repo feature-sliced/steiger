@@ -19,6 +19,8 @@ export function flattenFolder(folder: Folder): File[] {
  * Turns flat array of files and folders into a tree structure based on the paths.
  * */
 export function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
+  const folderCopy = copyFsEntity(folder)
+
   function getEntityBackToTree(folder: Folder, nested: Folder | File) {
     const pathDiff = nested.path.slice(folder.path.length + 1)
     const pathParts = pathDiff.split(sep).filter(Boolean)
@@ -52,8 +54,10 @@ export function recomposeTree(folder: Folder, nodes: Array<Folder | File>) {
   }
 
   nodes.forEach((node) => {
-    getEntityBackToTree(folder, node)
+    getEntityBackToTree(folderCopy, node)
   })
+
+  return folderCopy
 }
 
 export function copyFsEntity<T extends Folder | File>(fsEntity: T, deep: boolean = false) {

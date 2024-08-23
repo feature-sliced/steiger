@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { copyFsEntity } from '../../shared/file-system'
+import { copyFsEntity } from '../../../shared/file-system'
 import markSeverities from './mark-severities'
-import { RuleInstructions } from './types'
+import { RuleInstructions } from '../types'
 import { File } from '@steiger/types'
 
 describe('markSeverities', () => {

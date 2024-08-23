@@ -6,7 +6,7 @@ import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $ruleInstructions, $rules } from './models/config'
-import prepareRuleEnvs from './models/config/prepare-rule-envs'
+import prepareRuleEnvs from './models/config/prepare-rule-run-envs/prepare-rule-envs'
 import { RuleRunEnvironment } from './models/config/types'
 
 function getRuleDescriptionUrl(ruleName: string) {

@@ -111,9 +111,9 @@ importers:
       prexit:
         specifier: ^2.2.0
         version: 2.2.0
-      rambda:
-        specifier: ^9.2.1
-        version: 9.2.1
+      ramda:
+        specifier: ^0.30.1
+        version: 0.30.1
       yargs:
         specifier: ^17.7.2
         version: 17.7.2
@@ -2506,8 +2506,8 @@ packages:
   quote-unquote@1.0.0:
     resolution: {integrity: sha512-twwRO/ilhlG/FIgYeKGFqyHhoEhqgnKVkcmqMKi2r524gz3ZbDTcyFt38E9xjJI2vT+KbRNHVbnJ/e0I25Azwg==}
 
-  rambda@9.2.1:
-    resolution: {integrity: sha512-6Dp+QQVQuAuhwBlbIvL2FjJVHCKF29W+n9ca/BMTVDqpj+Q7KKqUh7UAINEna8aaB2/oRvPuL5hViCTQARa70Q==}
+  ramda@0.30.1:
+    resolution: {integrity: sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==}
 
   rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
@@ -5519,7 +5519,7 @@ snapshots:
 
   quote-unquote@1.0.0: {}
 
-  rambda@9.2.1: {}
+  ramda@0.30.1: {}
 
   rc@1.2.8:
     dependencies:

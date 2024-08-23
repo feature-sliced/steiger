@@ -1,4 +1,4 @@
-import { flattenFolder, copyFsEntity } from '../../shared/file-system'
+import { flattenFolder, copyFsEntity } from '../../../shared/file-system'
 import { Folder, File } from '@steiger/types'
 
 export default function createVfsForRules(rules: Array<string>, vfs: Folder): Record<string, Array<File>> {

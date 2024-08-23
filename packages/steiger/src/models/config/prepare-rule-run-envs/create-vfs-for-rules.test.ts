@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import createVfsForRules from './create-vfs-for-rules'
 import { Folder } from '@steiger/types'
-import { parseIntoFsdRoot, joinFromRoot } from '../../_lib/prepare-test'
-import { flattenFolder } from '../../shared/file-system'
+import { parseIntoFsdRoot, joinFromRoot } from '../../../_lib/prepare-test'
+import { flattenFolder } from '../../../shared/file-system'
 
 describe('createVfsForRules', () => {
   it('should return an empty object if no rules are provided', () => {
