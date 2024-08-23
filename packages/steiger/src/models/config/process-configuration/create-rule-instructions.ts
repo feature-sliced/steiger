@@ -1,5 +1,5 @@
 import { Config, Severity } from '@steiger/types'
-import { RuleInstructions } from './types'
+import { RuleInstructions } from '../types'
 
 export default function createRuleInstructions(config: Config): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = {}

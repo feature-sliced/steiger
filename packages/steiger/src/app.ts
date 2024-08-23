@@ -6,7 +6,7 @@ import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $ruleInstructions, $rules } from './models/config'
-import prepareRuleRunEnvs from './models/config/prepare-rule-run-envs'
+import { prepareRuleRunEnvs } from './models/config'
 import { RuleRunEnvironment } from './models/config/types'
 
 function getRuleDescriptionUrl(ruleName: string) {
@@ -44,7 +44,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
           ...d,
           ruleName: rule.name,
           getRuleDescriptionUrl,
-          severity: 'error',
+          severity: ruleEnv.severityMap[d.location.path],
         })),
       )
     }),

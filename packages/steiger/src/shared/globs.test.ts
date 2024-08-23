@@ -2,7 +2,7 @@ import { expect, it, describe } from 'vitest'
 
 import { createFilterAccordingToGlobs } from './globs'
 
-describe('applyGlobs', () => {
+describe('createFilterAccordingToGlobs', () => {
   it('should return the passed folder if no globs are provided', () => {
     const filter = createFilterAccordingToGlobs({
       inclusions: [],

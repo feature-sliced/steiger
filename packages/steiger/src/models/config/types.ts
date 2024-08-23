@@ -1,7 +1,7 @@
 import { Severity, File, Folder, BaseRuleOptions } from '@steiger/types'
 
 export interface RuleRunEnvironment {
-  severityMap: Record<string, Severity>
+  severityMap: Record<string, Exclude<Severity, 'off'>>
   vfs: Folder | null
   ruleOptions: BaseRuleOptions
 }
