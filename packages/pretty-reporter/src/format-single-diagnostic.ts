@@ -2,8 +2,7 @@ import { relative } from 'node:path'
 import figures from 'figures'
 import terminalLink from 'terminal-link'
 import chalk from 'chalk'
-
-import type { AugmentedDiagnostic } from './types.js'
+import type { AugmentedDiagnostic } from '@steiger/types'
 
 export function formatSingleDiagnostic(d: AugmentedDiagnostic, cwd: string): string {
   const x = d.severity === 'error' ? chalk.red(figures.cross) : chalk.yellow(figures.warning)

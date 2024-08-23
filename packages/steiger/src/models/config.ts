@@ -2,8 +2,8 @@ import z from 'zod'
 import { createEvent, createStore } from 'effector'
 import { Config, ConfigObject, Plugin, Rule } from '@steiger/types'
 
-export const $config = createStore<ConfigObject | null>(null)
-const setConfig = createEvent<ConfigObject>()
+export const $config = createStore<ConfigObject<Array<Rule>> | null>(null)
+const setConfig = createEvent<ConfigObject<Array<Rule>>>()
 $config.on(setConfig, (_state, payload) => payload)
 
 export const $rules = createStore<Array<Rule>>([])
@@ -30,7 +30,7 @@ function processPlugins(config: Config) {
 function mergeConfigObjects(config: Config) {
   // TODO: temporary simplified implementation.
   //  Implement handling the "files" and "ignores" globs in further updates.
-  return config.reduce((acc: ConfigObject, item) => {
+  return config.reduce((acc: ConfigObject<Array<Rule>>, item) => {
     if ('rules' in item) {
       return { ...acc, rules: { ...acc.rules, ...item.rules } }
     }
@@ -77,7 +77,7 @@ export function processConfiguration(config: Config) {
   const allRules = processPlugins(config)
   const validationScheme = buildValidationScheme(allRules)
   const mergedConfig = mergeConfigObjects(config)
-  const validatedConfig = validationScheme.parse(mergedConfig) as ConfigObject
+  const validatedConfig = validationScheme.parse(mergedConfig) as ConfigObject<Array<Rule>>
 
   setRules(allRules)
   setConfig(validatedConfig)

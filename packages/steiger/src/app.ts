@@ -1,7 +1,6 @@
 import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import type { Rule, Folder, Severity } from '@steiger/types'
-import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
+import type { Rule, Folder, Severity, AugmentedDiagnostic } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'

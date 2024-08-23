@@ -1,4 +1,4 @@
-import { enableAllRules, type Config, type ConfigObjectOf, type Plugin } from '@steiger/toolkit'
+import { enableAllRules, type ConfigObjectOf, createPlugin, createConfigs } from '@steiger/toolkit'
 
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
@@ -17,49 +17,35 @@ import sharedLibGrouping from './shared-lib-grouping/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json'
 
-const plugin = {
+const rules = [
+  ambiguousSliceNames,
+  excessiveSlicing,
+  forbiddenImports,
+  inconsistentNaming,
+  insignificantSlice,
+  noLayerPublicApi,
+  noPublicApiSidestep,
+  noReservedFolderNames,
+  noSegmentlessSlices,
+  noSegmentsOnSlicedLayers,
+  publicApi,
+  repetitiveNaming,
+  segmentsByPurpose,
+  sharedLibGrouping,
+  noProcesses,
+]
+
+const plugin = createPlugin({
   meta: {
     name: 'steiger-plugin-fsd',
     version: packageJson.version,
   },
-  ruleDefinitions: [
-    ambiguousSliceNames,
-    excessiveSlicing,
-    forbiddenImports,
-    inconsistentNaming,
-    insignificantSlice,
-    noLayerPublicApi,
-    noPublicApiSidestep,
-    noReservedFolderNames,
-    noSegmentlessSlices,
-    noSegmentsOnSlicedLayers,
-    publicApi,
-    repetitiveNaming,
-    segmentsByPurpose,
-    sharedLibGrouping,
-    noProcesses,
-  ],
-} satisfies Plugin
+  ruleDefinitions: rules,
+})
 
-// export const anotherPlugin = createPlugin({
-//   meta: {
-//     name: 'steiger-plugin-hello',
-//     version: '0.0.0'
-//   },
-//   ruleDefinitions: [
-//     {
-//       name: 'hello/test',
-//       check(root, options: { foo: string }) {
-//         console.log(options.foo)
-//         return { diagnostics: [] }
-//       }
-//     }
-//   ]
-// })
-
-const configs = {
+const configs = createConfigs({
   recommended: enableAllRules(plugin),
-} satisfies Record<string, Config>
+})
 
 export default {
   plugin,

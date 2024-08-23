@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import figures from 'figures'
+import type { AugmentedDiagnostic } from '@steiger/types'
 
-import type { AugmentedDiagnostic } from './types.js'
 import { formatSingleDiagnostic } from './format-single-diagnostic.js'
 import { s } from './pluralization.js'
 
@@ -46,5 +46,3 @@ export function formatPretty(diagnostics: Array<AugmentedDiagnostic>, cwd: strin
 export function reportPretty(diagnostics: Array<AugmentedDiagnostic>, cwd: string) {
   console.error(formatPretty(diagnostics, cwd))
 }
-
-export type { AugmentedDiagnostic }
