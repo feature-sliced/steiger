@@ -68,7 +68,7 @@ describe('createRuleRunEnvironments', () => {
 
     const root: Folder = {
       type: 'folder',
-      path: '/src',
+      path: joinFromRoot('src'),
       children: [],
     }
 
@@ -211,7 +211,7 @@ describe('createRuleRunEnvironments', () => {
 
     const root: Folder = {
       type: 'folder',
-      path: '/src',
+      path: joinFromRoot('src'),
       children: [],
     }
 

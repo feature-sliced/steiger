@@ -8,7 +8,7 @@ describe('createVfsForRules', () => {
   it('should return an empty object if no rules are provided', () => {
     const vfs: Folder = {
       type: 'folder',
-      path: '/src',
+      path: joinFromRoot('src'),
       children: [],
     }
 

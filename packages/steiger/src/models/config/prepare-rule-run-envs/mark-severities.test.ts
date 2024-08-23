@@ -3,41 +3,42 @@ import { copyFsEntity } from '../../../shared/file-system'
 import markSeverities from './mark-severities'
 import { RuleInstructions } from '../types'
 import { File } from '@steiger/types'
+import { joinFromRoot } from '../../../_lib/prepare-test'
 
 describe('markSeverities', () => {
   it('should mark FS entities', () => {
     const files: Array<File> = [
       {
         type: 'file',
-        path: '/src/shared/ui/index.ts',
+        path: joinFromRoot('src', 'shared', 'ui', 'index.ts'),
       },
       {
         type: 'file',
-        path: '/src/shared/ui/Button.tsx',
+        path: joinFromRoot('src', 'shared', 'ui', 'Button.tsx'),
       },
       {
         type: 'file',
-        path: '/src/entities/user/ui/UserAvatar.tsx',
+        path: joinFromRoot('src', 'entities', 'user', 'ui', 'UserAvatar.tsx'),
       },
       {
         type: 'file',
-        path: '/src/entities/user/ui/index.ts',
+        path: joinFromRoot('src', 'entities', 'user', 'ui', 'index.ts'),
       },
       {
         type: 'file',
-        path: '/src/entities/user/index.ts',
+        path: joinFromRoot('src', 'entities', 'user', 'index.ts'),
       },
       {
         type: 'file',
-        path: '/src/entities/post/index.ts',
+        path: joinFromRoot('src', 'entities', 'post', 'index.ts'),
       },
       {
         type: 'file',
-        path: '/src/entities/post/ui/index.ts',
+        path: joinFromRoot('src', 'entities', 'post', 'ui', 'index.ts'),
       },
       {
         type: 'file',
-        path: '/src/entities/post/ui/PostList.tsx',
+        path: joinFromRoot('src', 'entities', 'post', 'ui', 'PostList.tsx'),
       },
     ]
 
@@ -84,42 +85,42 @@ describe('markSeverities', () => {
       rule1: [
         {
           type: 'file',
-          path: '/src/shared/ui/index.ts',
+          path: joinFromRoot('src', 'shared', 'ui', 'index.ts'),
           severity: 'warn',
         },
         {
           type: 'file',
-          path: '/src/shared/ui/Button.tsx',
+          path: joinFromRoot('src', 'shared', 'ui', 'Button.tsx'),
           severity: 'warn',
         },
         {
           type: 'file',
-          path: '/src/entities/user/ui/UserAvatar.tsx',
+          path: joinFromRoot('src', 'entities', 'user', 'ui', 'UserAvatar.tsx'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/user/ui/index.ts',
+          path: joinFromRoot('src', 'entities', 'user', 'ui', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/user/index.ts',
+          path: joinFromRoot('src', 'entities', 'user', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/post/index.ts',
+          path: joinFromRoot('src', 'entities', 'post', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/post/ui/index.ts',
+          path: joinFromRoot('src', 'entities', 'post', 'ui', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/post/ui/PostList.tsx',
+          path: joinFromRoot('src', 'entities', 'post', 'ui', 'PostList.tsx'),
           severity: 'error',
         },
       ],
@@ -127,42 +128,42 @@ describe('markSeverities', () => {
       rule2: [
         {
           type: 'file',
-          path: '/src/shared/ui/index.ts',
+          path: joinFromRoot('src', 'shared', 'ui', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/shared/ui/Button.tsx',
+          path: joinFromRoot('src', 'shared', 'ui', 'Button.tsx'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/user/ui/UserAvatar.tsx',
+          path: joinFromRoot('src', 'entities', 'user', 'ui', 'UserAvatar.tsx'),
           severity: 'off',
         },
         {
           type: 'file',
-          path: '/src/entities/user/ui/index.ts',
+          path: joinFromRoot('src', 'entities', 'user', 'ui', 'index.ts'),
           severity: 'off',
         },
         {
           type: 'file',
-          path: '/src/entities/user/index.ts',
+          path: joinFromRoot('src', 'entities', 'user', 'index.ts'),
           severity: 'off',
         },
         {
           type: 'file',
-          path: '/src/entities/post/index.ts',
+          path: joinFromRoot('src', 'entities', 'post', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/post/ui/index.ts',
+          path: joinFromRoot('src', 'entities', 'post', 'ui', 'index.ts'),
           severity: 'error',
         },
         {
           type: 'file',
-          path: '/src/entities/post/ui/PostList.tsx',
+          path: joinFromRoot('src', 'entities', 'post', 'ui', 'PostList.tsx'),
           severity: 'error',
         },
       ],
