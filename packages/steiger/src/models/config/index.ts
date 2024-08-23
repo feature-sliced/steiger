@@ -2,7 +2,7 @@ import z from 'zod'
 import { createEvent, createStore } from 'effector'
 import { Config, ConfigObject, Plugin, Rule } from '@steiger/types'
 
-import getRuleInstructions from './get-rule-instructions'
+import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from './types'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
@@ -80,7 +80,7 @@ export function processConfiguration(config: Config) {
   const validationScheme = buildValidationScheme(allRules)
   const configObjects = getConfigObjects(config)
   const validatedConfig = validationScheme.parse(configObjects)
-  const ruleInstructions = getRuleInstructions(validatedConfig)
+  const ruleInstructions = createRuleInstructions(validatedConfig)
 
   setRules(allRules)
   setRuleInstructions(ruleInstructions)

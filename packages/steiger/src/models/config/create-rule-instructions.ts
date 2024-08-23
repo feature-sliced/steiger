@@ -1,7 +1,7 @@
 import { Config, Severity } from '@steiger/types'
 import { RuleInstructions } from './types'
 
-export default function getRuleInstructions(config: Config): Record<string, RuleInstructions> {
+export default function createRuleInstructions(config: Config): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = {}
 
   return config.reduce((acc: Record<string, RuleInstructions>, item) => {
@@ -13,34 +13,30 @@ export default function getRuleInstructions(config: Config): Record<string, Rule
               options: null,
               globGroups: [],
             }
+          }
 
-            const ruleOptions: Record<string, unknown> | null = Array.isArray(severityOrTuple)
-              ? severityOrTuple[1]
-              : null
+          const ruleOptions: Record<string, unknown> | null = Array.isArray(severityOrTuple) ? severityOrTuple[1] : null
 
-            if (ruleOptions && acc[ruleName].options) {
-              throw new Error(
-                `
+          if (ruleOptions && acc[ruleName].options) {
+            throw new Error(
+              `
                 Rule "${ruleName}" has multiple options provided! 
                   ${JSON.stringify(acc[ruleName].options)} 
                 and
                   ${JSON.stringify(ruleOptions)}.
                 You can only provide options for a rule once.`,
-              )
-            }
-
-            if (ruleOptions) {
-              acc[ruleName].options = ruleOptions
-            }
-
-            if (item.files || item.ignores) {
-              acc[ruleName].globGroups.push({
-                severity: Array.isArray(severityOrTuple) ? severityOrTuple[0] : severityOrTuple,
-                files: item.files ?? [],
-                ignores: item.ignores ?? [],
-              })
-            }
+            )
           }
+
+          if (ruleOptions) {
+            acc[ruleName].options = ruleOptions
+          }
+
+          acc[ruleName].globGroups.push({
+            severity: Array.isArray(severityOrTuple) ? severityOrTuple[0] : severityOrTuple,
+            files: item.files ?? [],
+            ignores: item.ignores ?? [],
+          })
         },
       )
     }

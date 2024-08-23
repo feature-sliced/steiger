@@ -6,7 +6,7 @@ import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $ruleInstructions, $rules } from './models/config'
-import prepareRuleEnvs from './models/config/prepare-rule-run-envs/prepare-rule-envs'
+import prepareRuleRunEnvs from './models/config/prepare-rule-run-envs'
 import { RuleRunEnvironment } from './models/config/types'
 
 function getRuleDescriptionUrl(ruleName: string) {
@@ -28,12 +28,16 @@ const $enabledRules = combine($ruleInstructions, $rules, (ruleInstructions, rule
 })
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const envs: Record<string, RuleRunEnvironment> = prepareRuleEnvs($ruleInstructions.getState() || {}, vfs)
+  const envs: Record<string, RuleRunEnvironment> = prepareRuleRunEnvs($ruleInstructions.getState() || {}, vfs)
   const ruleResults = await Promise.all(
     rules.map((rule) => {
       const ruleEnv = envs[rule.name]
       const optionsForCurrentRule = ruleEnv ? ruleEnv.ruleOptions : undefined
       const ruleVfs = ruleEnv.vfs
+
+      if (!ruleVfs) {
+        return Promise.resolve([])
+      }
 
       return Promise.resolve(rule.check(ruleVfs, optionsForCurrentRule)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({

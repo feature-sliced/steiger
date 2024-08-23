@@ -2,7 +2,7 @@ import { Severity, File, Folder, BaseRuleOptions } from '@steiger/types'
 
 export interface RuleRunEnvironment {
   severityMap: Record<string, Severity>
-  vfs: Folder
+  vfs: Folder | null
   ruleOptions: BaseRuleOptions
 }
 
