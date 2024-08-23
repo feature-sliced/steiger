@@ -37,6 +37,8 @@ export default function createRuleRunEnvironments(
       ...acc,
       [ruleName]: {
         severityMap,
+        // If there are no files, we don't need to recompose the tree
+        // so, the code that uses this data can see null and skip running the rule
         vfs: files.length ? recomposeTree(root, files) : null,
         ruleOptions: options,
       },
