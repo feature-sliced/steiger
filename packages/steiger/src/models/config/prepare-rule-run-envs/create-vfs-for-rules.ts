@@ -5,12 +5,12 @@ export default function createVfsForRules(rules: Array<string>, vfs: Folder): Re
   const flatVfs = flattenFolder(vfs)
   const ruleToVfs: Record<string, Array<File>> = {}
 
-  flatVfs.forEach((entity) => {
-    rules.forEach((rule) => {
-      if (!ruleToVfs[rule]) {
-        ruleToVfs[rule] = []
-      }
+  rules.forEach((rule) => {
+    if (!ruleToVfs[rule]) {
+      ruleToVfs[rule] = []
+    }
 
+    flatVfs.forEach((entity) => {
       ruleToVfs[rule].push(copyFsEntity(entity))
     })
   })

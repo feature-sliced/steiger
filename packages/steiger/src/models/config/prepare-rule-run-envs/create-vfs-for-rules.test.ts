@@ -41,4 +41,19 @@ describe('createVfsForRules', () => {
     expect(ruleToVfs['rule1']).toEqual(files)
     expect(ruleToVfs['rule2']).toEqual(files)
   })
+
+  it('should correctly handle an empty folder passed as vfs', () => {
+    const vfs: Folder = {
+      type: 'folder',
+      path: joinFromRoot('src'),
+      children: [],
+    }
+
+    const ruleToVfs = createVfsForRules(['rule1', 'rule2'], vfs)
+
+    expect(ruleToVfs).toEqual({
+      rule1: [],
+      rule2: [],
+    })
+  })
 })
