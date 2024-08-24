@@ -92,7 +92,7 @@ describe('createRuleInstructions', () => {
     })
   })
 
-  it('should throw an error if a rule has multiple options provided', () => {
+  it('should successfully create instructions when the config provides a rule with multiple but identical options', () => {
     const config: Config = [
       {
         rules: {
@@ -104,6 +104,56 @@ describe('createRuleInstructions', () => {
         files: ['src/shared/ui/**/*', 'src/entities/user/ui/**/*'],
         rules: {
           rule1: ['warn', {}],
+        },
+      },
+    ]
+
+    expect(createRuleInstructions(config)).toEqual({
+      rule1: {
+        options: {},
+        globGroups: [
+          {
+            severity: 'warn',
+            files: [],
+            ignores: [],
+          },
+          {
+            severity: 'warn',
+            files: ['src/shared/ui/**/*', 'src/entities/user/ui/**/*'],
+            ignores: [],
+          },
+        ],
+      },
+      rule2: {
+        options: {},
+        globGroups: [
+          {
+            severity: 'error',
+            files: [],
+            ignores: [],
+          },
+        ],
+      },
+    })
+  })
+
+  it('should throw an error when the config provides a rule with multiple but different options', () => {
+    const config: Config = [
+      {
+        rules: {
+          rule1: ['warn', { option1: 'value1' }],
+          rule2: ['error', {}],
+        },
+      },
+      {
+        files: ['src/shared/ui/**/*', 'src/entities/user/ui/**/*'],
+        rules: {
+          rule1: [
+            'warn',
+            {
+              option1: 'value2',
+            },
+          ],
         },
       },
     ]

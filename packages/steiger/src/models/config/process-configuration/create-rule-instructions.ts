@@ -1,5 +1,7 @@
 import { Config, Severity } from '@steiger/types'
+
 import { RuleInstructions } from '../types'
+import { isEqual } from '../../../shared/objects'
 
 export default function createRuleInstructions(config: Config): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = {}
@@ -15,9 +17,10 @@ export default function createRuleInstructions(config: Config): Record<string, R
             }
           }
 
+          const prevOptions = acc[ruleName].options
           const ruleOptions: Record<string, unknown> | null = Array.isArray(severityOrTuple) ? severityOrTuple[1] : null
 
-          if (ruleOptions && acc[ruleName].options) {
+          if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
             throw new Error(
               `
                 Rule "${ruleName}" has multiple options provided! 
