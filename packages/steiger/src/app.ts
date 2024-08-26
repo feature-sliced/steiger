@@ -14,15 +14,9 @@ function getRuleDescriptionUrl(ruleName: string) {
 }
 
 const $enabledRules = combine($ruleInstructions, $rules, (ruleInstructions, rules) => {
-  const ruleConfigs = ruleInstructions ? Object.keys(ruleInstructions) : []
+  const rulesThatHaveInstructions = ruleInstructions ? Object.keys(ruleInstructions) : []
 
-  if (ruleConfigs === undefined) {
-    return rules
-  }
-
-  return rules.filter(
-    (rule) => !(rule.name in ruleConfigs) || ruleConfigs[rule.name as keyof typeof ruleConfigs] !== 'off',
-  )
+  return rules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
 })
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
