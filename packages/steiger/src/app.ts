@@ -13,8 +13,6 @@ function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
-type RuleToInstructions = typeof $ruleInstructions
-
 const $enabledRules = combine($ruleInstructions, $rules, (ruleInstructions, rules) => {
   const ruleConfigs = ruleInstructions ? Object.keys(ruleInstructions) : []
 
@@ -82,5 +80,3 @@ export const linter = {
 export function defineConfig(config: Config) {
   return config
 }
-
-export type { RuleToInstructions }
