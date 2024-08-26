@@ -57,11 +57,11 @@ export type Fix =
       content: string
     }
 
-export type Config = Array<ConfigObject | Plugin>
+export type Config = Array<ConfigObject | Plugin | GlobalIgnore>
 
 export type Severity = 'off' | 'warn' | 'error'
 
-export interface ConfigObject {
+export type ConfigObject = {
   /** Globs of files to check */
   files?: Array<string>
   /** Globs of files to ignore */
@@ -71,6 +71,8 @@ export interface ConfigObject {
     [ruleName: string]: Severity | [Severity, BaseRuleOptions]
   }
 }
+
+export type GlobalIgnore = { ignores: Array<string> }
 
 export interface Plugin {
   meta: {

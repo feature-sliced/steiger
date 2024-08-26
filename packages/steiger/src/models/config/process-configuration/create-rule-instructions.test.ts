@@ -160,4 +160,57 @@ describe('createRuleInstructions', () => {
 
     expect(() => createRuleInstructions(config)).toThrow()
   })
+
+  it('should correctly handle global ignores', () => {
+    const config: Config = [
+      {
+        ignores: ['src/shared/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['src/entities/ui/**/*'],
+      },
+      {
+        rules: {
+          rule2: 'error',
+        },
+        files: ['src/features/ui/**/*'],
+      },
+    ]
+
+    expect(createRuleInstructions(config)).toEqual({
+      rule1: {
+        options: null,
+        globGroups: [
+          {
+            severity: 'off',
+            files: ['src/shared/**'],
+            ignores: [],
+          },
+          {
+            severity: 'warn',
+            files: ['src/entities/ui/**/*'],
+            ignores: [],
+          },
+        ],
+      },
+      rule2: {
+        options: null,
+        globGroups: [
+          {
+            severity: 'off',
+            files: ['src/shared/**'],
+            ignores: [],
+          },
+          {
+            severity: 'error',
+            files: ['src/features/ui/**/*'],
+            ignores: [],
+          },
+        ],
+      },
+    })
+  })
 })
