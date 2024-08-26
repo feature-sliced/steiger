@@ -1,6 +1,6 @@
 import { createEffect, sample, combine } from 'effector'
 import { debounce, not } from 'patronum'
-import { Folder, Rule } from '@steiger/types'
+import { Config, Folder, Rule } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
@@ -13,7 +13,7 @@ function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
-type Config = typeof $ruleInstructions
+type RuleToInstructions = typeof $ruleInstructions
 
 const $enabledRules = combine($ruleInstructions, $rules, (ruleInstructions, rules) => {
   const ruleConfigs = ruleInstructions ? Object.keys(ruleInstructions) : []
@@ -83,4 +83,4 @@ export function defineConfig(config: Config) {
   return config
 }
 
-export type { Config }
+export type { RuleToInstructions }
