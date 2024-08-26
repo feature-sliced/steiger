@@ -5,7 +5,7 @@ import { createFilterAccordingToGlobs } from '../../../shared/globs'
 function markDefault(file: File): SeverityMarkedFile {
   return {
     ...file,
-    severity: 'error',
+    severity: 'off',
   }
 }
 
@@ -24,13 +24,12 @@ export default function markSeverities(
   )
 
   Object.entries(ruleToInstructions).forEach(([rule, instructions]) => {
-    const markedVfs = ruleToMarkedFiles[rule]
     const { globGroups } = instructions
 
     globGroups.forEach(({ severity, files, ignores }) => {
       const isApplied = createFilterAccordingToGlobs({ inclusions: files, exclusions: ignores })
 
-      ruleToMarkedFiles[rule] = markedVfs.map((file) => {
+      ruleToMarkedFiles[rule] = ruleToMarkedFiles[rule].map((file) => {
         const severityApplies = isApplied(file.path)
         return severityApplies
           ? {
