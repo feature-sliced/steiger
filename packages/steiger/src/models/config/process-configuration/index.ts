@@ -73,11 +73,7 @@ export function buildValidationScheme(rules: Array<Rule>) {
       (value) => {
         const configObjects = value.filter((item) => 'rules' in item)
 
-        if (configObjects.length === 0) {
-          return false
-        }
-
-        return true
+        return configObjects.length !== 0
       },
       { message: 'At least one config object must be provided!' },
     )
