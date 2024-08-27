@@ -215,4 +215,36 @@ describe('createFilterAccordingToGlobs', () => {
 
     expect(filteredFiles).toEqual(expected)
   })
+
+  it('should correctly handle folder paths', () => {
+    const files = [
+      '/src/shared/ui/styles.css',
+      '/src/shared/ui/Button.tsx',
+      '/src/shared/ui/TextField.tsx',
+      '/src/shared/ui/index.ts',
+      '/src/shared',
+      '/src/shared/ui',
+      '/src/entities/user/UserAvatar.tsx',
+      '/src/entities/user/styles.css',
+      '/src/entities/product/ProductCard.tsx',
+    ]
+
+    const expected = [
+      '/src/shared/ui/styles.css',
+      '/src/shared/ui/Button.tsx',
+      '/src/shared/ui/TextField.tsx',
+      '/src/shared/ui/index.ts',
+      '/src/shared',
+      '/src/shared/ui',
+    ]
+
+    const filter = createFilterAccordingToGlobs({
+      inclusions: ['**/shared', '**/shared/**'],
+      exclusions: [],
+    })
+
+    const filteredFiles = files.filter(filter)
+
+    expect(filteredFiles).toEqual(expected)
+  })
 })

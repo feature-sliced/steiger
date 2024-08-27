@@ -5,14 +5,17 @@ import { File, Folder } from '@steiger/types'
 /**
  * Turn a tree folder structure into a flat array of files.
  * */
-export function flattenFolder(folder: Folder): File[] {
-  return folder.children.reduce((acc, child) => {
-    if (child.type === 'file') {
-      return [...acc, child]
-    }
+export function flattenFolder(folder: Folder): Array<File | Folder> {
+  return folder.children.reduce(
+    (acc, child) => {
+      if (child.type === 'file') {
+        return [...acc, child]
+      }
 
-    return [...acc, ...flattenFolder(child)]
-  }, [] as File[])
+      return [...acc, copyFsEntity(child), ...flattenFolder(child)]
+    },
+    [] as Array<File | Folder>,
+  )
 }
 
 /**

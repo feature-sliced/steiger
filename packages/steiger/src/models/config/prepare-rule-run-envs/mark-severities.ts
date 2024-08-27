@@ -1,27 +1,26 @@
-import { File } from '@steiger/types'
-import { RuleInstructions, SeverityMarkedFile } from '../types'
+import { File, Folder } from '@steiger/types'
+import { RuleInstructions, SeverityMarkedFile, SeverityMarkedFolder } from '../types'
 import { createFilterAccordingToGlobs } from '../../../shared/globs'
 
-function markDefault(file: File): SeverityMarkedFile {
+function markDefault(entity: File | Folder): SeverityMarkedFile | SeverityMarkedFolder {
   return {
-    ...file,
+    ...entity,
     severity: 'off',
   }
 }
 
 export default function markSeverities(
   ruleToInstructions: Record<string, RuleInstructions>,
-  ruleToVfs: Record<string, Array<File>>,
-): Record<string, Array<SeverityMarkedFile>> {
-  const ruleToMarkedFiles: Record<string, Array<SeverityMarkedFile>> = Object.entries(ruleToVfs).reduce(
-    (acc, [ruleName, initialVfs]) => {
-      return {
-        ...acc,
-        [ruleName]: initialVfs.map(markDefault),
-      }
-    },
-    {},
-  )
+  ruleToVfs: Record<string, Array<File | Folder>>,
+): Record<string, Array<SeverityMarkedFile | SeverityMarkedFolder>> {
+  const ruleToMarkedFiles: Record<string, Array<SeverityMarkedFile | SeverityMarkedFolder>> = Object.entries(
+    ruleToVfs,
+  ).reduce((acc, [ruleName, initialVfs]) => {
+    return {
+      ...acc,
+      [ruleName]: initialVfs.map(markDefault),
+    }
+  }, {})
 
   Object.entries(ruleToInstructions).forEach(([rule, instructions]) => {
     const { globGroups } = instructions
