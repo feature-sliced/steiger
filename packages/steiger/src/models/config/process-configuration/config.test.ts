@@ -166,4 +166,22 @@ describe('buildValidationScheme', () => {
 
     expect(() => scheme.parse(config)).toThrow()
   })
+
+  it('should correctly validate a config with global ignores', () => {
+    const scheme = buildValidationScheme(dummyRules)
+
+    const config = [
+      {
+        ignores: ['/src/shared/**'],
+      },
+      {
+        ignores: ['/src/entities/**'],
+        rules: {
+          rule2: 'warn',
+        },
+      },
+    ]
+
+    expect(scheme.parse(config)).toEqual(config)
+  })
 })

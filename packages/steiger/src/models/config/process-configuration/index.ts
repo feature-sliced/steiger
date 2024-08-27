@@ -1,6 +1,6 @@
 import z from 'zod'
 import { createEvent, createStore } from 'effector'
-import { Config, ConfigObject, Plugin, Rule } from '@steiger/types'
+import { Config, ConfigObject, GlobalIgnore, Plugin, Rule } from '@steiger/types'
 
 import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from '../types'
@@ -15,8 +15,8 @@ export const $rules = createStore<Array<Rule>>([])
 const setRules = createEvent<Array<Rule>>()
 $rules.on(setRules, (_state, payload) => payload)
 
-function getConfigObjects(config: Config): Array<ConfigObject> {
-  return config.filter((item) => 'rules' in item)
+function getConfigObjects(config: Config): Array<ConfigObject | GlobalIgnore> {
+  return config.filter((item) => 'rules' in item || 'ignores' in item)
 }
 
 function processPlugins(config: Config) {
@@ -49,15 +49,25 @@ export function buildValidationScheme(rules: Array<Rule>) {
 
   return z
     .array(
-      z.object({
-        files: z.optional(z.array(z.string())),
-        ignores: z.optional(z.array(z.string())),
-        // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-        rules: z.record(
-          z.enum(ruleNames as [string, ...string[]]),
-          z.union([z.enum(['off', 'error', 'warn']), z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()])]),
-        ),
-      }),
+      z.union([
+        z
+          .object({
+            ignores: z.array(z.string()),
+          })
+          .passthrough(),
+        z.object({
+          files: z.optional(z.array(z.string())),
+          ignores: z.optional(z.array(z.string())),
+          // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
+          rules: z.record(
+            z.enum(ruleNames as [string, ...string[]]),
+            z.union([
+              z.enum(['off', 'error', 'warn']),
+              z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()]),
+            ]),
+          ),
+        }),
+      ]),
     )
     .refine(
       (value) => {
