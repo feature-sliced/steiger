@@ -1,42 +1,39 @@
-import { createEffect, sample, combine } from 'effector'
+import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
 import { Config, Folder, Rule } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $ruleInstructions, $rules } from './models/config'
-import { prepareRuleRunEnvs } from './models/config'
-import { RuleRunEnvironment } from './models/config/types'
+import { $enabledRules, getEnabledRules, getRuleOptions, getRuleSeveritySettings } from './models/config'
+import applySeverityGlobsToVfs from './features/apply-severity-globs-to-vfs'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
-const $enabledRules = combine($ruleInstructions, $rules, (ruleInstructions, rules) => {
-  const rulesThatHaveInstructions = ruleInstructions ? Object.keys(ruleInstructions) : []
-
-  return rules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
-})
-
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const envs: Record<string, RuleRunEnvironment> = prepareRuleRunEnvs($ruleInstructions.getState() || {}, vfs)
   const ruleResults = await Promise.all(
     rules.map((rule) => {
-      const ruleEnv = envs[rule.name]
-      const optionsForCurrentRule = ruleEnv ? ruleEnv.ruleOptions : undefined
-      const ruleVfs = ruleEnv.vfs
+      const optionsForCurrentRule = getRuleOptions(rule.name)
+      const severitySettings = getRuleSeveritySettings(rule.name)
 
-      if (!ruleVfs) {
+      if (!severitySettings) {
+        throw new Error(`Severity settings for rule ${rule.name} are not found but rule is enabled`)
+      }
+
+      const { vfs: finalVfs, severityMap } = applySeverityGlobsToVfs(severitySettings, vfs)
+
+      if (!finalVfs) {
         return Promise.resolve([])
       }
 
-      return Promise.resolve(rule.check(ruleVfs, optionsForCurrentRule)).then(({ diagnostics }) =>
+      return Promise.resolve(rule.check(finalVfs, optionsForCurrentRule || undefined)).then(({ diagnostics }) =>
         diagnostics.map<AugmentedDiagnostic>((d) => ({
           ...d,
           ruleName: rule.name,
           getRuleDescriptionUrl,
-          severity: ruleEnv.severityMap[d.location.path],
+          severity: severityMap[d.location.path],
         })),
       )
     }),
@@ -49,7 +46,7 @@ export const linter = {
     scan(path).then((vfs) =>
       runRules({
         vfs,
-        rules: $enabledRules.getState(),
+        rules: getEnabledRules(),
       }),
     ),
   watch: async (path: string) => {

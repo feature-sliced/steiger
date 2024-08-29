@@ -1,22 +1,15 @@
-import { Config, ConfigObject, GlobalIgnore, Severity } from '@steiger/types'
+import { Config, ConfigObject, Severity } from '@steiger/types'
 import { reduce, flatten, filter, pipe, map } from 'ramda'
 
-import { RuleInstructions } from '../types'
-import { isEqual } from '../../../shared/objects'
+import { RuleInstructions } from './types'
+import { isGlobalIgnore, isConfigObject } from './raw-config'
+import { isEqual } from '../../shared/objects'
 
 function createEmptyInstructions(): RuleInstructions {
   return {
     options: null,
     globGroups: [],
   }
-}
-
-function isGlobalIgnore(obj: unknown): obj is GlobalIgnore {
-  return typeof obj === 'object' && obj !== null && 'ignores' in obj && Object.keys(obj).length === 1
-}
-
-function isConfigObject(obj: unknown): obj is ConfigObject {
-  return typeof obj === 'object' && obj !== null && 'rules' in obj
 }
 
 function extractRuleNames(configObject: ConfigObject) {

@@ -1,17 +1,9 @@
-import { buildValidationScheme } from './index'
 import { describe, expect, it } from 'vitest'
 import { Config } from '@steiger/types'
 
-const dummyRules = [
-  {
-    name: 'rule1',
-    check: () => ({ diagnostics: [] }),
-  },
-  {
-    name: 'rule2',
-    check: () => ({ diagnostics: [] }),
-  },
-]
+import buildValidationScheme from './build-validation-scheme'
+
+const dummyRules = ['rule1', 'rule2']
 
 describe('buildValidationScheme', () => {
   it('should successfully validate config with plain severities', () => {
