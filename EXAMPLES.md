@@ -17,8 +17,8 @@ There are 3 types of config objects that you can put in your config file. They f
   ```
   ```javascript
   export default defineConfig({
-    files: ['**/shared/**'],
-    ignores: ['**/shared/__mocks__/**'],
+    files: ['./src/shared/**'],
+    ignores: ['./src/shared/__mocks__/**'],
     rules: {
       'fsd/no-public-api': 'off',
       'fsd/forbidden-imports': ['warn', { someOption: false }],
@@ -35,7 +35,7 @@ There are 3 types of config objects that you can put in your config file. They f
   export default defineConfig([
     ...fsd.configs.recommended,
     {
-      ignores: ['**/shared/__mocks__/**'],
+      ignores: ['./src/shared/__mocks__/**'],
     },
   ])
   ```
@@ -111,7 +111,7 @@ import defineConfig from 'steiger'
 export default defineConfig([
   ...fsd.configs.recommended,
   {
-    files: ['**/shared', '**/shared/**'],
+    files: ['./src/shared', './src/shared/**'],
     rules: {
       'fsd/no-public-api': 'off',
     },
@@ -128,8 +128,8 @@ import defineConfig from 'steiger'
 export default defineConfig([
   ...fsd.configs.recommended,
   {
-    files: ['**/shared', '**/shared/**'],
-    ignores: ['**/shared/lib/**', '**/shared/ui/**'],
+    files: ['./src/shared', './src/shared/**'],
+    ignores: ['./src/shared/lib/**', './src/shared/ui/**'],
     rules: {
       'fsd/no-public-api': 'off', // Disable the rule for the shared folder, but not for the lib and ui folders
     },

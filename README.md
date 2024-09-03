@@ -63,14 +63,14 @@ export default defineConfig([
     ignores: ['**/__mocks__/**'],
   },
   {
-    files: ['**/shared/**'],
+    files: ['./src/shared/**'],
     rules: {
       // disable public-api rule for files in /shared folder
       'fsd/public-api': 'off',
     },
   },
   {
-    files: ['**/widgets/**'],
+    files: ['./src/widgets/**'],
     ignores: ['**/discount-offers/**'],
     rules: {
       // disable no-segmentless-slices rule for all widgets except /discount-offers
