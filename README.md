@@ -42,53 +42,7 @@ Steiger is configurable via `cosmiconfig`. That means that you can create a `ste
 
 The config file shape is highly inspired by ESLint's config file, so if you have configured ESLint before, you'll find it easy to configure Steiger.
 
-### Structure and concepts
-
-There are 3 types of config objects that you can put in your config file. They follow 2 purposes: registration and configuration.
-
-- Plugin - allows you to register a plugin that provides rules to run. (We will consider this one in more detail in a later section)
-- Config Object - allows you to configure the behaviour of rules provided by the plugins. It has the following shape:
-  ```text
-  {
-  	"files"?: <GlobArray>,
-  	"ignores"?: <GlobArray>,
-  	"rules": {
-  		<RuleName>: <Severity> | [<Severity>, <RuleOptions>]
-  	}
-  }
-  ```
-  ```javascript
-  export default defineConfig({
-    files: ['**/shared/**'],
-    ignores: ['**/shared/__mocks__/**'],
-    rules: {
-      'fsd/no-public-api': 'off',
-      'fsd/forbidden-imports': ['warn', { someOption: false }],
-    },
-  })
-  ```
-- Global ignore - allows you to disable all rules for a specific part of the file system.
-  ```text
-  {
-  	ignores: <GlobArray>
-  }
-  ```
-  ```javascript
-  export default defineConfig([
-    ...fsd.configs.recommended,
-    {
-      ignores: ['**/shared/__mocks__/**'],
-    },
-  ])
-  ```
-
-Parts of the config object:
-
-- Severity - can be one of the following: "off", "warn", "error"
-- GlobArray - string array with glob patterns to match files and folders in your project.
-- RuleOptions - an object that contains specific rule options and can be passed to the rule to configure its behavior.
-
-### Examples
+### Example
 
 Here are some rules on how configuration is processed:
 
@@ -97,132 +51,36 @@ Here are some rules on how configuration is processed:
 
 Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
 
-#### Example 1. Default case
-
 ```javascript
 // ./steiger.config.ts
 import fsd from '@feature-sliced/steiger-plugin'
 import defineConfig from 'steiger'
 
-export default defineConfig([...fsd.configs.recommended])
-```
-
-#### Example 2. FSD with all rules enabled by default, but excluding a couple of folders
-
-```javascript
-import fsd from '@feature-sliced/steiger-plugin'
-import defineConfig from 'steiger'
-
 export default defineConfig([
   ...fsd.configs.recommended,
   {
+    // ignore all mock files for all rules
     ignores: ['**/__mocks__/**'],
   },
-])
-```
-
-#### Example 3. FSD without certain rules.
-
-```javascript
-import fsd from '@feature-sliced/steiger-plugin'
-import defineConfig from 'steiger'
-
-export default defineConfig([
-  ...fsd.configs.recommended,
   {
+    files: ['**/shared/**'],
     rules: {
-      'fsd/no-processes': 'off',
-      'fsd/no-public-api-sidestep': 'warn',
-    },
-  },
-  {
-    files: ['./src/shared/**'],
-    rules: {
+      // disable public-api rule for files in /shared folder
       'fsd/public-api': 'off',
     },
   },
-])
-```
-
-#### Example 4. Disabling a rule for files in a specific folder and the folder itself.
-
-```javascript
-import fsd from '@feature-sliced/steiger-plugin'
-import defineConfig from 'steiger'
-
-export default defineConfig([
-  ...fsd.configs.recommended,
   {
-    files: ['**/shared', '**/shared/**'],
+    files: ['**/widgets/**'],
+    ignores: ['**/discount-offers/**'],
     rules: {
-      'fsd/no-public-api': 'off',
+      // disable no-segmentless-slices rule for all widgets except /discount-offers
+      'fsd/no-segmentless-slices': 'off',
     },
   },
 ])
 ```
 
-#### Example 5. Using ignores along with files.
-
-```javascript
-import fsd from '@feature-sliced/steiger-plugin'
-import defineConfig from 'steiger'
-
-export default defineConfig([
-  ...fsd.configs.recommended,
-  {
-    files: ['**/shared', '**/shared/**'],
-    ignores: ['**/shared/lib/**', '**/shared/ui/**'],
-    rules: {
-      'fsd/no-public-api': 'off', // Disable the rule for the shared folder, but not for the lib and ui folders
-    },
-  },
-])
-```
-
-#### Example 6. Setting rule options.
-
-```javascript
-import fsd from '@feature-sliced/steiger-plugin'
-import defineConfig from 'steiger'
-
-export default defineConfig([
-  ...fsd.configs.recommended,
-  {
-    rules: {
-      'fsd/no-public-api': ['warn', { someOptions: true }],
-    },
-  },
-  {
-    files: ['./src/shared/**'],
-    rules: {
-      'fsd/no-public-api': ['error', { someOptions: false }], // Would throw an error as you can't override the options
-    },
-  },
-])
-```
-
-### Plugins
-
-One of the main features that came with 0.5.0 release is the ability to use plugins to extend Steiger with custom rules. To use a plugin, you need to install it (if it is an open-source one) or just import if you wrote it yourself in your project, and add it to the config.
-
-The plugin object has the following shape:
-
-```javascript
-const customPlugin = {
-  meta: {
-    name: 'super-duper-architecture',
-    version: '1.0.0',
-  },
-  ruleDefinitions: [
-    {
-      name: 'sda/no-classes',
-      check: (root, options: { forSure: boolean } = { forSure: true }) => {
-        /* … */
-      },
-    },
-  ],
-}
-```
+For more details, see [examples](EXAMPLES.md).
 
 ### Migration from 0.4.0
 
