@@ -41,7 +41,7 @@ export default defineConfig({
   rules: {
     'public-api': 'off',
     'ambiguous-slice-names': 'off',
-    'nonexisting-rule': 'off',
+    'no-processes': 'off',
   },
 })
 ```
@@ -59,7 +59,7 @@ export default defineConfig([
     rules: {
       'fsd/public-api': 'off',
       'fsd/ambiguous-slice-names': 'off',
-      'nonexisting-rule': 'off',
+      'fsd/no-processes': 'off',
     },
   },
 ])
@@ -72,17 +72,17 @@ export default defineConfig([
 **pnpm**:
 
 ```shell
-pnpx jscodeshift -t https://raw.githubusercontent.com/feature-sliced/steiger/codemod/packages/steiger/migrations/convert-config-to-flat.js steiger.config.js
+pnpx jscodeshift -t https://raw.githubusercontent.com/feature-sliced/steiger/master/packages/steiger/migrations/convert-config-to-flat.js steiger.config.js
 ```
 
 **yarn**:
 
 ```shell
-yarn dlx jscodeshift -t https://raw.githubusercontent.com/feature-sliced/steiger/codemod/packages/steiger/migrations/convert-config-to-flat.js steiger.config.js
+yarn dlx jscodeshift -t https://raw.githubusercontent.com/feature-sliced/steiger/master/packages/steiger/migrations/convert-config-to-flat.js steiger.config.js
 ```
 
 **npm**:
 
 ```shell
-npx jscodeshift -t https://raw.githubusercontent.com/feature-sliced/steiger/codemod/packages/steiger/migrations/convert-config-to-flat.js steiger.config.js
+npx jscodeshift -t https://raw.githubusercontent.com/feature-sliced/steiger/master/packages/steiger/migrations/convert-config-to-flat.js steiger.config.js
 ```
