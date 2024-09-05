@@ -47,7 +47,7 @@ The config file shape is highly inspired by ESLint's config file, so if you have
 Here are some rules on how configuration is processed:
 
 - Objects in the config array are processed in order, so later objects can override the objects before them.
-- You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
+- If a rule has configurable options, then you can set it once in any of the objects in the array and these options will be applied to the entire codebase, regardless of `files` and `excludes`.
 
 Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
 
