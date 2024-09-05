@@ -68,6 +68,6 @@ export function getRuleOptions(ruleName: string) {
   return $ruleInstructions.getState()?.[ruleName].options || null
 }
 
-export function getRuleSeveritySettings(ruleName: string) {
+export function getGlobsForRule(ruleName: string) {
   return $ruleInstructions.getState()?.[ruleName].globGroups || null
 }

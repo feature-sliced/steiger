@@ -5,7 +5,7 @@ import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getRuleOptions, getRuleSeveritySettings } from './models/config'
+import { $enabledRules, getEnabledRules, getRuleOptions, getGlobsForRule } from './models/config'
 import applySeverityGlobsToVfs from './features/apply-severity-globs-to-vfs'
 
 function getRuleDescriptionUrl(ruleName: string) {
@@ -16,7 +16,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const ruleResults = await Promise.all(
     rules.map((rule) => {
       const optionsForCurrentRule = getRuleOptions(rule.name)
-      const severitySettings = getRuleSeveritySettings(rule.name)
+      const severitySettings = getGlobsForRule(rule.name)
 
       if (!severitySettings) {
         throw new Error(`Severity settings for rule ${rule.name} are not found but rule is enabled`)
