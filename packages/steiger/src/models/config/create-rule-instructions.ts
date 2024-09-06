@@ -2,7 +2,7 @@ import { Config, ConfigObject, Severity } from '@steiger/types'
 import { reduce, flatten, filter, pipe, map } from 'ramda'
 
 import { RuleInstructions } from './types'
-import { isGlobalIgnore, isConfigObject } from './raw-config'
+import { isConfigObject } from './raw-config'
 import { isEqual } from '../../shared/objects'
 
 function createEmptyInstructions(): RuleInstructions {
@@ -30,27 +30,16 @@ const preCreateRuleInstructions: (l: Config) => Record<string, RuleInstructions>
 )
 
 export default function createRuleInstructions(config: Config): Record<string, RuleInstructions> {
-  // Pre-create an empty rule instructions object for each rule.
-  // Mainly to be able to add a global ignore for all rules later.
   const ruleNameToInstructions: Record<string, RuleInstructions> = preCreateRuleInstructions(config)
 
   return config.reduce((acc: Record<string, RuleInstructions>, item) => {
-    if (isGlobalIgnore(item)) {
-      Object.keys(ruleNameToInstructions).forEach((ruleName) => {
-        acc[ruleName].globGroups.push({
-          severity: 'off',
-          files: item.ignores,
-          ignores: [],
-        })
-      })
-    }
-
     if (isConfigObject(item)) {
       Object.entries(item.rules!).forEach(
         ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
           const prevOptions = acc[ruleName].options
           const ruleOptions: Record<string, unknown> | null = Array.isArray(severityOrTuple) ? severityOrTuple[1] : null
 
+          // TODO: try to move to validation
           if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
             throw new Error(
               `

@@ -1,10 +1,10 @@
 import { combine, createEvent, createStore } from 'effector'
-import { Config, Plugin } from '@steiger/types'
+import { Config, GlobalIgnore, Plugin } from '@steiger/types'
 
 import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from './types'
 import buildValidationScheme from './build-validation-scheme'
-import { isConfiguration, isPlugin } from './raw-config'
+import { isConfiguration, isGlobalIgnore, isPlugin } from './raw-config'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
@@ -13,6 +13,10 @@ export { GlobGroup } from './types'
 export const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
 const setRuleInstructions = createEvent<RuleInstructionsPerRule>()
 $ruleInstructions.on(setRuleInstructions, (_state, payload) => payload)
+
+export const $globalIgnores = createStore<Array<GlobalIgnore>>([])
+const setGlobalIgnores = createEvent<Array<GlobalIgnore>>()
+$globalIgnores.on(setGlobalIgnores, (_state, payload) => payload)
 
 export const $plugins = createStore<Array<Plugin>>([])
 const setPlugins = createEvent<Array<Plugin>>()
@@ -51,6 +55,7 @@ export function processConfiguration(rawConfig: Config) {
   const ruleInstructions = createRuleInstructions(validatedConfig)
 
   setPlugins(plugins)
+  setGlobalIgnores(rawConfig.filter(isGlobalIgnore))
   setRuleInstructions(ruleInstructions)
 
   return validatedConfig
@@ -66,6 +71,10 @@ export function getEnabledRules() {
 
 export function getRuleOptions(ruleName: string) {
   return $ruleInstructions.getState()?.[ruleName].options || null
+}
+
+export function getGlobalIgnores() {
+  return $globalIgnores.getState()
 }
 
 export function getGlobsForRule(ruleName: string) {

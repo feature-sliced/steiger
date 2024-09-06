@@ -8,13 +8,11 @@ interface ApplyGlobsOptions {
   exclusions?: string[]
 }
 
-type RequiredApplyGlobsOptions = Required<ApplyGlobsOptions>
-
 export function isNegationPattern(pattern: string) {
   return pattern.startsWith('!')
 }
 
-export function createFilterAccordingToGlobs({ inclusions, exclusions }: RequiredApplyGlobsOptions) {
+export function createFilterAccordingToGlobs({ inclusions = [], exclusions = [] }: ApplyGlobsOptions) {
   const thereAreInclusions = inclusions.length > 0
   const thereAreExclusions = exclusions.length > 0
 

@@ -1,18 +1,37 @@
 import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import { Config, Folder, Rule } from '@steiger/types'
+import { Config, Folder, GlobalIgnore, Rule } from '@steiger/types'
 import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getRuleOptions, getGlobsForRule } from './models/config'
+import { $enabledRules, getEnabledRules, getRuleOptions, getGlobsForRule, getGlobalIgnores } from './models/config'
 import applySeverityGlobsToVfs from './features/apply-severity-globs-to-vfs'
+import { copyFsEntity, flattenFolder, recomposeTree } from './shared/file-system'
+import { createFilterAccordingToGlobs } from './shared/globs'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
+function removeNodes(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
+  const flatVfs = flattenFolder(vfs)
+
+  return recomposeTree(
+    copyFsEntity(vfs),
+    flatVfs.filter((file) =>
+      globalIgnores.every((ignore) => {
+        const filterAccordingToGlobs = createFilterAccordingToGlobs({ exclusions: ignore.ignores })
+
+        return !filterAccordingToGlobs(file.path)
+      }),
+    ),
+  )
+}
+
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
+  const vfsWithoutGlobalIgnores = removeNodes(vfs, getGlobalIgnores())
+
   const ruleResults = await Promise.all(
     rules.map((rule) => {
       const optionsForCurrentRule = getRuleOptions(rule.name)
@@ -22,7 +41,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
         throw new Error(`Severity settings for rule ${rule.name} are not found but rule is enabled`)
       }
 
-      const { vfs: finalVfs, severityMap } = applySeverityGlobsToVfs(severitySettings, vfs)
+      const { vfs: finalVfs, severityMap } = applySeverityGlobsToVfs(severitySettings, vfsWithoutGlobalIgnores)
 
       if (!finalVfs) {
         return Promise.resolve([])
