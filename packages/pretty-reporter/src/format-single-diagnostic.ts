@@ -3,9 +3,9 @@ import figures from 'figures'
 import terminalLink from 'terminal-link'
 import chalk from 'chalk'
 
-import type { AugmentedDiagnostic } from './types.js'
+import type { FullDiagnostic } from './types.js'
 
-export function formatSingleDiagnostic(d: AugmentedDiagnostic, cwd: string): string {
+export function formatSingleDiagnostic(d: FullDiagnostic, cwd: string): string {
   const x = d.severity === 'error' ? chalk.red(figures.cross) : chalk.yellow(figures.warning)
   const s = chalk.reset(figures.lineDownRight)
   const bar = chalk.reset(figures.lineVertical)
@@ -13,7 +13,7 @@ export function formatSingleDiagnostic(d: AugmentedDiagnostic, cwd: string): str
   const message = chalk.reset(d.message)
   const autofixable = d.fixes !== undefined && d.fixes.length > 0 ? chalk.green(`${figures.tick} Auto-fixable`) : null
   const location = chalk.gray(formatLocation(d.location, cwd))
-  const ruleName = chalk.blue(terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString()))
+  const ruleName = chalk.blue(terminalLink(d.ruleName, d.ruleDescriptionUrl))
 
   return `
 ${s} ${location}
@@ -23,7 +23,7 @@ ${e} ${ruleName}
 `.trim()
 }
 
-function formatLocation(location: AugmentedDiagnostic['location'], cwd: string) {
+function formatLocation(location: FullDiagnostic['location'], cwd: string) {
   let path = relative(cwd, location.path)
   if (location.line !== undefined) {
     path += `:${location.line}`
