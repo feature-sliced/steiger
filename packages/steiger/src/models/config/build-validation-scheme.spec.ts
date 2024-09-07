@@ -169,7 +169,7 @@ describe('buildValidationScheme', () => {
   })
 
   it('should throw an error if no config objects are provided', () => {
-    const config = [] as Config
+    const config = [dummyPlugin] as Config
     const scheme = buildValidationScheme(config)
 
     expect(() => scheme.parse(config)).toThrow('At least one config object must be provided!')
