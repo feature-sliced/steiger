@@ -30,26 +30,9 @@ export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructi
   return allRules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
 })
 
-function getAllRuleNames(plugins: Array<Plugin>) {
-  const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
-  const ruleNames = allRules.map((rule) => rule.name)
-  const uniqueNames = new Set<string>(ruleNames)
-
-  // Check conflicts in rule names
-  if (uniqueNames.size !== allRules.length) {
-    const duplicates = ruleNames.filter((name, index) => ruleNames.indexOf(name) !== index)
-    throw new Error(
-      `Conflicting rule definitions found: ${duplicates.join(', ')}. Rules must be unique! Please check your plugins.`,
-    )
-  }
-
-  return ruleNames
-}
-
 export function processConfiguration(rawConfig: Config) {
   const plugins = rawConfig.filter(isPlugin)
-  const allRuleNames = getAllRuleNames(plugins)
-  const validationScheme = buildValidationScheme(allRuleNames)
+  const validationScheme = buildValidationScheme(rawConfig)
   const configObjects = rawConfig.filter(isConfiguration)
   const validatedConfig = validationScheme.parse(configObjects)
   const ruleInstructions = createRuleInstructions(validatedConfig)

@@ -1,8 +1,13 @@
 import z from 'zod'
 
-import { getOptions, isConfigObject } from './raw-config'
+import { getOptions, isConfigObject, isPlugin } from './raw-config'
 import { isEqual } from '../../shared/objects'
-import { BaseRuleOptions, Config, Severity } from '@steiger/types'
+import { BaseRuleOptions, Config, Plugin, Severity } from '@steiger/types'
+
+function getAllRuleNames(plugins: Array<Plugin>) {
+  const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
+  return allRules.map((rule) => rule.name)
+}
 
 function validateConfigObjectsNumber(value: Config, ctx: z.RefinementCtx) {
   const configObjects = value.filter(isConfigObject)
@@ -11,6 +16,20 @@ function validateConfigObjectsNumber(value: Config, ctx: z.RefinementCtx) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'At least one config object must be provided!',
+    })
+  }
+}
+
+function validateRuleUniqueness(value: Config, ctx: z.RefinementCtx) {
+  const allRuleNames = getAllRuleNames(value.filter(isPlugin))
+  const uniqueNames = new Set<string>(allRuleNames)
+
+  // Check conflicts in rule names (each rule can only be defined once)
+  if (uniqueNames.size !== allRuleNames.length) {
+    const duplicates = allRuleNames.filter((name, index) => allRuleNames.indexOf(name) !== index)
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Conflicting rule definitions found: ${duplicates.join(', ')}. Rules must be unique! Please check your plugins.`,
     })
   }
 }
@@ -50,11 +69,19 @@ function validateRuleOptions(value: Config, ctx: z.RefinementCtx) {
 /**
  * Dynamically build a validation scheme based on the rules provided by plugins.
  * */
-export default function buildValidationScheme(ruleNames: Array<string>) {
-  // Ensure the array has at least one element
-  if (ruleNames.length === 0) {
+export default function buildValidationScheme(rawConfig: Config) {
+  const allRuleNames = getAllRuleNames(rawConfig.filter(isPlugin))
+
+  // Make sure there's at least one rule registered by plugins
+  // Need to check this before creating the scheme, because zod.enum requires at least one element
+  if (allRuleNames.length === 0) {
     throw new Error('At least one rule must be provided by plugins!')
   }
+
+  // Marked as "any" because return type is not useful for this validation
+  const ruleResultScheme = z.object({
+    diagnostics: z.array(z.any()),
+  })
 
   return z
     .array(
@@ -69,15 +96,31 @@ export default function buildValidationScheme(ruleNames: Array<string>) {
           ignores: z.optional(z.array(z.string())),
           // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
           rules: z.record(
-            z.enum(ruleNames as [string, ...string[]]),
+            z.enum(allRuleNames as [string, ...string[]]),
             z.union([
               z.enum(['off', 'error', 'warn']),
               z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()]),
             ]),
           ),
         }),
+        z.object({
+          meta: z.object({
+            name: z.string(),
+            version: z.string(),
+          }),
+          ruleDefinitions: z.array(
+            z.object({
+              name: z.string(),
+              check: z
+                .function()
+                .args()
+                .returns(z.union([z.promise(ruleResultScheme), ruleResultScheme])),
+            }),
+          ),
+        }),
       ]),
     )
     .superRefine(validateConfigObjectsNumber)
     .superRefine(validateRuleOptions)
+    .superRefine(validateRuleUniqueness)
 }
