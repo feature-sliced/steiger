@@ -17,6 +17,6 @@ function removeNodes(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
   )
 }
 
-export default function removeGlobalIgnoreFromVfs(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
+export default function removeGlobalIgnoresFromVfs(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
   return removeNodes(vfs, globalIgnores)
 }

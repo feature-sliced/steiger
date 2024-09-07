@@ -3,9 +3,9 @@ import figures from 'figures'
 import terminalLink from 'terminal-link'
 import chalk from 'chalk'
 
-import type { FullDiagnostic } from './types.js'
+import type { Diagnostic } from '@steiger/types'
 
-export function formatSingleDiagnostic(d: FullDiagnostic, cwd: string): string {
+export function formatSingleDiagnostic(d: Diagnostic, cwd: string): string {
   const x = d.severity === 'error' ? chalk.red(figures.cross) : chalk.yellow(figures.warning)
   const s = chalk.reset(figures.lineDownRight)
   const bar = chalk.reset(figures.lineVertical)
@@ -23,7 +23,7 @@ ${e} ${ruleName}
 `.trim()
 }
 
-function formatLocation(location: FullDiagnostic['location'], cwd: string) {
+function formatLocation(location: Diagnostic['location'], cwd: string) {
   let path = relative(cwd, location.path)
   if (location.line !== undefined) {
     path += `:${location.line}`

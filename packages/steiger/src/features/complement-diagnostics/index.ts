@@ -1,5 +1,4 @@
-import type { FullDiagnostic } from '@steiger/pretty-reporter'
-import { Diagnostic, Severity } from '@steiger/types'
+import { Diagnostic, PartialDiagnostic, Severity } from '@steiger/types'
 import { getGlobsForRule, GlobGroup } from '../../models/config'
 import { createFilterAccordingToGlobs } from '../../shared/globs'
 
@@ -27,10 +26,10 @@ function getSeverity(path: string, globGroups: Array<GlobGroup>): Exclude<Severi
   return finalSeverity
 }
 
-export default function complementDiagnostics(diagnostics: Array<Diagnostic>, ruleName: string) {
+export default function complementDiagnostics(diagnostics: Array<PartialDiagnostic>, ruleName: string) {
   const ruleGlobs = getGlobsForRule(ruleName)
 
-  return diagnostics.map<FullDiagnostic>((d) => ({
+  return diagnostics.map<Diagnostic>((d) => ({
     ...d,
     ruleName: ruleName,
     ruleDescriptionUrl: getRuleDescriptionUrl(ruleName).toString(),

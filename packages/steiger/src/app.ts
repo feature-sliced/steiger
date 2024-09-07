@@ -7,10 +7,10 @@ import { defer } from './shared/defer'
 import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/config'
 import complementDiagnostics from './features/complement-diagnostics'
 import { runRule } from './features/run-rule'
-import removeGlobalIgnoreFromVfs from './features/remove-global-ignore-from-vfs'
+import removeGlobalIgnoresFromVfs from './features/remove-global-ignores-from-vfs'
 
 async function ruleRunSequence({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
+  const vfsWithoutGlobalIgnores = removeGlobalIgnoresFromVfs(vfs, getGlobalIgnores())
   const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
   return ruleResults.flatMap((r, index) => complementDiagnostics(r.diagnostics, rules[index].name))
 }

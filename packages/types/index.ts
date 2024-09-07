@@ -18,10 +18,10 @@ export interface Rule<Context = void, RuleOptions = BaseRuleOptions> {
 }
 
 export interface RuleResult {
-  diagnostics: Array<Diagnostic>
+  diagnostics: Array<PartialDiagnostic>
 }
 
-export interface Diagnostic {
+export interface PartialDiagnostic {
   message: string
   fixes?: Array<Fix>
   location: {
@@ -30,6 +30,12 @@ export interface Diagnostic {
     line?: number
     column?: number
   }
+}
+
+export interface Diagnostic extends PartialDiagnostic {
+  ruleName: string
+  severity: Exclude<Severity, 'off'>
+  ruleDescriptionUrl: string
 }
 
 export type Fix =

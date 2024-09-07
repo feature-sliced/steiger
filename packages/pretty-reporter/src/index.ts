@@ -1,11 +1,11 @@
 import chalk from 'chalk'
 import figures from 'figures'
 
-import type { FullDiagnostic } from './types.js'
+import type { Diagnostic } from '@steiger/types'
 import { formatSingleDiagnostic } from './format-single-diagnostic.js'
 import { s } from './pluralization.js'
 
-export function formatPretty(diagnostics: Array<FullDiagnostic>, cwd: string) {
+export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   if (diagnostics.length === 0) {
     return chalk.green(`${figures.tick} No problems found!`)
   }
@@ -43,8 +43,8 @@ export function formatPretty(diagnostics: Array<FullDiagnostic>, cwd: string) {
   )
 }
 
-export function reportPretty(diagnostics: Array<FullDiagnostic>, cwd: string) {
+export function reportPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   console.error(formatPretty(diagnostics, cwd))
 }
 
-export type { FullDiagnostic }
+export type { Diagnostic }

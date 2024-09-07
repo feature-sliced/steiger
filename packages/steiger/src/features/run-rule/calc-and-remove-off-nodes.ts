@@ -1,7 +1,7 @@
 import { File, Folder } from '@steiger/types'
 import { filter, map, pipe } from 'ramda'
 
-import markSeverities from './mark-severities'
+import markSeverities from '../run-rule/mark-severities'
 import { GlobGroup } from '../../models/config'
 import { copyFsEntity, flattenFolder, recomposeTree } from '../../shared/file-system'
 import { SeverityMarkedFile, SeverityMarkedFolder } from './types'

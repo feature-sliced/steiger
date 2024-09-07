@@ -1,5 +1,5 @@
 import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/types'
 import { NAMESPACE } from '../constants.js'
 
 const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals', 'types', 'constants', 'consts', 'const']
@@ -8,7 +8,7 @@ const BAD_NAMES = ['components', 'hooks', 'helpers', 'utils', 'modals', 'types',
 const segmentsByPurpose = {
   name: `${NAMESPACE}/segments-by-purpose`,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
       if (layer === null) {
