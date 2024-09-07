@@ -16,21 +16,26 @@ function validateConfigObjectsNumber(value: Config, ctx: z.RefinementCtx) {
 }
 
 function validateRuleOptions(value: Config, ctx: z.RefinementCtx) {
-  const ruleToOptions: Record<string, BaseRuleOptions> = {}
+  const ruleToOptions: Record<string, BaseRuleOptions | null> = {}
 
   value.forEach((configObject) => {
     if (isConfigObject(configObject)) {
       Object.entries(configObject.rules).forEach(
         ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
-          const prevOptions = ruleToOptions[ruleName].options
-          const ruleOptions: Record<string, unknown> | null = getOptions(severityOrTuple)
+          const prevOptions = ruleToOptions[ruleName]
+          const ruleOptions: BaseRuleOptions | null = getOptions(severityOrTuple)
+
+          if (!prevOptions) {
+            ruleToOptions[ruleName] = ruleOptions
+            return
+          }
 
           if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `
                 Rule "${ruleName}" has multiple options provided! 
-                  ${JSON.stringify(ruleToOptions[ruleName].options)} 
+                  ${JSON.stringify(ruleToOptions[ruleName])} 
                 and
                   ${JSON.stringify(ruleOptions)}.
                 You can only provide options for a rule once.`,

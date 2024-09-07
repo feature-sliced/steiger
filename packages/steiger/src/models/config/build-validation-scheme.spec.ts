@@ -176,4 +176,67 @@ describe('buildValidationScheme', () => {
 
     expect(scheme.parse(config)).toEqual(config)
   })
+
+  it('should correctly validate a config with unique rule options', () => {
+    const scheme = buildValidationScheme(dummyRules)
+
+    const config = [
+      {
+        ignores: ['/src/shared/**'],
+      },
+      {
+        ignores: ['/src/entities/**'],
+        rules: {
+          rule2: ['warn', { option1: 'value1' }],
+        },
+      },
+    ]
+
+    expect(scheme.parse(config)).toEqual(config)
+  })
+
+  it('should successfully validate when the config provides a rule with multiple but identical options', () => {
+    const scheme = buildValidationScheme(dummyRules)
+    const config: Config = [
+      {
+        rules: {
+          rule1: ['warn', {}],
+          rule2: ['error', {}],
+        },
+      },
+      {
+        files: ['src/shared/ui/**/*', 'src/entities/user/ui/**/*'],
+        rules: {
+          rule1: ['warn', {}],
+        },
+      },
+    ]
+
+    expect(scheme.parse(config)).toEqual(config)
+  })
+
+  it('should throw an error when the config provides a rule with multiple but different options', () => {
+    const scheme = buildValidationScheme(dummyRules)
+    const config: Config = [
+      {
+        rules: {
+          rule1: ['warn', { option1: 'value1' }],
+          rule2: ['error', {}],
+        },
+      },
+      {
+        files: ['src/shared/ui/**/*', 'src/entities/user/ui/**/*'],
+        rules: {
+          rule1: [
+            'warn',
+            {
+              option1: 'value2',
+            },
+          ],
+        },
+      },
+    ]
+
+    expect(() => scheme.parse(config)).toThrow()
+  })
 })
