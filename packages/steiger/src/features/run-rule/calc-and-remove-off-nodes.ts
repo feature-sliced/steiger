@@ -25,7 +25,7 @@ function toPlainFsEntity(entity: SeverityMarkedFile | SeverityMarkedFolder): Fil
 
 const removeOffAndBackToPlain = pipe(filter(isNotOff), map(toPlainFsEntity))
 
-export default function applySeverityGlobsToVfs(globs: Array<GlobGroup>, vfs: Folder) {
+export default function calcAndRemoveOffNodes(globs: Array<GlobGroup>, vfs: Folder) {
   const flatVfs = flattenFolder(vfs)
   const markedVfs = markSeverities(globs, flatVfs)
 
