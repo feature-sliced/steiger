@@ -1,6 +1,6 @@
 import { Folder, GlobalIgnore } from '@steiger/types'
-import { copyFsEntity, flattenFolder, recomposeTree } from '../shared/file-system'
-import { createFilterAccordingToGlobs } from '../shared/globs'
+import { copyFsEntity, flattenFolder, recomposeTree } from '../../shared/file-system'
+import { createFilterAccordingToGlobs } from '../../shared/globs'
 
 function removeNodes(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
   const flatVfs = flattenFolder(vfs)
@@ -17,6 +17,6 @@ function removeNodes(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
   )
 }
 
-export default function removeGlobalIgnoresFromVfs(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
+export default function index(vfs: Folder, globalIgnores: Array<GlobalIgnore>) {
   return removeNodes(vfs, globalIgnores)
 }
