@@ -30,12 +30,12 @@ export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructi
   return allRules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
 })
 
-export function processConfiguration(rawConfig: Config) {
+export function processConfiguration(rawConfig: Config, configLocationFolder: string) {
   const validationScheme = buildValidationScheme(rawConfig)
   const validatedConfig = validationScheme.parse(rawConfig)
 
   const plugins = rawConfig.filter(isPlugin)
-  const ruleInstructions = createRuleInstructions(validatedConfig)
+  const ruleInstructions = createRuleInstructions(validatedConfig, configLocationFolder)
 
   setPlugins(plugins)
   setGlobalIgnores(rawConfig.filter(isGlobalIgnore))
