@@ -1,6 +1,46 @@
 import z from 'zod'
 
-import { isConfigObject } from './raw-config'
+import { getOptions, isConfigObject } from './raw-config'
+import { isEqual } from '../../shared/objects'
+import { BaseRuleOptions, Config, Severity } from '@steiger/types'
+
+function validateConfigObjectsNumber(value: Config, ctx: z.RefinementCtx) {
+  const configObjects = value.filter(isConfigObject)
+
+  if (configObjects.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'At least one config object must be provided!',
+    })
+  }
+}
+
+function validateRuleOptions(value: Config, ctx: z.RefinementCtx) {
+  const ruleToOptions: Record<string, BaseRuleOptions> = {}
+
+  value.forEach((configObject) => {
+    if (isConfigObject(configObject)) {
+      Object.entries(configObject.rules).forEach(
+        ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
+          const prevOptions = ruleToOptions[ruleName].options
+          const ruleOptions: Record<string, unknown> | null = getOptions(severityOrTuple)
+
+          if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `
+                Rule "${ruleName}" has multiple options provided! 
+                  ${JSON.stringify(ruleToOptions[ruleName].options)} 
+                and
+                  ${JSON.stringify(ruleOptions)}.
+                You can only provide options for a rule once.`,
+            })
+          }
+        },
+      )
+    }
+  })
+}
 
 /**
  * Dynamically build a validation scheme based on the rules provided by plugins.
@@ -33,12 +73,6 @@ export default function buildValidationScheme(ruleNames: Array<string>) {
         }),
       ]),
     )
-    .refine(
-      (value) => {
-        const configObjects = value.filter(isConfigObject)
-
-        return configObjects.length !== 0
-      },
-      { message: 'At least one config object must be provided!' },
-    )
+    .superRefine(validateConfigObjectsNumber)
+    .superRefine(validateRuleOptions)
 }
