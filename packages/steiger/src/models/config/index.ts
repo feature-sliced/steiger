@@ -4,7 +4,7 @@ import { Config, GlobalIgnore, Plugin } from '@steiger/types'
 import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from './types'
 import buildValidationScheme from './build-validation-scheme'
-import { isConfiguration, isGlobalIgnore, isPlugin } from './raw-config'
+import { isGlobalIgnore, isPlugin } from './raw-config'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
@@ -31,10 +31,10 @@ export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructi
 })
 
 export function processConfiguration(rawConfig: Config) {
-  const plugins = rawConfig.filter(isPlugin)
   const validationScheme = buildValidationScheme(rawConfig)
-  const configObjects = rawConfig.filter(isConfiguration)
-  const validatedConfig = validationScheme.parse(configObjects)
+  const validatedConfig = validationScheme.parse(rawConfig)
+
+  const plugins = rawConfig.filter(isPlugin)
   const ruleInstructions = createRuleInstructions(validatedConfig)
 
   setPlugins(plugins)

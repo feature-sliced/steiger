@@ -286,4 +286,26 @@ describe('buildValidationScheme', () => {
 
     expect(() => scheme.parse(config)).toThrow()
   })
+
+  it('should throw an error when duplicate rule definition are provided', () => {
+    const config: Config = [
+      dummyPlugin,
+      dummyPlugin,
+      {
+        rules: {
+          rule1: ['warn', { option1: 'value1' }],
+          rule2: ['error', {}],
+        },
+      },
+      {
+        files: ['src/shared/ui/**/*', 'src/entities/user/ui/**/*'],
+        rules: {
+          rule1: ['warn', { option1: 'value1' }],
+        },
+      },
+    ]
+    const scheme = buildValidationScheme(config)
+
+    expect(() => scheme.parse(config)).toThrow()
+  })
 })
