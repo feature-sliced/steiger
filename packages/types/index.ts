@@ -61,7 +61,7 @@ export type Fix =
       content: string
     }
 
-export type Config = Array<ConfigObject<Array<Rule>> | Plugin>
+export type Config<Rules extends Array<Rule>> = Array<ConfigObject<Rules> | Plugin<unknown, Rules>>
 
 export type Severity = 'off' | 'warn' | 'error'
 
@@ -107,9 +107,6 @@ export interface Plugin<Context = unknown, Rules extends Array<Rule<Context>> = 
   ruleDefinitions: Rules
 }
 
-// TODO: this type should be owned by `pretty-reporter`, but for some reason
-//   `tsup` refuses to inline the types from `pretty-reporter`, even though
-//    it's perfectly capable of inlining types from `types`. Idk, I'll figure it out later.
 export interface AugmentedDiagnostic extends Diagnostic {
   ruleName: string
   severity: Exclude<Severity, 'off'>
