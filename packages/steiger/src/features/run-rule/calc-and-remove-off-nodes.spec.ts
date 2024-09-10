@@ -1,7 +1,6 @@
 import calcAndRemoveOffNodes from './calc-and-remove-off-nodes'
 import { it, expect, describe } from 'vitest'
-import { joinFromRoot } from '../../_lib/prepare-test'
-import { Folder } from '@steiger/types'
+import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
 import { GlobGroup } from '../../models/config'
 
 describe('calcAndRemoveOffNodes', () => {
@@ -11,81 +10,34 @@ describe('calcAndRemoveOffNodes', () => {
       { severity: 'off', files: ['**/shared', '**/shared/**'], ignores: [] },
     ] as Array<GlobGroup>
 
-    const vfs = {
-      type: 'folder',
-      path: joinFromRoot('src'),
-      children: [
-        {
-          type: 'folder',
-          path: joinFromRoot('src', 'shared'),
-          children: [
-            {
-              type: 'file',
-              path: joinFromRoot('src', 'shared', 'ui', 'index.ts'),
-            },
-          ],
-        },
-        {
-          type: 'folder',
-          path: joinFromRoot('src', 'entities'),
-          children: [
-            {
-              type: 'folder',
-              path: joinFromRoot('src', 'entities', 'user'),
-              children: [
-                {
-                  type: 'file',
-                  path: joinFromRoot('src', 'entities', 'user', 'index.ts'),
-                },
-                {
-                  type: 'folder',
-                  path: joinFromRoot('src', 'entities', 'user', 'ui'),
-                  children: [
-                    {
-                      type: 'file',
-                      path: joinFromRoot('src', 'entities', 'user', 'ui', 'UserAvatar.tsx'),
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    } as Folder
+    const vfs = parseIntoFsdRoot(
+      `
+      📂 src
+        📂 shared
+          📂 ui
+            📄 index.ts
+        📂 entities
+          📂 user
+            📄 index.ts
+            📂 ui
+              📄 UserAvatar.tsx
+    `,
+      joinFromRoot('src'),
+    )
+
+    const expectedVfs = parseIntoFsdRoot(
+      `
+      📂 src
+        📂 entities
+          📂 user
+            📄 index.ts
+            📂 ui
+              📄 UserAvatar.tsx
+    `,
+      joinFromRoot('src'),
+    )
 
     const result = calcAndRemoveOffNodes(globs, vfs)
-    expect(result).toEqual({
-      type: 'folder',
-      path: joinFromRoot('src'),
-      children: [
-        {
-          type: 'folder',
-          path: joinFromRoot('src', 'entities'),
-          children: [
-            {
-              type: 'folder',
-              path: joinFromRoot('src', 'entities', 'user'),
-              children: [
-                {
-                  type: 'file',
-                  path: joinFromRoot('src', 'entities', 'user', 'index.ts'),
-                },
-                {
-                  type: 'folder',
-                  path: joinFromRoot('src', 'entities', 'user', 'ui'),
-                  children: [
-                    {
-                      type: 'file',
-                      path: joinFromRoot('src', 'entities', 'user', 'ui', 'UserAvatar.tsx'),
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    })
+    expect(result).toEqual(expectedVfs)
   })
 })
