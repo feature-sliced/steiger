@@ -32,7 +32,7 @@ export default function complementDiagnostics(diagnostics: Array<PartialDiagnost
   return diagnostics.map<Diagnostic>((d) => ({
     ...d,
     ruleName: ruleName,
-    ruleDescriptionUrl: getRuleDescriptionUrl(ruleName).toString(),
+    getRuleDescriptionUrl,
     severity: getSeverity(d.location.path, ruleGlobs || []),
   }))
 }

@@ -35,7 +35,7 @@ export interface PartialDiagnostic {
 export interface Diagnostic extends PartialDiagnostic {
   ruleName: string
   severity: Exclude<Severity, 'off'>
-  ruleDescriptionUrl: string
+  getRuleDescriptionUrl(ruleName: string): URL
 }
 
 export type Fix =

@@ -209,6 +209,9 @@ importers:
       '@steiger/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
+      '@types/node':
+        specifier: ^20.14.2
+        version: 20.14.2
       typescript:
         specifier: ^5.5.3
         version: 5.5.3
