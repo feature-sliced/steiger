@@ -1,12 +1,8 @@
-import { Diagnostic, PartialDiagnostic, Severity } from '@steiger/types'
+import { Severity } from '@steiger/types'
 import { getGlobsForRule, GlobGroup } from '../../models/config'
 import { createFilterAccordingToGlobs } from '../../shared/globs'
 
-function getRuleDescriptionUrl(ruleName: string) {
-  return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
-}
-
-function getSeverity(path: string, globGroups: Array<GlobGroup>): Exclude<Severity, 'off'> {
+function getFinalSeverity(path: string, globGroups: Array<GlobGroup>): Exclude<Severity, 'off'> {
   let finalSeverity: Severity = 'error'
 
   for (const { severity, files, ignores } of globGroups) {
@@ -26,13 +22,8 @@ function getSeverity(path: string, globGroups: Array<GlobGroup>): Exclude<Severi
   return finalSeverity
 }
 
-export default function complementDiagnostics(diagnostics: Array<PartialDiagnostic>, ruleName: string) {
+export default function calculateSeverity(path: string, ruleName: string) {
   const ruleGlobs = getGlobsForRule(ruleName)
 
-  return diagnostics.map<Diagnostic>((d) => ({
-    ...d,
-    ruleName: ruleName,
-    getRuleDescriptionUrl,
-    severity: getSeverity(d.location.path, ruleGlobs || []),
-  }))
+  return getFinalSeverity(path, ruleGlobs || [])
 }
