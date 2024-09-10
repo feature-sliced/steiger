@@ -14,8 +14,8 @@ export function enableAllRules<Context, Rules extends Array<Rule>>(
   ]
 }
 
-export function createConfigs<const Rules extends Array<Rule> = Array<Rule>>(
-  configs: Record<string, Config<Rules>>,
-): Record<string, Config<Rules>> {
+export function createConfigs<const Rules extends Array<Rule> = Array<Rule>, Keys extends string = string>(
+  configs: Record<Keys, Config<Rules>>,
+): Record<Keys, Config<Rules>> {
   return configs
 }
