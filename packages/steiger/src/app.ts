@@ -9,7 +9,7 @@ import complementDiagnostics from './features/complement-diagnostics'
 import { runRule } from './features/run-rule'
 import removeGlobalIgnoresFromVfs from './features/remove-global-ignores-from-vfs'
 
-async function collectDiagnostics({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
+async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoresFromVfs(vfs, getGlobalIgnores())
   const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
   return ruleResults.flatMap((r, index) => complementDiagnostics(r.diagnostics, rules[index].name))
@@ -18,7 +18,7 @@ async function collectDiagnostics({ vfs, rules }: { vfs: Folder; rules: Array<Ru
 export const linter = {
   run: (path: string) =>
     scan(path).then((vfs) =>
-      collectDiagnostics({
+      runRules({
         vfs,
         rules: getEnabledRules(),
       }),
@@ -27,7 +27,7 @@ export const linter = {
     const { vfs, watcher } = await createWatcher(path)
 
     const treeChanged = debounce(vfs.$tree, 500)
-    const runRulesFx = createEffect(collectDiagnostics)
+    const runRulesFx = createEffect(runRules)
 
     sample({
       clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
