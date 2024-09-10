@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { resolve, relative, sep } from 'node:path'
+import { resolve, relative, dirname } from 'node:path'
 import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
@@ -56,7 +56,7 @@ const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config
 const defaultConfig = fsd.configs.recommended
 
 try {
-  const configLocationDirectory = filepath ? filepath.split(sep).slice(0, -1).join(sep) : ''
+  const configLocationDirectory = filepath ? dirname(filepath) : null
   // use FSD recommended config as a default
   processConfiguration(config || defaultConfig, configLocationDirectory)
 } catch (err) {

@@ -30,7 +30,7 @@ export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructi
   return allRules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
 })
 
-export function processConfiguration(rawConfig: Config, configLocationFolder: string) {
+export function processConfiguration(rawConfig: Config, configLocationFolder: string | null) {
   const validationScheme = buildValidationScheme(rawConfig)
   const validatedConfig = validationScheme.parse(rawConfig)
 

@@ -1,9 +1,10 @@
+import { sep, posix } from 'node:path'
+
 import { Config, ConfigObject, Severity } from '@steiger/types'
 import { reduce, flatten, filter, pipe, map } from 'ramda'
 
 import { RuleInstructions } from './types'
 import { getOptions, getSeverity, isConfigObject } from './raw-config'
-import { sep } from 'node:path'
 
 function createEmptyInstructions(): RuleInstructions {
   return {
@@ -35,9 +36,9 @@ function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) 
     const segmentsOfRoot = root.slice(1).split(sep)
 
     // Remove './' from the beginning of the glob. Globs always have '/' as separators
-    const segmentsOfGlob = glob.slice(2).split('/')
+    const segmentsOfGlob = glob.slice(2).split(posix.sep)
 
-    return `/${[...segmentsOfRoot, ...segmentsOfGlob].join('/')}`
+    return `/${posix.join(...segmentsOfRoot, ...segmentsOfGlob)}`
   }
 
   return globs.map((glob) => (glob.startsWith('.') && rootPath ? composeAbsolutePath(rootPath, glob) : glob))
@@ -45,13 +46,13 @@ function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) 
 
 export default function createRuleInstructions(
   config: Config,
-  configLocationPath: string,
+  configLocationPath: string | null,
 ): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = preCreateRuleInstructions(config)
 
   return config.reduce((acc: Record<string, RuleInstructions>, item) => {
     if (isConfigObject(item)) {
-      Object.entries(item.rules!).forEach(
+      Object.entries(item.rules).forEach(
         ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
           const ruleOptions: Record<string, unknown> | null = getOptions(severityOrTuple)
 
@@ -61,8 +62,9 @@ export default function createRuleInstructions(
 
           acc[ruleName].globGroups.push({
             severity: getSeverity(severityOrTuple),
-            files: item.files ? convertRelativeGlobsToAbsolute(configLocationPath, item.files) : [],
-            ignores: item.ignores ? convertRelativeGlobsToAbsolute(configLocationPath, item.ignores) : [],
+            // Config file location is not null if we have any globs, because they are set in the config file.
+            files: item.files ? convertRelativeGlobsToAbsolute(configLocationPath!, item.files) : [],
+            ignores: item.ignores ? convertRelativeGlobsToAbsolute(configLocationPath!, item.ignores) : [],
           })
         },
       )
