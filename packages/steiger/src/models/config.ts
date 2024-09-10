@@ -10,7 +10,7 @@ export const $rules = createStore<Array<Rule>>([])
 const setRules = createEvent<Array<Rule>>()
 $rules.on(setRules, (_state, payload) => payload)
 
-function processPlugins(config: Config<[]>) {
+function processPlugins(config: Config<Array<Rule>>) {
   const plugins = config.filter((item) => 'ruleDefinitions' in item) as Array<Plugin>
   const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
   const ruleNames = allRules.map((rule) => rule.name)
@@ -27,7 +27,7 @@ function processPlugins(config: Config<[]>) {
   return allRules
 }
 
-function mergeConfigObjects(config: Config<[]>) {
+function mergeConfigObjects(config: Config<Array<Rule>>) {
   // TODO: temporary simplified implementation.
   //  Implement handling the "files" and "ignores" globs in further updates.
   return config.reduce((acc: ConfigObject<Array<Rule>>, item) => {
@@ -73,7 +73,7 @@ export function buildValidationScheme(rules: Array<Rule>) {
   })
 }
 
-export function processConfiguration(config: Config<[]>) {
+export function processConfiguration(config: Config<Array<Rule>>) {
   const allRules = processPlugins(config)
   const validationScheme = buildValidationScheme(allRules)
   const mergedConfig = mergeConfigObjects(config)
