@@ -32,6 +32,11 @@
   "peerDependencies": {
     "vitest": "^1.6.0"
   },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@steiger/eslint-config": "workspace:*",
     "@steiger/tsconfig": "workspace:*",
