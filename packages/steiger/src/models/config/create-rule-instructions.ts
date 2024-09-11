@@ -41,7 +41,7 @@ function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) 
     return `/${posix.join(...segmentsOfRoot, ...segmentsOfGlob)}`
   }
 
-  return globs.map((glob) => (glob.startsWith('.') && rootPath ? composeAbsolutePath(rootPath, glob) : glob))
+  return globs.map((glob) => (glob.startsWith('.') ? composeAbsolutePath(rootPath, glob) : glob))
 }
 
 export default function createRuleInstructions(

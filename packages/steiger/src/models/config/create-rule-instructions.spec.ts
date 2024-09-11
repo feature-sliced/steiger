@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import createRuleInstructions from './create-rule-instructions'
 import { Config } from '@steiger/types'
+
+import createRuleInstructions from './create-rule-instructions'
+import { joinFromRoot } from '../../_lib/prepare-test'
 
 describe('createRuleInstructions', () => {
   it('should create rule instructions for each rule present in the config', () => {
@@ -86,6 +88,31 @@ describe('createRuleInstructions', () => {
             severity: 'error',
             files: ['src/entities/user/ui/**/*'],
             ignores: [],
+          },
+        ],
+      },
+    })
+  })
+
+  it('should convert relative globs to absolute', () => {
+    const config: Config = [
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['./src/shared/ui/**/*'],
+        ignores: ['./src/shared/ui/index.ts'],
+      },
+    ]
+
+    expect(createRuleInstructions(config, joinFromRoot('projects', 'dummy-project'))).toEqual({
+      rule1: {
+        options: null,
+        globGroups: [
+          {
+            severity: 'warn',
+            files: ['/projects/dummy-project/src/shared/ui/**/*'],
+            ignores: ['/projects/dummy-project/src/shared/ui/index.ts'],
           },
         ],
       },
