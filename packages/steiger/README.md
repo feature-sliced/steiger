@@ -22,16 +22,18 @@ npm i -D steiger
 # Usage
 
 ```bash
-steiger ./src
+npx steiger ./src
 ```
 
 To run in watch mode, add `-w`/`--watch` to the command:
 
 ```bash
-steiger ./src --watch
+npx steiger ./src --watch
 ```
 
 # Configuration
+
+Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.
 
 Steiger is configurable via `cosmiconfig`. That means that you can create a `steiger.config.ts` or `steiger.config.js` file in the root of your project to configure the rules. Import `{ defineConfig } from "steiger"` to get autocompletion.
 
@@ -40,7 +42,7 @@ import { defineConfig } from 'steiger'
 
 export default defineConfig({
   rules: {
-    'no-public-api': 'off',
+    'public-api': 'off',
   },
 })
 ```

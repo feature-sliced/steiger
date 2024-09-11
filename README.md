@@ -22,13 +22,13 @@ npm i -D steiger
 # Usage
 
 ```bash
-steiger ./src
+npx steiger ./src
 ```
 
 To run in watch mode, add `-w`/`--watch` to the command:
 
 ```bash
-steiger ./src --watch
+npx steiger ./src --watch
 ```
 
 # Configuration
