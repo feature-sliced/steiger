@@ -5,6 +5,7 @@ import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from './types'
 import buildValidationScheme from './build-validation-scheme'
 import { isGlobalIgnore, isPlugin } from './raw-config'
+import { convertRelativeGlobsToAbsolute } from './convert-relative-globs-to-absolute'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
@@ -35,7 +36,8 @@ export function processConfiguration(rawConfig: Config, configLocationFolder: st
   const validatedConfig = validationScheme.parse(rawConfig)
 
   const plugins = rawConfig.filter(isPlugin)
-  const ruleInstructions = createRuleInstructions(validatedConfig, configLocationFolder)
+  const configWithConvertedGlobs = convertRelativeGlobsToAbsolute(validatedConfig, configLocationFolder)
+  const ruleInstructions = createRuleInstructions(configWithConvertedGlobs)
 
   setPlugins(plugins)
   setGlobalIgnores(rawConfig.filter(isGlobalIgnore))

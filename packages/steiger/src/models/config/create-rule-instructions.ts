@@ -1,5 +1,3 @@
-import { sep, posix } from 'node:path'
-
 import { Config, ConfigObject, Severity } from '@steiger/types'
 import { reduce, flatten, filter, pipe, map } from 'ramda'
 
@@ -30,21 +28,7 @@ const preCreateRuleInstructions: (l: Config) => Record<string, RuleInstructions>
   ),
 )
 
-function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) {
-  function composeAbsolutePath(root: string, glob: string) {
-    // Remove '/'. The root has platform-specific separators
-    const segmentsOfRoot = root.slice(1).split(sep)
-
-    return `/${posix.join(...segmentsOfRoot, glob)}`
-  }
-
-  return globs.map((glob) => (glob.startsWith('.') ? composeAbsolutePath(rootPath, glob) : glob))
-}
-
-export default function createRuleInstructions(
-  config: Config,
-  configLocationPath: string | null,
-): Record<string, RuleInstructions> {
+export default function createRuleInstructions(config: Config): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = preCreateRuleInstructions(config)
 
   return config.reduce((acc: Record<string, RuleInstructions>, item) => {
@@ -59,9 +43,8 @@ export default function createRuleInstructions(
 
           acc[ruleName].globGroups.push({
             severity: getSeverity(severityOrTuple),
-            // Config file location is not null if we have any globs, because they are set in the config file.
-            files: item.files ? convertRelativeGlobsToAbsolute(configLocationPath!, item.files) : [],
-            ignores: item.ignores ? convertRelativeGlobsToAbsolute(configLocationPath!, item.ignores) : [],
+            files: item.files ? item.files : [],
+            ignores: item.ignores ? item.ignores : [],
           })
         },
       )
