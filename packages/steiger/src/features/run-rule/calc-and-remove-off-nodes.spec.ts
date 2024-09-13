@@ -12,27 +12,25 @@ describe('calcAndRemoveOffNodes', () => {
 
     const vfs = parseIntoFsdRoot(
       `
-      📂 src
-        📂 shared
+      📂 shared
+        📂 ui
+          📄 index.ts
+      📂 entities
+        📂 user
+          📄 index.ts
           📂 ui
-            📄 index.ts
-        📂 entities
-          📂 user
-            📄 index.ts
-            📂 ui
-              📄 UserAvatar.tsx
+            📄 UserAvatar.tsx
     `,
       joinFromRoot('src'),
     )
 
     const expectedVfs = parseIntoFsdRoot(
       `
-      📂 src
-        📂 entities
-          📂 user
-            📄 index.ts
-            📂 ui
-              📄 UserAvatar.tsx
+      📂 entities
+        📂 user
+          📄 index.ts
+          📂 ui
+            📄 UserAvatar.tsx
     `,
       joinFromRoot('src'),
     )
