@@ -23,7 +23,7 @@ const sharedLibGrouping = {
     if (lib.type === 'folder' && lib.children.length > THRESHOLD) {
       diagnostics.push({
         message: `Shared/lib has ${lib.children.length} modules, which is above the recommended threshold of ${THRESHOLD}. Consider grouping them.`,
-        location: { path: lib.path },
+        location: { path: lib.path, type: 'folder' },
       })
     }
 

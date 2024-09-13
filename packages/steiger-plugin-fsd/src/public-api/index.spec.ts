@@ -58,7 +58,7 @@ it('reports errors on slices that are missing a public API', () => {
           content: '',
         },
       ],
-      location: { path: joinFromRoot('entities', 'posts') },
+      location: { path: joinFromRoot('entities', 'posts'), type: 'folder' },
     },
     {
       message: 'This slice is missing a public API.',
@@ -69,7 +69,7 @@ it('reports errors on slices that are missing a public API', () => {
           content: '',
         },
       ],
-      location: { path: joinFromRoot('pages', 'editor') },
+      location: { path: joinFromRoot('pages', 'editor'), type: 'folder' },
     },
   ])
 })
@@ -109,7 +109,7 @@ it('reports errors on segments that are missing a public API', () => {
           content: '',
         },
       ],
-      location: { path: joinFromRoot('shared', 'ui') },
+      location: { path: joinFromRoot('shared', 'ui'), type: 'folder' },
     },
   ])
 })

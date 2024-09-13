@@ -54,11 +54,11 @@ it('reports errors on a project where some slices have no segments', () => {
   expect(diagnostics).toEqual([
     {
       message: 'This slice has no segments. Consider dividing the code inside into segments.',
-      location: { path: joinFromRoot('entities', 'user') },
+      location: { path: joinFromRoot('entities', 'user'), type: 'folder' },
     },
     {
       message: 'This slice has no segments. Consider dividing the code inside into segments.',
-      location: { path: joinFromRoot('pages', 'settings', 'profile') },
+      location: { path: joinFromRoot('pages', 'settings', 'profile'), type: 'folder' },
     },
   ])
 })

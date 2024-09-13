@@ -41,12 +41,12 @@ const importLocality = {
         if (isRelative && !isWithinSameSlice) {
           diagnostics.push({
             message: `Import from "${dependency}" should not be relative.`,
-            location: { path: sourceFile.file.path },
+            location: { path: sourceFile.file.path, type: 'file' },
           })
         } else if (!isRelative && isWithinSameSlice) {
           diagnostics.push({
             message: `Import from "${dependency}" should be relative.`,
-            location: { path: sourceFile.file.path },
+            location: { path: sourceFile.file.path, type: 'file' },
           })
         }
       }

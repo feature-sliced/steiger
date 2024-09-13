@@ -47,11 +47,11 @@ it('reports no errors on a project with folder segments on sliced layers', async
   expect(noFileSegments.check(root).diagnostics).toEqual([
     {
       message: 'This segment is a file. Prefer folder segments.',
-      location: { path: joinFromRoot('features', 'comments', 'ui.tsx') },
+      location: { path: joinFromRoot('features', 'comments', 'ui.tsx'), type: 'file' },
     },
     {
       message: 'This segment is a file. Prefer folder segments.',
-      location: { path: joinFromRoot('pages', 'editor', 'ui.tsx') },
+      location: { path: joinFromRoot('pages', 'editor', 'ui.tsx'), type: 'file' },
     },
   ])
 })
@@ -94,7 +94,7 @@ it('reports errors on a project with folder segments in Shared', async () => {
   expect(noFileSegments.check(root).diagnostics.sort(compareMessages)).toEqual([
     {
       message: 'This segment is a file. Prefer folder segments.',
-      location: { path: joinFromRoot('shared', 'routes.ts') },
+      location: { path: joinFromRoot('shared', 'routes.ts'), type: 'file' },
     },
   ])
 })

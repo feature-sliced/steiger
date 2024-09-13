@@ -19,11 +19,12 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   return ruleResults.flatMap((r, index) =>
     r.diagnostics.map((d) => {
       const ruleName = rules[index].name
+      const { path, type } = d.location
       return {
         ...d,
         ruleName,
         getRuleDescriptionUrl,
-        severity: calculateSeverity(d.location.path, ruleName),
+        severity: calculateSeverity(path, type, ruleName),
       }
     }),
   )

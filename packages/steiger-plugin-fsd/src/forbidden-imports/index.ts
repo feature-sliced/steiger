@@ -41,12 +41,12 @@ const forbiddenImports = {
           if (dependencyLocation.sliceName === null) {
             diagnostics.push({
               message: `Forbidden cross-import from segment "${dependencyLocation.segmentName}".`,
-              location: { path: sourceFile.file.path },
+              location: { path: sourceFile.file.path, type: 'file' },
             })
           } else {
             diagnostics.push({
               message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
-              location: { path: sourceFile.file.path },
+              location: { path: sourceFile.file.path, type: 'file' },
             })
           }
         } else {
@@ -56,7 +56,7 @@ const forbiddenImports = {
           if (thisLayerIndex < dependencyLayerIndex) {
             diagnostics.push({
               message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
-              location: { path: sourceFile.file.path },
+              location: { path: sourceFile.file.path, type: 'file' },
             })
           }
         }

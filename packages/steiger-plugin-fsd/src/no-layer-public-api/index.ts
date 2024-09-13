@@ -18,7 +18,7 @@ const noLayerPublicApi = {
       if (notAmongExceptions && index !== undefined) {
         diagnostics.push({
           message: `Layer "${layerName}" should not have an index file`,
-          location: { path: index.path },
+          location: { path: index.path, type: 'file' },
         })
       }
     }

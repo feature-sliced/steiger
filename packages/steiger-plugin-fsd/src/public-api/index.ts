@@ -27,7 +27,7 @@ const publicApi = {
                   content: '',
                 },
               ],
-              location: { path: segment.path },
+              location: { path: segment.path, type: 'folder' },
             })
           }
         }
@@ -44,7 +44,7 @@ const publicApi = {
                   content: '',
                 },
               ],
-              location: { path: slice.path },
+              location: { path: slice.path, type: 'folder' },
             })
           }
         }

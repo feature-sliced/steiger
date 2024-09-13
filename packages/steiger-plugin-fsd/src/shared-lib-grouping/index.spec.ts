@@ -87,7 +87,7 @@ it('reports errors on a project with shared/lib above threshold', () => {
   expect(diagnostics).toEqual([
     {
       message: 'Shared/lib has 19 modules, which is above the recommended threshold of 15. Consider grouping them.',
-      location: { path: joinFromRoot('shared', 'lib') },
+      location: { path: joinFromRoot('shared', 'lib'), type: 'folder' },
     },
   ])
 })

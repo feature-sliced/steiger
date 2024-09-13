@@ -11,7 +11,7 @@ export default function removeGlobalIgnoresFromVfs(vfs: Folder, globalIgnores: A
       globalIgnores.every((ignore) => {
         const filterAccordingToGlobs = createFilterAccordingToGlobs({ exclusions: ignore.ignores })
 
-        return filterAccordingToGlobs(file.path)
+        return filterAccordingToGlobs(file.path, file.type)
       }),
     ),
   )

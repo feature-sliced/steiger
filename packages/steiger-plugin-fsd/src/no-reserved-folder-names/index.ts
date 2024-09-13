@@ -27,7 +27,7 @@ const noReservedFolderNames = {
         )) {
           diagnostics.push({
             message: `Having a folder with the name "${basename(violatingFolder.path)}" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.`,
-            location: { path: violatingFolder.path },
+            location: { path: violatingFolder.path, type: 'folder' },
           })
         }
       }

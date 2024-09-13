@@ -47,7 +47,7 @@ it('reports errors on a project with subfolders in segments that use reserved na
     {
       message:
         'Having a folder with the name "lib" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.',
-      location: { path: joinFromRoot('shared', 'ui', 'lib') },
+      location: { path: joinFromRoot('shared', 'ui', 'lib'), type: 'folder' },
     },
   ])
 })

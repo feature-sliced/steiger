@@ -112,7 +112,7 @@ it('reports errors on a project with an excessive amount of features', () => {
 
   expect(diagnostics).toEqual([
     {
-      location: { path: joinFromRoot('features') },
+      location: { path: joinFromRoot('features'), type: 'folder' },
       message:
         'Layer "features" has 23 ungrouped slices, which is above the recommended threshold of 20. Consider grouping them or moving the code inside to the layer where it\'s used.',
     },
@@ -212,7 +212,7 @@ it('works with slice groups', () => {
 
   expect(diagnostics).toEqual([
     {
-      location: { path: joinFromRoot('features', 'junk') },
+      location: { path: joinFromRoot('features', 'junk'), type: 'folder' },
       message:
         'Slice group "junk" has 23 slices, which is above the recommended threshold of 20. Consider grouping them or moving the code inside to the layer where it\'s used.',
     },

@@ -29,7 +29,7 @@ const ambiguousSliceNames = {
       if (matchingSegment === sliceName) {
         diagnostics.push({
           message: `Slice "${sliceName}" could be confused with a segment from Shared with the same name`,
-          location: { path: slice.path },
+          location: { path: slice.path, type: 'folder' },
         })
         continue
       }
@@ -39,7 +39,7 @@ const ambiguousSliceNames = {
       if (!isGroup) {
         diagnostics.push({
           message: `Slice "${sliceName}" could be confused with a segment "${matchingSegment}" from Shared`,
-          location: { path: slice.path },
+          location: { path: slice.path, type: 'folder' },
         })
       } else {
         const layer = layers[slice.layerName as LayerName]
@@ -60,7 +60,7 @@ const ambiguousSliceNames = {
         if (group !== undefined) {
           diagnostics.push({
             message: `Slice group "${pathSegmentsToGroup.join(sep)}" could be confused with a segment "${matchingSegment}" from Shared`,
-            location: { path: group.path },
+            location: { path: group.path, type: 'folder' },
           })
         }
       }

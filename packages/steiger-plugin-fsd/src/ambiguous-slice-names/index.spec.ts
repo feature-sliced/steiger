@@ -51,7 +51,7 @@ it('reports errors on a project with slice names that match some segment name in
   expect(diagnostics).toEqual([
     {
       message: 'Slice "i18n" could be confused with a segment from Shared with the same name',
-      location: { path: joinFromRoot('features', 'i18n') },
+      location: { path: joinFromRoot('features', 'i18n'), type: 'folder' },
     },
   ])
 })
@@ -84,11 +84,11 @@ it('works for slice groups and grouped slices', () => {
   expect(diagnostics).toEqual([
     {
       message: 'Slice group "i18n" could be confused with a segment "i18n" from Shared',
-      location: { path: joinFromRoot('features', 'i18n') },
+      location: { path: joinFromRoot('features', 'i18n'), type: 'folder' },
     },
     {
       message: `Slice "${join('test', 'store')}" could be confused with a segment "store" from Shared`,
-      location: { path: joinFromRoot('features', 'test', 'store') },
+      location: { path: joinFromRoot('features', 'test', 'store'), type: 'folder' },
     },
   ])
 })

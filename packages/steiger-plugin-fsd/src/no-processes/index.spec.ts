@@ -48,6 +48,9 @@ it('reports errors on a project with the Processes layer', () => {
 
   const diagnostics = noProcesses.check(root).diagnostics
   expect(diagnostics).toEqual([
-    { message: 'Layer "processes" is deprecated, avoid using it', location: { path: joinFromRoot('processes') } },
+    {
+      message: 'Layer "processes" is deprecated, avoid using it',
+      location: { path: joinFromRoot('processes'), type: 'folder' },
+    },
   ])
 })

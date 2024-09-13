@@ -47,7 +47,7 @@ const noPublicApiSidestep = {
           if (dependencyLocation.segmentName !== null) {
             diagnostics.push({
               message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-              location: { path: sourceFile.file.path },
+              location: { path: sourceFile.file.path, type: 'file' },
             })
           }
         } else if (dependencyLocation.segmentName !== null) {
@@ -65,7 +65,7 @@ const noPublicApiSidestep = {
           if (resolvedDependency !== index?.path) {
             diagnostics.push({
               message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-              location: { path: sourceFile.file.path },
+              location: { path: sourceFile.file.path, type: 'file' },
             })
           }
         }

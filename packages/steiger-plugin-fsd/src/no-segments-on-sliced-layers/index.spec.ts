@@ -77,22 +77,22 @@ describe('no-segments-on-sliced-layers rule', () => {
       {
         message:
           'Conventional segment "api" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('features', 'api') },
+        location: { path: joinFromRoot('features', 'api'), type: 'folder' },
       },
       {
         message:
           'Conventional segment "config" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('widgets', 'config') },
+        location: { path: joinFromRoot('widgets', 'config'), type: 'folder' },
       },
       {
         message:
           'Conventional segment "lib" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('pages', 'lib') },
+        location: { path: joinFromRoot('pages', 'lib'), type: 'folder' },
       },
       {
         message:
           'Conventional segment "ui" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('entities', 'ui') },
+        location: { path: joinFromRoot('entities', 'ui'), type: 'folder' },
       },
     ])
   })

@@ -21,7 +21,7 @@ export default function markSeverities(
     return globs.reduce((acc, { severity, files, ignores }) => {
       const isApplied = createFilterAccordingToGlobs({ inclusions: files, exclusions: ignores })
 
-      const severityApplies = isApplied(acc.path)
+      const severityApplies = isApplied(acc.path, acc.type)
       return severityApplies
         ? {
             ...acc,

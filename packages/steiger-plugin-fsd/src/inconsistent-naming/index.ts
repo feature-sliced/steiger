@@ -35,7 +35,7 @@ const inconsistentNaming = {
               path: join(entities.path, groupPrefix, name),
               newName: plural(name),
             })),
-            location: { path: join(entities.path, groupPrefix) },
+            location: { path: join(entities.path, groupPrefix), type: 'folder' },
           })
         } else {
           diagnostics.push({
@@ -45,7 +45,7 @@ const inconsistentNaming = {
               path: join(entities.path, groupPrefix, name),
               newName: singular(name),
             })),
-            location: { path: join(entities.path, groupPrefix) },
+            location: { path: join(entities.path, groupPrefix), type: 'folder' },
           })
         }
       }

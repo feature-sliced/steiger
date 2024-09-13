@@ -27,18 +27,18 @@ const insignificantSlice = {
         if (unslicedLayers.includes(referenceLocationKey)) {
           diagnostics.push({
             message: `This slice has only one reference on layer "${referenceLocationKey}". Consider moving this code to "${referenceLocationKey}".`,
-            location: { path: join(root.path, sourceLocationKey) },
+            location: { path: join(root.path, sourceLocationKey), type: 'folder' },
           })
         } else {
           diagnostics.push({
             message: `This slice has only one reference in slice "${referenceLocationKey}". Consider merging them.`,
-            location: { path: join(root.path, sourceLocationKey) },
+            location: { path: join(root.path, sourceLocationKey), type: 'folder' },
           })
         }
       } else if (targetLocationKeys.size === 0) {
         diagnostics.push({
           message: `This slice has no references. Consider removing it.`,
-          location: { path: join(root.path, sourceLocationKey) },
+          location: { path: join(root.path, sourceLocationKey), type: 'folder' },
         })
       }
     }

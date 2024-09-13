@@ -36,7 +36,7 @@ it('reports errors on a project with repetition of "page"', () => {
 
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
-    { message: 'Repetitive word "page" in slice names.', location: { path: joinFromRoot('pages') } },
+    { message: 'Repetitive word "page" in slice names.', location: { path: joinFromRoot('pages'), type: 'folder' } },
   ])
 })
 
@@ -56,7 +56,10 @@ it('recognizes words in different naming conventions', () => {
 
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
-    { message: 'Repetitive word "folder" in slice names.', location: { path: joinFromRoot('entities') } },
+    {
+      message: 'Repetitive word "folder" in slice names.',
+      location: { path: joinFromRoot('entities'), type: 'folder' },
+    },
   ])
 })
 
