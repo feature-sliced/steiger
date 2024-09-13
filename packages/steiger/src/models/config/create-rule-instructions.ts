@@ -35,10 +35,7 @@ function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) 
     // Remove '/'. The root has platform-specific separators
     const segmentsOfRoot = root.slice(1).split(sep)
 
-    // Remove './' from the beginning of the glob. Globs always have '/' as separators
-    const segmentsOfGlob = glob.slice(2).split(posix.sep)
-
-    return `/${posix.join(...segmentsOfRoot, ...segmentsOfGlob)}`
+    return `/${posix.join(...segmentsOfRoot, glob)}`
   }
 
   return globs.map((glob) => (glob.startsWith('.') ? composeAbsolutePath(rootPath, glob) : glob))

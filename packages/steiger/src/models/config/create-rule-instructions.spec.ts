@@ -22,7 +22,7 @@ describe('createRuleInstructions', () => {
       },
     ]
 
-    const result = createRuleInstructions(config, '')
+    const result = createRuleInstructions(config, null)
 
     expect(result).toEqual({
       rule1: {
@@ -75,7 +75,7 @@ describe('createRuleInstructions', () => {
       },
     ]
 
-    expect(createRuleInstructions(config, '')).toEqual({
+    expect(createRuleInstructions(config, null)).toEqual({
       rule1: {
         options: null,
         globGroups: [
