@@ -40,7 +40,7 @@ export function processConfiguration(rawConfig: Config, configLocationFolder: st
   const ruleInstructions = createRuleInstructions(configWithConvertedGlobs)
 
   setPlugins(plugins)
-  setGlobalIgnores(rawConfig.filter(isGlobalIgnore))
+  setGlobalIgnores(configWithConvertedGlobs.filter(isGlobalIgnore))
   setRuleInstructions(ruleInstructions)
 
   return validatedConfig
