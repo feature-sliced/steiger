@@ -36,4 +36,5 @@ Examples of project structures that fail this rule:
 
 ## Rationale
 
-This layer is an entry point of the application, it handles global logic such as routing initialization, dependency injection, different providers, stores, etc. As for <code>ui</code> segment, it belongs to view part of the application and typically defined within pages, features, entities or other underlying layers.
+This layer is an entry point of the application, it handles global logic such as routing initialization, dependency injection, different providers, stores, etc. As for the <code>ui</code> segment, it belongs to the "view" part of the application and is typically present in the layers below, for example, <code>pages</code>, <code>features</code>, <code>entities</code>.
+As one possible exception, <code>ui</code> segment can be used in <code>app</code> layer if the entire application consists of only one page and there is no any reasons to define <code>pages</code> layer.
