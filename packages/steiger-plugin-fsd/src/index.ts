@@ -15,6 +15,7 @@ import publicApi from './public-api/index.js'
 import repetitiveNaming from './repetitive-naming/index.js'
 import segmentsByPurpose from './segments-by-purpose/index.js'
 import sharedLibGrouping from './shared-lib-grouping/index.js'
+import typoInLayerName from './typo-in-layer-name/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json'
 
@@ -34,6 +35,7 @@ const allRules: Array<Rule> = [
   repetitiveNaming,
   segmentsByPurpose,
   sharedLibGrouping,
+  typoInLayerName,
   noProcesses,
 ]
 
