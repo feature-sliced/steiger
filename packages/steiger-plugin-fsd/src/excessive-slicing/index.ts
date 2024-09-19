@@ -34,12 +34,12 @@ const excessiveSlicing = {
         if (group === '') {
           diagnostics.push({
             message: `Layer "${layerName}" has ${slices.length} ungrouped slices, which is above the recommended threshold of ${threshold}. Consider grouping them or moving the code inside to the layer where it's used.`,
-            location: { path: layer.path, type: 'folder' },
+            location: { path: layer.path },
           })
         } else {
           diagnostics.push({
             message: `Slice group "${group}" has ${slices.length} slices, which is above the recommended threshold of ${threshold}. Consider grouping them or moving the code inside to the layer where it's used.`,
-            location: { path: join(layer.path, group), type: 'folder' },
+            location: { path: join(layer.path, group) },
           })
         }
       }

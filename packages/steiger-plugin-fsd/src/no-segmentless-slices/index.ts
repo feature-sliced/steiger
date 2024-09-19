@@ -27,7 +27,7 @@ const noSegmentlessSlices = {
           if (!isSlice(sliceCandidate)) {
             diagnostics.push({
               message: 'This slice has no segments. Consider dividing the code inside into segments.',
-              location: { path: sliceCandidate.path, type: 'folder' },
+              location: { path: sliceCandidate.path },
             })
           }
         }

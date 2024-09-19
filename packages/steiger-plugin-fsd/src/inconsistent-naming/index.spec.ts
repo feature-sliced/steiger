@@ -39,7 +39,7 @@ it('reports an error on slice names that are not pluralized consistently', () =>
           newName: 'users',
         },
       ],
-      location: { path: joinFromRoot('entities'), type: 'folder' },
+      location: { path: joinFromRoot('entities') },
     },
   ])
 })
@@ -69,7 +69,7 @@ it('prefers the singular form when there are more singular slices', () => {
           newName: 'comment',
         },
       ],
-      location: { path: joinFromRoot('entities'), type: 'folder' },
+      location: { path: joinFromRoot('entities') },
     },
   ])
 })

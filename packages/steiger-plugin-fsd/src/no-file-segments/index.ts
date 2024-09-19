@@ -14,7 +14,7 @@ const noFileSegments = {
           if (child.type === 'file') {
             diagnostics.push({
               message: 'This segment is a file. Prefer folder segments.',
-              location: { path: child.path, type: 'file' },
+              location: { path: child.path },
             })
           }
         }
@@ -24,7 +24,7 @@ const noFileSegments = {
             if (child.type === 'file' && withoutExtension(basename(child.path)) !== 'index') {
               diagnostics.push({
                 message: 'This segment is a file. Prefer folder segments.',
-                location: { path: child.path, type: 'file' },
+                location: { path: child.path },
               })
             }
           }

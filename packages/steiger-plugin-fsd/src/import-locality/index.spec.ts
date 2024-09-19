@@ -80,7 +80,7 @@ it('reports errors on a project with absolute imports within a slice', async () 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
       message: `Import from "@/entities/user/ui/Name" should be relative.`,
-      location: { path: joinFromRoot('entities', 'user', 'ui', 'UserAvatar.tsx'), type: 'file' },
+      location: { path: joinFromRoot('entities', 'user', 'ui', 'UserAvatar.tsx') },
     },
   ])
 })
@@ -110,7 +110,7 @@ it('reports errors on a project with absolute imports from the index within a sl
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
       message: `Import from "@/entities/user" should be relative.`,
-      location: { path: joinFromRoot('entities', 'user', 'ui', 'Status.tsx'), type: 'file' },
+      location: { path: joinFromRoot('entities', 'user', 'ui', 'Status.tsx') },
     },
   ])
 })
@@ -144,7 +144,7 @@ it('reports errors on a project with relative imports between slices', async () 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
       message: `Import from "../../../entities/user" should not be relative.`,
-      location: { path: joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx'), type: 'file' },
+      location: { path: joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx') },
     },
   ])
 })

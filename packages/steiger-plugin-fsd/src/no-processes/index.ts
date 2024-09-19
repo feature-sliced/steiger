@@ -14,7 +14,7 @@ const noProcesses = {
     if (processesLayer !== undefined) {
       diagnostics.push({
         message: 'Layer "processes" is deprecated, avoid using it',
-        location: { path: processesLayer.path, type: 'folder' },
+        location: { path: processesLayer.path },
       })
     }
 

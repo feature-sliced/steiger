@@ -2,11 +2,7 @@ import { Severity } from '@steiger/types'
 import { getGlobsForRule, GlobGroup } from '../../models/config'
 import { createFilterAccordingToGlobs } from '../../shared/globs'
 
-function getFinalSeverity(
-  path: string,
-  type: 'file' | 'folder',
-  globGroups: Array<GlobGroup>,
-): Exclude<Severity, 'off'> {
+function getFinalSeverity(path: string, globGroups: Array<GlobGroup>): Exclude<Severity, 'off'> {
   let finalSeverity: Severity = 'error'
 
   for (const { severity, files, ignores } of globGroups) {
@@ -18,7 +14,7 @@ function getFinalSeverity(
       continue
     }
 
-    if (isApplied(path, type)) {
+    if (isApplied(path)) {
       finalSeverity = severity
     }
   }
@@ -26,8 +22,8 @@ function getFinalSeverity(
   return finalSeverity
 }
 
-export default function calculateSeverity(path: string, type: 'file' | 'folder', ruleName: string) {
+export default function calculateSeverity(path: string, ruleName: string) {
   const ruleGlobs = getGlobsForRule(ruleName)
 
-  return getFinalSeverity(path, type, ruleGlobs || [])
+  return getFinalSeverity(path, ruleGlobs || [])
 }

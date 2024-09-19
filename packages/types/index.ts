@@ -27,7 +27,6 @@ export interface PartialDiagnostic {
   location: {
     /** Absolute path to a folder or a file that contains the issue. */
     path: string
-    type: 'file' | 'folder'
     line?: number
     column?: number
   }

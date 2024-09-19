@@ -20,7 +20,7 @@ const segmentsByPurpose = {
           if (BAD_NAMES.includes(segmentName)) {
             diagnostics.push({
               message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-              location: { path: segment.path, type: 'folder' },
+              location: { path: segment.path },
             })
           }
         }
@@ -30,7 +30,7 @@ const segmentsByPurpose = {
             if (BAD_NAMES.includes(segmentName)) {
               diagnostics.push({
                 message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-                location: { path: segment.path, type: 'folder' },
+                location: { path: segment.path },
               })
             }
           }

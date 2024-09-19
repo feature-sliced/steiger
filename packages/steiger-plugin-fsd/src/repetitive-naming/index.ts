@@ -40,10 +40,7 @@ const repetitiveNaming = {
           count >= sliceNames.length &&
           wordsInSliceNames.every((words) => words.includes(word))
         ) {
-          diagnostics.push({
-            message: `Repetitive word "${word}" in slice names.`,
-            location: { path: layer.path, type: 'folder' },
-          })
+          diagnostics.push({ message: `Repetitive word "${word}" in slice names.`, location: { path: layer.path } })
         }
       }
     }

@@ -52,23 +52,23 @@ it('reports errors on a project with bad segments', () => {
   expect(diagnostics).toEqual([
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('entities', 'user', 'components'), type: 'folder' },
+      location: { path: joinFromRoot('entities', 'user', 'components') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'helpers'), type: 'folder' },
+      location: { path: joinFromRoot('shared', 'helpers') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'hooks'), type: 'folder' },
+      location: { path: joinFromRoot('shared', 'hooks') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'modals'), type: 'folder' },
+      location: { path: joinFromRoot('shared', 'modals') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'utils'), type: 'folder' },
+      location: { path: joinFromRoot('shared', 'utils') },
     },
   ])
 })

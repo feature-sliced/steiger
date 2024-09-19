@@ -107,7 +107,7 @@ it('reports errors on a project with cross-imports in entities', async () => {
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx'), type: 'file' },
+      location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx') },
     },
   ])
 })
@@ -140,7 +140,7 @@ it('reports errors on a project where a feature imports from a page', async () =
   expect((await forbiddenImports.check(root)).diagnostics.sort()).toEqual([
     {
       message: `Forbidden import from higher layer "pages".`,
-      location: { path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx'), type: 'file' },
+      location: { path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx') },
     },
   ])
 })
@@ -182,11 +182,11 @@ it('reports errors in a project where a lower level imports from files that are 
   expect(diagnostics).toEqual([
     {
       message: `Forbidden import from higher layer "app".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'lib', 'count-cart-items.ts'), type: 'file' },
+      location: { path: joinFromRoot('src', 'entities', 'cart', 'lib', 'count-cart-items.ts') },
     },
     {
       message: `Forbidden import from higher layer "app".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'SmallCart.tsx'), type: 'file' },
+      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'SmallCart.tsx') },
     },
   ])
 })

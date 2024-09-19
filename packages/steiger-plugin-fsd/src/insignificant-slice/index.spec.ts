@@ -124,11 +124,11 @@ it('reports errors on a project with insignificant slices', async () => {
   expect((await insignificantSlice.check(root)).diagnostics.sort(compareMessages)).toEqual([
     {
       message: `This slice has no references. Consider removing it.`,
-      location: { path: joinFromRoot('entities', 'product'), type: 'folder' },
+      location: { path: joinFromRoot('entities', 'product') },
     },
     {
       message: `This slice has only one reference in slice "${join('pages', 'editor')}". Consider merging them.`,
-      location: { path: joinFromRoot('entities', 'user'), type: 'folder' },
+      location: { path: joinFromRoot('entities', 'user') },
     },
   ])
 })

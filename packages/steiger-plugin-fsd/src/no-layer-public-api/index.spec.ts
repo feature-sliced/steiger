@@ -50,13 +50,7 @@ it('reports errors on a project with index files on layer level', () => {
 
   const diagnostics = noLayerPublicApi.check(root).diagnostics
   expect(diagnostics).toEqual([
-    {
-      message: 'Layer "shared" should not have an index file',
-      location: { path: joinFromRoot('shared', 'index.ts'), type: 'file' },
-    },
-    {
-      message: 'Layer "pages" should not have an index file',
-      location: { path: joinFromRoot('pages', 'index.ts'), type: 'file' },
-    },
+    { message: 'Layer "shared" should not have an index file', location: { path: joinFromRoot('shared', 'index.ts') } },
+    { message: 'Layer "pages" should not have an index file', location: { path: joinFromRoot('pages', 'index.ts') } },
   ])
 })
