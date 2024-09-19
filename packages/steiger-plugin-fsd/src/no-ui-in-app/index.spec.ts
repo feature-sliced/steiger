@@ -3,7 +3,7 @@ import { expect, it } from 'vitest'
 import noUiInApp from './index.js'
 import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
-it('reports no errors on a project without "ui" segment in "app" layer', () => {
+it('reports no errors on a project without the "ui" segment on the "app" layer', () => {
   const root = parseIntoFsdRoot(`
     📂 shared
       📂 ui
@@ -20,7 +20,7 @@ it('reports no errors on a project without "ui" segment in "app" layer', () => {
   expect(noUiInApp.check(root)).toEqual({ diagnostics: [] })
 })
 
-it('reports errors on a project with "ui" segment in "app" layer', () => {
+it('reports errors on a project with the "ui" segment on the "app" layer', () => {
   const root = parseIntoFsdRoot(`
     📂 shared
       📂 ui
