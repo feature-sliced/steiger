@@ -1,25 +1,13 @@
-import { File, Folder, GlobalIgnore, Severity } from '@steiger/types'
+import { Folder, GlobalIgnore, Severity } from '@steiger/types'
 
 import { getGlobalIgnores, GlobGroup } from '../../models/config'
 import markFileSeverities from './mark-file-severities'
 import propagateSeverityToFolders from './propagate-severity-to-folders'
+import markDefault from './mark-default'
 import { SeverityMarkedFile, SeverityMarkedFolder } from './types'
 
 export interface VfsSeverityWizard {
   getSeverityForPath(path: string): string | null
-}
-
-export function markDefault(node: Folder | File): SeverityMarkedFolder | SeverityMarkedFile {
-  return node.type === 'folder'
-    ? {
-        ...node,
-        children: node.children.map((c) => markDefault(c)),
-        severity: 'off',
-      }
-    : {
-        ...node,
-        severity: 'off',
-      }
 }
 
 function markNodesAsExcludedForever(vfs: SeverityMarkedFolder, globalIgnores: Array<GlobalIgnore>) {

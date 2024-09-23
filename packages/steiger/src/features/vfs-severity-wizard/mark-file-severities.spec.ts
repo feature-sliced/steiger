@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { PublicSeverity } from '@steiger/types'
 
 import markFileSeverities from './mark-file-severities'
+import markDefault from './mark-default'
 import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
-import { markDefault } from './index'
 import { SeverityMarkedFolder } from './types'
 
 const files1 = parseIntoFsdRoot(
