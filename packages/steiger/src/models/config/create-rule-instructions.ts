@@ -1,4 +1,4 @@
-import { Config, ConfigObject, Severity } from '@steiger/types'
+import { Config, ConfigObject, PublicSeverity } from '@steiger/types'
 import { reduce, flatten, filter, pipe, map } from 'ramda'
 
 import { RuleInstructions } from './types'
@@ -34,7 +34,7 @@ export default function createRuleInstructions(config: Config): Record<string, R
   return config.reduce((acc: Record<string, RuleInstructions>, item) => {
     if (isConfigObject(item)) {
       Object.entries(item.rules).forEach(
-        ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
+        ([ruleName, severityOrTuple]: [string, PublicSeverity | [PublicSeverity, Record<string, unknown>]]) => {
           const ruleOptions: Record<string, unknown> | null = getOptions(severityOrTuple)
 
           if (ruleOptions) {

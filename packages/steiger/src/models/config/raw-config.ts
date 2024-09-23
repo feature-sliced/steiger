@@ -1,10 +1,12 @@
-import { BaseRuleOptions, ConfigObject, GlobalIgnore, Plugin, Severity } from '@steiger/types'
+import { BaseRuleOptions, ConfigObject, GlobalIgnore, Plugin, PublicSeverity } from '@steiger/types'
 
-export function getSeverity(severityOrTuple: Severity | [Severity, BaseRuleOptions]): Severity {
+export function getSeverity(severityOrTuple: PublicSeverity | [PublicSeverity, BaseRuleOptions]): PublicSeverity {
   return Array.isArray(severityOrTuple) ? severityOrTuple[0] : severityOrTuple
 }
 
-export function getOptions(severityOrTuple: Severity | [Severity, BaseRuleOptions]): BaseRuleOptions | null {
+export function getOptions(
+  severityOrTuple: PublicSeverity | [PublicSeverity, BaseRuleOptions],
+): BaseRuleOptions | null {
   return Array.isArray(severityOrTuple) ? severityOrTuple[1] : null
 }
 

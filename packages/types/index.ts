@@ -34,7 +34,7 @@ export interface PartialDiagnostic {
 
 export interface Diagnostic extends PartialDiagnostic {
   ruleName: string
-  severity: Exclude<Severity, 'off'>
+  severity: Exclude<PublicSeverity, 'off'>
   getRuleDescriptionUrl(ruleName: string): URL
 }
 
@@ -65,7 +65,9 @@ export type Fix =
 
 export type Config = Array<ConfigObject | Plugin | GlobalIgnore>
 
-export type Severity = 'off' | 'warn' | 'error'
+export type Severity = 'off' | 'warn' | 'error' | 'excluded'
+
+export type PublicSeverity = Exclude<Severity, 'excluded'>
 
 export type ConfigObject = {
   /** Globs of files to check */
@@ -74,7 +76,7 @@ export type ConfigObject = {
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
   rules: {
-    [ruleName: string]: Severity | [Severity, BaseRuleOptions]
+    [ruleName: string]: PublicSeverity | [PublicSeverity, BaseRuleOptions]
   }
 }
 

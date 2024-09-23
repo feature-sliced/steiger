@@ -2,7 +2,7 @@ import z from 'zod'
 
 import { getOptions, isConfigObject, isPlugin } from './raw-config'
 import { isEqual } from '../../shared/objects'
-import { BaseRuleOptions, Config, Plugin, Severity } from '@steiger/types'
+import { BaseRuleOptions, Config, Plugin, PublicSeverity } from '@steiger/types'
 
 function getAllRuleNames(plugins: Array<Plugin>) {
   const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
@@ -40,7 +40,7 @@ function validateRuleOptions(value: Config, ctx: z.RefinementCtx) {
   value.forEach((configObject) => {
     if (isConfigObject(configObject)) {
       Object.entries(configObject.rules).forEach(
-        ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
+        ([ruleName, severityOrTuple]: [string, PublicSeverity | [PublicSeverity, Record<string, unknown>]]) => {
           const prevOptions = ruleToOptions[ruleName]
           const ruleOptions: BaseRuleOptions | null = getOptions(severityOrTuple)
 
