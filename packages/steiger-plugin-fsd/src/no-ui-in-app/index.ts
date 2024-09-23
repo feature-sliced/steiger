@@ -1,11 +1,11 @@
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/types'
 import { NAMESPACE } from '../constants.js'
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
 
 const noUiInApp = {
   name: `${NAMESPACE}/no-ui-in-app`,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     const layers = getLayers(root)
 
