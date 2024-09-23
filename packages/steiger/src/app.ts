@@ -6,7 +6,7 @@ import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $enabledRules, getEnabledRules, getGlobsForRule } from './models/config'
 import { runRule } from './features/run-rule'
-import CreateVfsSeverityWizard, { VfsSeverityWizard } from './features/vfs-severity-wizard'
+import CreateVfsSeverityWizard from './features/vfs-severity-wizard'
 import { DiagnosticSeverity } from './shared/severity'
 
 function getRuleDescriptionUrl(ruleName: string) {
@@ -14,30 +14,29 @@ function getRuleDescriptionUrl(ruleName: string) {
 }
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const ruleToVfsSeverityWizard: Record<string, VfsSeverityWizard> = {}
-
-  rules.forEach((rule) => {
-    const globsForRule = getGlobsForRule(rule.name)
-
-    if (!globsForRule) {
-      throw new Error(`Severity settings for rule ${rule.name} are not found but rule is enabled`)
-    }
-
-    ruleToVfsSeverityWizard[rule.name] = CreateVfsSeverityWizard(vfs, globsForRule)
-  })
-
   const ruleResults = await Promise.all(rules.map((rule) => runRule(vfs, rule)))
   return ruleResults.flatMap((r, ruleResultsIndex) => {
+    if (r.diagnostics.length === 0) {
+      return []
+    }
+
     const ruleName = rules[ruleResultsIndex].name
+    const globsForRule = getGlobsForRule(ruleName)
+
+    if (!globsForRule) {
+      throw new Error(`Severity settings for rule ${ruleName} are not found but rule is enabled`)
+    }
+
+    const vfsSeverityWizard = CreateVfsSeverityWizard(vfs, globsForRule)
 
     return r.diagnostics
       .filter((d) => {
-        const severity = ruleToVfsSeverityWizard[ruleName].getSeverityForPath(d.location.path)
+        const severity = vfsSeverityWizard.getSeverityForPath(d.location.path)
 
         return severity !== 'off' && severity !== 'excluded'
       })
       .map((d) => {
-        const diagnosticSeverity = ruleToVfsSeverityWizard[ruleName].getSeverityForPath(d.location.path)
+        const diagnosticSeverity = vfsSeverityWizard.getSeverityForPath(d.location.path)
 
         return {
           ...d,

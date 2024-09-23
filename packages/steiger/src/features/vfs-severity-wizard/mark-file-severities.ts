@@ -1,7 +1,4 @@
-import path from 'node:path'
-
-import { File, Folder } from '@steiger/types'
-import { pipe } from 'ramda'
+import { posix } from 'node:path'
 
 import { GlobGroup } from '../../models/config'
 import { createFilterAccordingToGlobs } from '../../shared/globs'
@@ -14,12 +11,12 @@ function convertToSingleFolderCase(globGroup: GlobGroup): GlobGroup {
     return !part.includes('.') && !part.includes('*')
   }
 
-  function mapToSpecialCase(glob: string) {
-    const globParts = glob.split(path.posix.sep)
+  function mapToSingleFolderCase(glob: string) {
+    const globParts = glob.split(posix.sep)
     const lastPart = globParts[globParts.length - 1]
 
     if (isSingleFolderGlob(lastPart)) {
-      return [...globParts.slice(0, -1), lastPart, '*'].join(path.posix.sep)
+      return [...globParts.slice(0, -1), lastPart, '*'].join(posix.sep)
     }
 
     return glob
@@ -27,24 +24,24 @@ function convertToSingleFolderCase(globGroup: GlobGroup): GlobGroup {
 
   return {
     ...globGroup,
-    files: globGroup.files.map(mapToSpecialCase),
-    ignores: globGroup.ignores.map(mapToSpecialCase),
+    files: globGroup.files.map(mapToSingleFolderCase),
+    ignores: globGroup.ignores.map(mapToSingleFolderCase),
   }
 }
 
 export default function markFileSeverities(globs: Array<GlobGroup>, vfs: SeverityMarkedFolder): SeverityMarkedFolder {
   const vfsCopy = copyFsEntity(vfs, true)
 
-  const fileMarkingPipeline = pipe((fsEntity) =>
-    fsEntity.type === 'folder' || fsEntity.severity === 'excluded'
-      ? fsEntity
+  function markIfFile(node: SeverityMarkedFolder | SeverityMarkedFile) {
+    return node.type === 'folder' || node.severity === 'excluded'
+      ? node
       : globs.reduce((acc, { severity, files, ignores }) => {
           const isApplied = createFilterAccordingToGlobs({ inclusions: files, exclusions: ignores })
           let severityApplies = isApplied(acc.path)
 
           // Special case for single folder globs like 'src/shared' that should apply to all files
           // that are direct children of 'src/shared'
-          if (!severityApplies && fsEntity.type === 'file') {
+          if (!severityApplies && node.type === 'file') {
             const singleFolderCaseGlobs = convertToSingleFolderCase({ severity, files, ignores })
             const isCaseApplied = createFilterAccordingToGlobs({
               inclusions: singleFolderCaseGlobs.files,
@@ -60,18 +57,18 @@ export default function markFileSeverities(globs: Array<GlobGroup>, vfs: Severit
                 severity,
               }
             : acc
-        }, fsEntity),
-  )
+        }, node)
+  }
 
-  function walk(node: Folder | File): Folder | SeverityMarkedFile {
+  function walk(node: SeverityMarkedFolder | SeverityMarkedFile): SeverityMarkedFolder | SeverityMarkedFile {
     if (node.type === 'folder') {
       return {
         ...node,
-        children: node.children.map(walk),
+        children: (node.children as Array<SeverityMarkedFolder | SeverityMarkedFile>).map(walk),
       }
     }
 
-    return fileMarkingPipeline(node)
+    return markIfFile(node)
   }
 
   return <SeverityMarkedFolder>walk(vfsCopy)

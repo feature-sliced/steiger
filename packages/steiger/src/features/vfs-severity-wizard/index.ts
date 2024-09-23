@@ -10,6 +10,9 @@ export interface VfsSeverityWizard {
   getSeverityForPath(path: string): string | null
 }
 
+/**
+ * Marks nodes that match global ignores as excluded (a special inner severity that means that the node is excluded forever and cannot be overridden)
+ * */
 function markNodesAsExcludedForever(vfs: SeverityMarkedFolder, globalIgnores: Array<GlobalIgnore>) {
   const globalIgnoresTurnedIntoGlobGroups = globalIgnores.map((i) => ({
     severity: 'excluded' as Severity,
@@ -21,15 +24,14 @@ function markNodesAsExcludedForever(vfs: SeverityMarkedFolder, globalIgnores: Ar
 }
 
 export default function CreateVfsSeverityWizard(vfs: Folder, globGroups: Array<GlobGroup>): VfsSeverityWizard {
-  const afterGlobalIgnores = markNodesAsExcludedForever(<SeverityMarkedFolder>markDefault(vfs), getGlobalIgnores())
-
-  const severityMarkedVfs = propagateSeverityToFolders(markFileSeverities(globGroups, afterGlobalIgnores))
+  const vfsWithIgnoresMarked = markNodesAsExcludedForever(<SeverityMarkedFolder>markDefault(vfs), getGlobalIgnores())
+  const fullSeverityMarkedVfs = propagateSeverityToFolders(markFileSeverities(globGroups, vfsWithIgnoresMarked))
 
   return {
     getSeverityForPath(path: string) {
-      let severity = 'warn'
+      let severity = null
 
-      const stack: Array<SeverityMarkedFile | SeverityMarkedFolder> = [severityMarkedVfs]
+      const stack: Array<SeverityMarkedFile | SeverityMarkedFolder> = [fullSeverityMarkedVfs]
 
       while (stack.length > 0) {
         const node = stack.pop()!
