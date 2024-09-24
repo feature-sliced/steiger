@@ -26,4 +26,4 @@ Examples of project structures that fail this rule:
 
 ## Rationale
 
-The methodology contains a standardized set of layers. By enforcing uniform naming conventions, this rule checks for any potential typos, improving the quality of projects.
+The methodology contains a standardized set of layers. Enforcing these naming conventions is important for other developers, as well as for other rules of the linter to work correctly.
