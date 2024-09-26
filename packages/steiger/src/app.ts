@@ -4,47 +4,49 @@ import { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getGlobsForRule } from './models/config'
+import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/config'
 import { runRule } from './features/run-rule'
-import CreateVfsSeverityWizard from './features/vfs-severity-wizard'
-import { DiagnosticSeverity } from './shared/severity'
+import removeGlobalIgnoreFromVfs from './features/remove-global-ignores-from-vfs'
+import calculateFinalSeverities from './features/calculate-diagnostic-severities'
+import { lift } from 'ramda'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
+const mergeDiagnosticsWithSeverity = lift((diagnostic, severity) => ({ ...diagnostic, severity }))
+
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const ruleResults = await Promise.all(rules.map((rule) => runRule(vfs, rule)))
+  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
+
+  const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
   return ruleResults.flatMap((r, ruleResultsIndex) => {
-    if (r.diagnostics.length === 0) {
+    const { diagnostics } = r
+    if (diagnostics.length === 0) {
       return []
     }
 
     const ruleName = rules[ruleResultsIndex].name
-    const globsForRule = getGlobsForRule(ruleName)
+    const severities = calculateFinalSeverities(
+      vfsWithoutGlobalIgnores,
+      ruleName,
+      diagnostics.map((d) => d.location.path),
+    )
 
-    if (!globsForRule) {
-      throw new Error(`Severity settings for rule ${ruleName} are not found but rule is enabled`)
+    if (severities.some((s) => s === 'off' || s === null)) {
+      throw new Error(
+        `Node with path  described in a diagnostic has severity off or null that literally must not happen!`,
+      )
     }
 
-    const vfsSeverityWizard = CreateVfsSeverityWizard(vfs, globsForRule)
-
-    return r.diagnostics
-      .filter((d) => {
-        const severity = vfsSeverityWizard.getSeverityForPath(d.location.path)
-
-        return severity !== 'off' && severity !== 'excluded'
-      })
-      .map((d) => {
-        const diagnosticSeverity = vfsSeverityWizard.getSeverityForPath(d.location.path)
-
-        return {
-          ...d,
-          ruleName,
-          getRuleDescriptionUrl,
-          severity: <DiagnosticSeverity>diagnosticSeverity,
-        }
-      })
+    return mergeDiagnosticsWithSeverity(
+      diagnostics.map((d) => ({
+        ...d,
+        ruleName,
+        getRuleDescriptionUrl,
+      })),
+      severities,
+    )
   })
 }
 

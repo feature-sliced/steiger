@@ -1,11 +1,19 @@
 import { Folder, Rule } from '@steiger/types'
+import { getGlobsForRule, getRuleOptions } from '../../models/config'
+import { prepareVfsForRuleRun } from './prepare-vfs-for-rule-run'
 
-import { getRuleOptions } from '../../models/config'
+export async function runRule(vfs: Folder, rule: Rule) {
+  const globsForRule = getGlobsForRule(rule.name)
 
-export async function runRule(vfs: Folder | null, rule: Rule) {
-  if (!vfs) {
+  if (!globsForRule) {
+    throw new Error(`Glob settings for rule ${rule.name} are not found but rule is enabled`)
+  }
+
+  const finalVfs = prepareVfsForRuleRun(vfs, globsForRule)
+
+  if (!finalVfs) {
     return Promise.resolve({ diagnostics: [] })
   }
 
-  return Promise.resolve(rule.check(vfs, getRuleOptions(rule.name) || undefined))
+  return Promise.resolve(rule.check(finalVfs, getRuleOptions(rule.name) || undefined))
 }

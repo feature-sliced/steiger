@@ -1,9 +1,11 @@
 import { expect, it, describe } from 'vitest'
 
 import { createFilterAccordingToGlobs } from './globs'
+import { minimatch } from 'minimatch'
 
 describe('createFilterAccordingToGlobs', () => {
   it('should return true if no globs are provided', () => {
+    console.log(minimatch('/src/shared/ui', '/src/shared/*'))
     const filter = createFilterAccordingToGlobs({
       inclusions: [],
       exclusions: [],

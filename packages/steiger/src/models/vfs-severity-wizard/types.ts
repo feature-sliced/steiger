@@ -5,5 +5,5 @@ export interface SeverityMarkedFile extends File {
 }
 
 export interface SeverityMarkedFolder extends Folder {
-  severity: Severity
+  children: Array<SeverityMarkedFolder | SeverityMarkedFile>
 }

@@ -1,10 +1,9 @@
-import { PublicSeverity } from '@steiger/types'
+import { Severity } from '@steiger/types'
 
 export enum SeverityHierarchy {
-  excluded = 0,
-  off = 1,
-  warn = 2,
-  error = 3,
+  off = 0,
+  warn = 1,
+  error = 2,
 }
 
-export type DiagnosticSeverity = Exclude<PublicSeverity, 'off' | 'excluded'>
+export type DiagnosticSeverity = Exclude<Severity, 'off'>
