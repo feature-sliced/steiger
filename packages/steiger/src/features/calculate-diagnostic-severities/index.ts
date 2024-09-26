@@ -1,5 +1,5 @@
 import { getGlobsForRule } from '../../models/config'
-import { calculateSeveritiesForPaths } from '../../models/vfs-severity-wizard'
+import { calculateSeveritiesForPaths } from '../../models/vfs-severity-map'
 import { Folder, Severity } from '@steiger/types'
 
 export default function calculateFinalSeverities(
