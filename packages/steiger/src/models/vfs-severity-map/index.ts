@@ -5,16 +5,17 @@ import markFileSeverities from './mark-file-severities'
 import { SeverityMarkedFile, SeverityMarkedFolder } from './types'
 import calculateFolderSeverity from './calculate-folder-severity'
 import toPlainVfs from './to-plain-vfs'
+import { removeEmptyFolders } from '../../shared/file-system'
+
+function removeOffFiles(node: SeverityMarkedFolder): SeverityMarkedFolder {
+  const children = node.children
+    .map((node) => (node.type === 'folder' ? removeOffFiles(node) : node))
+    .filter((node) => (node.type === 'folder' ? true : node.severity !== 'off'))
+  return { ...node, children }
+}
 
 function getWithoutOff(vfs: Folder, globGroups: Array<GlobGroup>) {
   const severityMarkedVfs = markFileSeverities(globGroups, vfs)
-
-  function removeOffFiles(node: SeverityMarkedFolder): SeverityMarkedFolder {
-    const children = node.children
-      .map((node) => (node.type === 'folder' ? node : node.severity !== 'off'))
-      .filter(Boolean) as Array<SeverityMarkedFolder>
-    return { ...node, children }
-  }
 
   return removeOffFiles(severityMarkedVfs)
 }
@@ -22,7 +23,7 @@ function getWithoutOff(vfs: Folder, globGroups: Array<GlobGroup>) {
 // It's a wrapper around getWithoutOff to bring the result to the plain VFS format
 // because severity-marked VFS is an internal format for this module and should not leak outside
 export function getVfsWithoutOffNodes(vfs: Folder, globGroups: Array<GlobGroup>) {
-  return toPlainVfs(getWithoutOff(vfs, globGroups))
+  return removeEmptyFolders(toPlainVfs(getWithoutOff(vfs, globGroups)))
 }
 
 export function calculateSeveritiesForPaths(vfs: Folder, globGroups: Array<GlobGroup>, paths: Array<string>) {

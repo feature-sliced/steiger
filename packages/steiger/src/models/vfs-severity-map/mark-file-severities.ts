@@ -2,7 +2,7 @@ import { File, Folder } from '@steiger/types'
 
 import { GlobGroup } from '../config'
 import { createFilterAccordingToGlobs } from '../../shared/globs'
-import { copyFsEntity } from '../../shared/file-system'
+import { copyNode } from '../../shared/file-system'
 import { SeverityMarkedFile, SeverityMarkedFolder } from './types'
 import { pipe } from 'ramda'
 
@@ -16,7 +16,7 @@ function markDefault(node: Folder | File): Folder | SeverityMarkedFile {
 }
 
 export default function markFileSeverities(globs: Array<GlobGroup>, vfs: Folder): SeverityMarkedFolder {
-  const vfsCopy = copyFsEntity(vfs, true)
+  const vfsCopy = copyNode(vfs, true)
 
   const fileMarkingPipeline = pipe(markDefault, markIfFile)
 
