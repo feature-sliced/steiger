@@ -46,7 +46,10 @@ flowchart BT
   end
 
   subgraph entities
-    subgraph entities/user["user (only one reference)"]
+    subgraph entities/user["user (only one reference, @x doesn't count)"]
+      subgraph entities/user/at-x[@x]
+        entities/user/at-x/product.ts[product.ts]
+      end
       subgraph entities/user/ui[ui]
         entities/user/ui/UserAvatar.tsx[UserAvatar.tsx]
       end
@@ -54,7 +57,9 @@ flowchart BT
     end
 
     subgraph entities/product["product (no references)"]
-      entities/product/ui[ui]
+      subgraph entities/product/ui[ui]
+        entities/product/ui/ProductCard.tsx[ProductCard.tsx]
+      end
       entities/product/index.ts[index.ts]
     end
   end
@@ -72,13 +77,16 @@ flowchart BT
   shared/ui/Button.tsx --> shared/ui/styles.ts
   shared/ui/TextField.tsx --> shared/ui/styles.ts
   entities/user/ui/UserAvatar.tsx --> shared/ui/index.ts
+  entities/product/ui/ProductCard.tsx --> entities/user/at-x/product.ts
   pages/editor/ui/Editor.tsx --❗️--> entities/user/index.ts
   pages/editor/ui/EditorPage.tsx --> shared/ui/index.ts
   pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
 
   style entities/user fill:pink
   style entities/user/ui fill:pink
+  style entities/user/at-x fill:pink
   style entities/product fill:pink
+  style entities/product/ui fill:pink
 ```
 
 ## Rationale

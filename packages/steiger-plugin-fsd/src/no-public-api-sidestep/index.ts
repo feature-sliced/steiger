@@ -44,7 +44,7 @@ const noPublicApiSidestep = {
         }
 
         if (isSliced(dependencyLocation.layerName)) {
-          if (dependencyLocation.segmentName !== null) {
+          if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== '@x') {
             diagnostics.push({
               message: `Forbidden sidestep of public API when importing from "${dependency}".`,
               location: { path: sourceFile.file.path },

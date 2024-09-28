@@ -23,12 +23,20 @@ const noReservedFolderNames = {
 
         for (const violatingFolder of findAllRecursively(
           child,
-          (entry) => entry.type === 'folder' && conventionalSegmentNames.includes(basename(entry.path)),
+          (entry) => entry.type === 'folder' && conventionalSegmentNames.concat('@x').includes(basename(entry.path)),
         )) {
-          diagnostics.push({
-            message: `Having a folder with the name "${basename(violatingFolder.path)}" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.`,
-            location: { path: violatingFolder.path },
-          })
+          const reservedName = basename(violatingFolder.path)
+          if (reservedName === '@x') {
+            diagnostics.push({
+              message: `Having a folder with the name "@x" inside a segment could be confusing because that name is reserved for cross-import public APIs. Consider renaming it.`,
+              location: { path: violatingFolder.path },
+            })
+          } else {
+            diagnostics.push({
+              message: `Having a folder with the name "${basename(violatingFolder.path)}" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.`,
+              location: { path: violatingFolder.path },
+            })
+          }
         }
       }
     }
