@@ -1,7 +1,7 @@
 import { File, Folder } from '@steiger/types'
 
 import { GlobGroup } from '../config'
-import { createFilterAccordingToGlobs } from '../../shared/globs'
+import { createFilterAccordingToGlobs } from '../../shared/globs/create-filter-according-to-globs'
 import { copyNode } from '../../shared/file-system'
 import { SeverityMarkedFile, SeverityMarkedFolder } from './types'
 import { pipe } from 'ramda'

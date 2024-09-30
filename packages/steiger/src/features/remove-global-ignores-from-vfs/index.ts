@@ -1,5 +1,5 @@
 import { Folder, File, GlobalIgnore } from '@steiger/types'
-import { createFilterAccordingToGlobs } from '../../shared/globs'
+import { createFilterAccordingToGlobs } from '../../shared/globs/create-filter-according-to-globs'
 import { removeEmptyFolders } from '../../shared/file-system'
 
 export default function removeGlobalIgnoreFromVfs(vfs: Folder, globalIgnores: Array<GlobalIgnore>): Folder {

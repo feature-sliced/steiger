@@ -1,6 +1,6 @@
 import { expect, it, describe } from 'vitest'
 
-import { createFilterAccordingToGlobs } from './globs'
+import { createFilterAccordingToGlobs } from './create-filter-according-to-globs'
 import { minimatch } from 'minimatch'
 
 describe('createFilterAccordingToGlobs', () => {
