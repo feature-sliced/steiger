@@ -2,10 +2,12 @@ import * as fs from 'node:fs'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import { getIndex, getLayers, getSegments, isSliced, resolveImport } from '@feature-sliced/filesystem'
+import { getIndex, getLayers, getSegments, isSliced } from '@feature-sliced/filesystem'
 import type { Folder, File, Diagnostic, Rule } from '@steiger/types'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
+import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
+import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
@@ -13,16 +15,17 @@ const noPublicApiSidestep = {
   name: `${NAMESPACE}/no-public-api-sidestep`,
   async check(root) {
     const diagnostics: Array<Diagnostic> = []
-    const { tsconfig } = await parseNearestTsConfig(root.path)
+    const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
+    const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
     const sourceFileIndex = indexSourceFiles(root)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
       for (const dependency of dependencies) {
-        const resolvedDependency = resolveImport(
+        const resolvedDependency = resolveDependency(
           dependency,
           sourceFile.file.path,
-          tsconfig?.compilerOptions ?? {},
+          tsConfigs,
           fs.existsSync,
           fs.existsSync,
         )
