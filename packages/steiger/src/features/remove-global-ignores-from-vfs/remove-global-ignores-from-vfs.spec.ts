@@ -1,6 +1,6 @@
 import { expect, it, describe } from 'vitest'
 
-import removeGlobalIgnoresFromVfs from './index'
+import removeGlobalIgnoresFromVfs from './remove-global-ignores-from-vfs'
 import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
 
 describe('removeGlobalIgnoresFromVfs', () => {
