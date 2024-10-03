@@ -1,5 +1,4 @@
 import { posix, sep } from 'node:path'
-import { pipe } from 'ramda'
 import { Config } from '@steiger/types'
 
 import { isConfigObject, isConfiguration } from './raw-config'
@@ -24,9 +23,10 @@ export function transformGlobs(config: Config, configLocationPath: string | null
     return config
   }
 
-  const globsTransformationPipeline = pipe(stripTrailingSlashes, (globs) =>
-    convertRelativeGlobsToAbsolute(configLocationPath, globs),
-  )
+  const globsTransformationPipeline = function (globs: Array<string>) {
+    const convertToAbsolute = (globs: Array<string>) => convertRelativeGlobsToAbsolute(configLocationPath, globs)
+    return convertToAbsolute(stripTrailingSlashes(globs))
+  }
 
   return config.map((item) => {
     if (!isConfiguration(item)) {

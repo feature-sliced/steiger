@@ -8,13 +8,10 @@ import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/confi
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
-import { lift } from 'ramda'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
-
-const mergeDiagnosticsWithSeverity = lift((diagnostic, severity) => ({ ...diagnostic, severity }))
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
@@ -39,14 +36,12 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
       )
     }
 
-    return mergeDiagnosticsWithSeverity(
-      diagnostics.map((d) => ({
-        ...d,
-        ruleName,
-        getRuleDescriptionUrl,
-      })),
-      severities,
-    )
+    return diagnostics.map((d, index) => ({
+      ...d,
+      ruleName,
+      getRuleDescriptionUrl,
+      severity: severities[index],
+    }))
   })
 }
 

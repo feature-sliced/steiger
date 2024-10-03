@@ -1,5 +1,4 @@
 import { Config, ConfigObject, Severity } from '@steiger/types'
-import { reduce, flatten, filter, pipe, map } from 'ramda'
 
 import { RuleInstructions } from './types'
 import { getOptions, getSeverity, isConfigObject } from './raw-config'
@@ -15,18 +14,18 @@ function extractRuleNames(configObject: ConfigObject) {
   return Object.keys(configObject.rules)
 }
 
-const preCreateRuleInstructions: (l: Config) => Record<string, RuleInstructions> = pipe(
-  filter(isConfigObject),
-  map(extractRuleNames),
-  flatten,
-  reduce(
-    (acc, item: string) => ({
-      ...acc,
-      [item]: createEmptyInstructions(),
-    }),
-    {},
-  ),
-)
+function preCreateRuleInstructions(config: Config) {
+  return config
+    .filter(isConfigObject)
+    .flatMap(extractRuleNames)
+    .reduce(
+      (acc, item) => ({
+        ...acc,
+        [item]: createEmptyInstructions(),
+      }),
+      {},
+    )
+}
 
 export default function createRuleInstructions(config: Config): Record<string, RuleInstructions> {
   const ruleNameToInstructions: Record<string, RuleInstructions> = preCreateRuleInstructions(config)
