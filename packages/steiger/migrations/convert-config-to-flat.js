@@ -68,6 +68,7 @@ const ruleNames = [
   'repetitive-naming',
   'segments-by-purpose',
   'shared-lib-grouping',
+  'typo-in-layer-name',
   'no-processes',
   'import-locality',
 ]
