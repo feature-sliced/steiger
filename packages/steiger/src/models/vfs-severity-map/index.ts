@@ -1,6 +1,6 @@
 import { Folder, Severity } from '@steiger/types'
 
-import { GlobGroup } from '../config'
+import { GlobGroupWithSeverity } from '../config'
 import markFileSeverities from './mark-file-severities'
 import { SeverityMarkedFile, SeverityMarkedFolder } from './types'
 import calculateFolderSeverity from './calculate-folder-severity'
@@ -14,7 +14,7 @@ function removeOffFiles(node: SeverityMarkedFolder): SeverityMarkedFolder {
   return { ...node, children }
 }
 
-function getWithoutOff(vfs: Folder, globGroups: Array<GlobGroup>) {
+function getWithoutOff(vfs: Folder, globGroups: Array<GlobGroupWithSeverity>) {
   const severityMarkedVfs = markFileSeverities(globGroups, vfs)
 
   return removeOffFiles(severityMarkedVfs)
@@ -22,11 +22,15 @@ function getWithoutOff(vfs: Folder, globGroups: Array<GlobGroup>) {
 
 // It's a wrapper around getWithoutOff to bring the result to the plain VFS format
 // because severity-marked VFS is an internal format for this module and should not leak outside
-export function getVfsWithoutOffNodes(vfs: Folder, globGroups: Array<GlobGroup>) {
+export function getVfsWithoutOffNodes(vfs: Folder, globGroups: Array<GlobGroupWithSeverity>) {
   return removeEmptyFolders(toPlainVfs(getWithoutOff(vfs, globGroups)))
 }
 
-export function calculateSeveritiesForPaths(vfs: Folder, globGroups: Array<GlobGroup>, paths: Array<string>) {
+export function calculateSeveritiesForPaths(
+  vfs: Folder,
+  globGroups: Array<GlobGroupWithSeverity>,
+  paths: Array<string>,
+) {
   const vfsWithoutOff = getWithoutOff(vfs, globGroups)
 
   const severities: Array<Severity | null> = new Array(paths.length).fill(null)

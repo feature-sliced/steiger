@@ -1,27 +1,31 @@
 import { File, Folder } from '@steiger/types'
 
-export function removeEmptyFolders(node: Folder): Folder {
-  const children = node.children
-    .map((node) => (node.type === 'folder' ? removeEmptyFolders(node) : node))
-    .filter((node) => (node.type === 'folder' ? node.children.length > 0 : true))
+export function isPathInTree(vfs: Folder, paths: string | Array<string>) {
+  const pathsToCheck = Array.isArray(paths) ? paths : [paths]
+  const results: Array<boolean> = new Array(pathsToCheck.length).fill(false)
+  let found = 0
 
-  return {
-    ...node,
-    children,
-  }
-}
+  const stack: Array<File | Folder> = [vfs]
 
-export function copyNode<T extends Folder | File>(fsEntity: T, deep: boolean = false) {
-  if (fsEntity.type === 'folder') {
-    const newChildren: Array<Folder | File> = deep
-      ? fsEntity.children.map((child) => (child.type === 'folder' ? copyNode(child, true) : child))
-      : []
+  while (stack.length > 0) {
+    const node = stack.pop()!
+    const currentPathIndex = pathsToCheck.indexOf(node.path)
 
-    return {
-      ...fsEntity,
-      children: newChildren,
+    if (currentPathIndex !== -1) {
+      results[currentPathIndex] = true
+      found++
+    }
+
+    if (found === pathsToCheck.length) {
+      break
+    }
+
+    if (node.type === 'folder') {
+      for (let i = 0; i < node.children.length; i++) {
+        stack.push(node.children[i])
+      }
     }
   }
 
-  return { ...fsEntity }
+  return typeof paths === 'string' ? results[0] : results
 }

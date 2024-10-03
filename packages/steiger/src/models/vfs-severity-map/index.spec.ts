@@ -3,11 +3,11 @@ import { Folder } from '@steiger/types'
 
 import { joinFromRoot } from '../../_lib/prepare-test'
 import { calculateSeveritiesForPaths, getVfsWithoutOffNodes } from './index'
-import { GlobGroup } from '../config'
+import { GlobGroupWithSeverity } from '../config'
 
 describe('vfs-severity-wizard', () => {
   it('should return vfs without off severity', () => {
-    const globGroups: Array<GlobGroup> = [
+    const globGroups: Array<GlobGroupWithSeverity> = [
       { files: [], ignores: [], severity: 'error' },
       {
         files: ['**/device-detect.ts', '**/Button.tsx'],
@@ -79,7 +79,7 @@ describe('vfs-severity-wizard', () => {
   })
 
   it('should find severities for the passed paths', () => {
-    const globGroups: Array<GlobGroup> = [
+    const globGroups: Array<GlobGroupWithSeverity> = [
       { files: [], ignores: [], severity: 'error' },
       {
         files: ['**/device-detect.ts', '**/Button.tsx'],

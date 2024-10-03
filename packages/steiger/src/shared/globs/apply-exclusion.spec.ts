@@ -1,7 +1,8 @@
-import { applyExclusion, not } from './index'
 import { describe, expect, it } from 'vitest'
+
+import { applyExclusion } from './apply-exclusion'
+import { not } from './not'
 import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
-//;('📂 📄')
 
 describe('applyExclusion', () => {
   it('should apply exclusions with a normal glob group', () => {
@@ -166,6 +167,51 @@ describe('applyExclusion', () => {
         ignores: [],
       }),
     ]
+
+    expect(applyExclusion(vfs, globs)).toEqual(expectedVfs)
+  })
+
+  it('should correctly apply exclusions for a special case', () => {
+    const globs = [not({ files: [], ignores: [] }), { files: ['/src/shared/ui/Button.ts'], ignores: [] }]
+
+    const vfs = parseIntoFsdRoot(
+      `
+      📂 shared
+        📂 ui
+          📄 Button.ts
+          📄 Button.spec.ts
+          📄 Input.ts
+          📄 Input.spec.ts
+          📄 index.ts
+        📂 lib
+          📄 get-query-params.ts
+          📄 get-query-params.spec.ts
+          📄 device-detection.ts
+          📄 device-detection.spec.ts
+          📄 index.ts
+      📂 entities
+        📂 user
+          📂 ui
+            📄 UserAvatar.ts
+            📄 UserAvatar.spec.ts
+          📄 Input.ts
+      📂 pages
+        📂 profile
+          📄 index.ts
+        📂 main
+          📄 index.ts
+      `,
+      joinFromRoot('src'),
+    )
+
+    const expectedVfs = parseIntoFsdRoot(
+      `
+      📂 shared
+        📂 ui
+          📄 Button.ts
+      `,
+      joinFromRoot('src'),
+    )
 
     expect(applyExclusion(vfs, globs)).toEqual(expectedVfs)
   })

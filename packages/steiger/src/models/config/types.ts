@@ -1,12 +1,11 @@
 import { Severity, BaseRuleOptions } from '@steiger/types'
+import { GlobGroup } from '../../shared/globs'
 
-export interface GlobGroup {
+export interface GlobGroupWithSeverity extends GlobGroup {
   severity: Severity
-  files: Array<string>
-  ignores: Array<string>
 }
 
 export interface RuleInstructions {
   options: BaseRuleOptions | null
-  globGroups: Array<GlobGroup>
+  globGroups: Array<GlobGroupWithSeverity>
 }

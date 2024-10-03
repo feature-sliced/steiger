@@ -9,7 +9,7 @@ import { transformGlobs } from './transform-globs'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
-export { GlobGroup } from './types'
+export { GlobGroupWithSeverity } from './types'
 
 export const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
 const setRuleInstructions = createEvent<RuleInstructionsPerRule>()

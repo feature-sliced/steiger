@@ -6,8 +6,8 @@ import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
 import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/config'
 import { runRule } from './features/run-rule'
-import removeGlobalIgnoreFromVfs from './features/remove-global-ignores-from-vfs'
-import calculateFinalSeverities from './features/calculate-diagnostic-severities'
+import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
+import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
 import { lift } from 'ramda'
 
 function getRuleDescriptionUrl(ruleName: string) {
