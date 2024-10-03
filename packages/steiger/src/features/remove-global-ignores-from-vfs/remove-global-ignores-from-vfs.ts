@@ -1,13 +1,9 @@
 import { Folder, GlobalIgnore } from '@steiger/types'
 import { applyExclusion } from '../../shared/globs'
+import { mergeGlobGroups } from '../../shared/globs/merge-glob-groups'
 
-// Todo: move this to shared/globs
 function turnGlobalIgnoresIntoSingleGlobGroup(globalIgnores: Array<GlobalIgnore>) {
-  const allIgnores = globalIgnores.reduce<Array<string>>((acc, { ignores }) => [...acc, ...ignores], [])
-  return {
-    files: [],
-    ignores: allIgnores,
-  }
+  return mergeGlobGroups(globalIgnores.map(({ ignores }) => ({ files: [], ignores })))
 }
 
 export default function removeGlobalIgnoreFromVfs(vfs: Folder, globalIgnores: Array<GlobalIgnore>): Folder {
