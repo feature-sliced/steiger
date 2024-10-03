@@ -30,12 +30,6 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
       diagnostics.map((d) => d.location.path),
     )
 
-    if (severities.some((s) => s === 'off' || s === null)) {
-      throw new Error(
-        `Node with path  described in a diagnostic has severity off or null that literally must not happen!`,
-      )
-    }
-
     return diagnostics.map((d, index) => ({
       ...d,
       ruleName,

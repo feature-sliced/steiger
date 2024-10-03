@@ -8,7 +8,7 @@ export default function calculateFinalSeverities(
   vfs: Folder,
   ruleName: string,
   paths: Array<string>,
-): Array<Severity | null> {
+): Array<Exclude<Severity, 'off'>> {
   const globGroups = getGlobsForRule(ruleName)
 
   if (!globGroups) {
