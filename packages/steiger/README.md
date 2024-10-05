@@ -47,6 +47,7 @@ The config file shape is highly inspired by ESLint's config file, so if you have
 Here are some rules on how configuration is processed:
 
 - Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
+- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and remove files from the linter sight forever, so you cannot re-assign severity for them in other later objects.
 - You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
 
 Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
@@ -79,6 +80,18 @@ export default defineConfig([
   },
 ])
 ```
+
+### Glob matching
+
+All globs are matched only against files, folder severities are computed based on the files inside them. The formula is simple: the folder severity is the highest severity of files inside it (from highest to lowest: error, warn, off).
+
+**Glob examples**:
+
+- `./src/shared/**` - matches all files in the `shared` folder and its subfolders
+- `./src/shared/*` - matches all files that are direct children of the `shared` folder
+- `./src/shared` - based on the fact that globs are matched against files, this one matches only `shared` file (without an extension) inside the `src` folder
+- `**/__mocks__/**` - matches all files in all `__mocks__` folders throughout the project
+- `**/*.(test|spec).ts` - matches all test files in the project
 
 ### Migration from 0.4.0
 
