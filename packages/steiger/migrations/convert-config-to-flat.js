@@ -63,10 +63,12 @@ const ruleNames = [
   'no-reserved-folder-names',
   'no-segmentless-slices',
   'no-segments-on-sliced-layers',
+  'no-ui-in-app',
   'public-api',
   'repetitive-naming',
   'segments-by-purpose',
   'shared-lib-grouping',
+  'typo-in-layer-name',
   'no-processes',
   'import-locality',
 ]

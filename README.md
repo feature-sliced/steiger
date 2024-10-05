@@ -25,13 +25,13 @@ npm i -D steiger
 ## Usage
 
 ```bash
-steiger ./src
+npx steiger ./src
 ```
 
 To run in watch mode, add `-w`/`--watch` to the command:
 
 ```bash
-steiger ./src --watch
+npx steiger ./src --watch
 ```
 
 ## Configuration
@@ -108,10 +108,12 @@ Currently, Steiger is not extendable with more rules, though that will change in
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-reserved-folder-names/README.md"><code>no-reserved-folder-names</code></a></td> <td>Forbid subfolders in segments that have the same name as other conventional segments.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-segmentless-slices/README.md"><code>no-segmentless-slices</code></a></td> <td>Forbid slices that don't have any segments.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-segments-on-sliced-layers/README.md"><code>no-segments-on-sliced-layers</code></a></td> <td>Forbid segments (like ui, lib, api ...) that appear directly in sliced layer folders (entities, features, ...)</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-ui-in-app/README.md"><code>no-ui-in-app</code></a></td> <td>Forbid having the <code>ui</code> segment on the App layer.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/public-api/README.md"><code>public-api</code></a></td> <td>Require slices (and segments on sliceless layers like Shared) to have a public API definition.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/repetitive-naming/README.md"><code>repetitive-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/segments-by-purpose/README.md"><code>segments-by-purpose</code></a></td> <td>Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/shared-lib-grouping/README.md"><code>shared-lib-grouping</code></a></td> <td>Forbid having too many ungrouped modules in <code>shared/lib</code>.</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/typo-in-layer-name/README.md"><code>typo-in-layer-name</code></a></td> <td>Ensure that all layers are named without any typos.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-processes/README.md"><code>no-processes</code></a></td> <td>Discourage the use of the deprecated Processes layer.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/import-locality/README.md"><code>import-locality</code></a></td> <td>Require that imports from the same slice be relative and imports from one slice to another be absolute.</td> </tr>
 </tbody>
