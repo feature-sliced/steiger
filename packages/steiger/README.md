@@ -47,7 +47,7 @@ The config file shape is highly inspired by ESLint's config file, so if you have
 Here are some rules on how configuration is processed:
 
 - Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
-- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and remove files from the linter sight forever, so you cannot re-assign severity for them in other later objects.
+- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and permanently remove files from the linter's field of view, so you can't reassign severity to them in other later objects.
 - You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
 
 Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
