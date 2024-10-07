@@ -6,10 +6,6 @@ import { prepareVfsForRuleRun } from './prepare-vfs-for-rule-run'
 export async function runRule(vfs: Folder, rule: Rule) {
   const globsForRule = getGlobsForRule(rule.name)
 
-  if (!globsForRule) {
-    throw new Error(`Glob settings for rule ${rule.name} are not found but rule is enabled`)
-  }
-
   const finalVfs = prepareVfsForRuleRun(vfs, globsForRule)
 
   if (!finalVfs) {
