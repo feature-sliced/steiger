@@ -11,10 +11,6 @@ export default function calculateFinalSeverities(
 ): Array<Exclude<Severity, 'off'>> {
   const globGroups = getGlobsForRule(ruleName)
 
-  if (!globGroups) {
-    return []
-  }
-
   const errorGlobs = globGroups.map(({ severity, ...rest }) => (severity === 'error' ? { ...rest } : not({ ...rest })))
   const errorVfs = applyExclusion(vfs, errorGlobs)
 

@@ -63,5 +63,5 @@ export function getGlobalIgnores() {
 }
 
 export function getGlobsForRule(ruleName: string) {
-  return $ruleInstructions.getState()?.[ruleName].globGroups || null
+  return $ruleInstructions.getState()?.[ruleName].globGroups || []
 }
