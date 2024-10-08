@@ -1,7 +1,8 @@
-import { posix, sep } from 'node:path'
+import { posix, sep, isAbsolute } from 'node:path'
 import { Config } from '@steiger/types'
 
 import { isConfigObject, isConfiguration } from './raw-config'
+import { getGlobPath, replaceGlobPath } from '../../shared/globs'
 
 function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) {
   function composeAbsolutePath(root: string, glob: string) {
@@ -11,7 +12,17 @@ function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) 
     return `/${posix.join(...segmentsOfRoot, glob)}`
   }
 
-  return globs.map((glob) => (glob.startsWith('.') ? composeAbsolutePath(rootPath, glob) : glob))
+  // An extra check for the * at the beginning is required
+  // because it is treated as a relative path by the path.isAbsolute, but should not be converted.
+  const needsConversion = (glob: string) => !isAbsolute(glob) && !glob.startsWith('*')
+
+  return globs.map((originalGlob) => {
+    const globClearPath = getGlobPath(originalGlob)
+
+    return needsConversion(originalGlob)
+      ? replaceGlobPath(originalGlob, composeAbsolutePath(rootPath, globClearPath))
+      : originalGlob
+  })
 }
 
 function stripTrailingSlashes(globs: Array<string>) {

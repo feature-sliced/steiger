@@ -60,4 +60,60 @@ describe('transformGlobs', () => {
       },
     ])
   })
+
+  it("should correctly transform globs that are relative but don't start with a dot", () => {
+    const config: Config = [
+      {
+        ignores: ['src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['src/shared/ui/**/*'],
+        ignores: ['src/shared/ui/index.ts'],
+      },
+    ]
+
+    expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
+      {
+        ignores: ['/projects/dummy-project/src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['/projects/dummy-project/src/shared/ui/**/*'],
+        ignores: ['/projects/dummy-project/src/shared/ui/index.ts'],
+      },
+    ])
+  })
+
+  it('should correctly transform negated globs', () => {
+    const config: Config = [
+      {
+        ignores: ['!src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['!src/shared/ui/**/*'],
+        ignores: ['!src/shared/ui/index.ts'],
+      },
+    ]
+
+    expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
+      {
+        ignores: ['!/projects/dummy-project/src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['!/projects/dummy-project/src/shared/ui/**/*'],
+        ignores: ['!/projects/dummy-project/src/shared/ui/index.ts'],
+      },
+    ])
+  })
 })
