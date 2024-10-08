@@ -3,7 +3,7 @@ import { expect, it, describe } from 'vitest'
 import { createFilterAccordingToGlobs } from './create-filter-according-to-globs'
 
 describe('createFilterAccordingToGlobs', () => {
-  it('should return true if no globs are provided', () => {
+  it('should return false if empty "files" are provided', () => {
     const filter = createFilterAccordingToGlobs({
       inclusions: [],
       exclusions: [],
@@ -17,7 +17,7 @@ describe('createFilterAccordingToGlobs', () => {
 
     const filteredFiles = files.filter(filter)
 
-    expect(filteredFiles).toEqual(files)
+    expect(filteredFiles).toEqual([])
   })
 
   it('should return the picked folder if a specific folder is passed to inclusion patterns', () => {
@@ -142,7 +142,6 @@ describe('createFilterAccordingToGlobs', () => {
     ]
 
     const filter = createFilterAccordingToGlobs({
-      inclusions: [],
       exclusions: ['**/*.config.js', '!**/eslint.config.js'],
     })
 
@@ -173,7 +172,6 @@ describe('createFilterAccordingToGlobs', () => {
     ]
 
     const filter = createFilterAccordingToGlobs({
-      inclusions: [],
       exclusions: ['**/__mocks__/**'],
     })
 
@@ -240,7 +238,6 @@ describe('createFilterAccordingToGlobs', () => {
 
     const filter = createFilterAccordingToGlobs({
       inclusions: ['**/shared', '**/shared/**'],
-      exclusions: [],
     })
 
     const filteredFiles = files.filter(filter)

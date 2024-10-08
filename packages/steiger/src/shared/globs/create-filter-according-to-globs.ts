@@ -12,13 +12,18 @@ export function isNegationPattern(pattern: string) {
   return pattern.startsWith('!')
 }
 
-export function createFilterAccordingToGlobs({ inclusions = [], exclusions = [] }: ApplyGlobsOptions) {
-  const thereAreInclusions = inclusions.length > 0
-  const thereAreExclusions = exclusions.length > 0
+export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGlobsOptions) {
+  const thereAreInclusions = Array.isArray(inclusions)
+  const thereAreExclusions = Array.isArray(exclusions)
+  const inclusionsEmpty = thereAreInclusions && inclusions.length === 0
 
   function filterAccordingToGlobs(path: string) {
     const matchesInclusionPatterns = !thereAreInclusions || inclusions.some((pattern) => minimatch(path, pattern))
     let isIgnored = false
+
+    if (inclusionsEmpty) {
+      return false
+    }
 
     if (matchesInclusionPatterns && thereAreExclusions) {
       isIgnored = exclusions

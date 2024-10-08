@@ -1,6 +1,6 @@
 export interface GlobGroup {
-  files: string[]
-  ignores: string[]
+  files?: string[]
+  ignores?: string[]
 }
 
 export interface InvertedGlobGroup extends GlobGroup {

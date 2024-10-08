@@ -99,7 +99,6 @@ describe('applyExclusion', () => {
       },
       not({
         files: ['/src/entities/**', '/src/shared/lib/get-query-params.ts'],
-        ignores: [],
       }),
     ]
 
@@ -156,23 +155,20 @@ describe('applyExclusion', () => {
       },
       not({
         files: ['/src/entities/**', '/src/shared/lib/get-query-params.ts'],
-        ignores: [],
       }),
       {
         files: ['/src/pages/**'],
-        ignores: [],
       },
       not({
         files: ['/src/pages/account/**'],
-        ignores: [],
       }),
     ]
 
     expect(applyExclusion(vfs, globs)).toEqual(expectedVfs)
   })
 
-  it('should correctly apply exclusions for a special case', () => {
-    const globs = [not({ files: [], ignores: [] }), { files: ['/src/shared/ui/Button.ts'], ignores: [] }]
+  it('should correctly apply exclusions for an empty glob group', () => {
+    const globs = [not({}), { files: ['/src/shared/ui/Button.ts'], ignores: [] }]
 
     const vfs = parseIntoFsdRoot(
       `

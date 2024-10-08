@@ -63,18 +63,14 @@ describe('prepareVfsForRuleRun', () => {
 
     const globGroups = [
       {
-        files: [],
-        ignores: [],
         severity: 'error',
       },
       {
         files: ['/src/pages/**'],
-        ignores: [],
         severity: 'off',
       },
       {
         files: ['**/ui/**'],
-        ignores: [],
         severity: 'warn',
       },
     ] as Array<GlobGroupWithSeverity>

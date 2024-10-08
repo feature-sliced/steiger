@@ -49,8 +49,6 @@ describe('createRuleInstructions', () => {
         globGroups: [
           {
             severity: 'off',
-            files: [],
-            ignores: [],
           },
         ],
       },
@@ -86,7 +84,6 @@ describe('createRuleInstructions', () => {
           {
             severity: 'error',
             files: ['src/entities/user/ui/**/*'],
-            ignores: [],
           },
         ],
       },

@@ -6,10 +6,7 @@ import { GlobGroupWithSeverity } from '../../models/config'
 
 vi.mock('../../models/config', async () => {
   const ruleToGlobs: Record<string, Array<GlobGroupWithSeverity>> = {
-    rule1: [
-      { files: [], ignores: [], severity: 'warn' },
-      { files: ['/src/shared/ui/Button.ts'], ignores: [], severity: 'error' },
-    ],
+    rule1: [{ severity: 'warn' }, { files: ['/src/shared/ui/Button.ts'], severity: 'error' }],
   }
 
   return {

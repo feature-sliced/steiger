@@ -42,8 +42,8 @@ export default function createRuleInstructions(config: Config): Record<string, R
 
           acc[ruleName].globGroups.push({
             severity: getSeverity(severityOrTuple),
-            files: item.files ? item.files : [],
-            ignores: item.ignores ? item.ignores : [],
+            files: item.files,
+            ignores: item.ignores,
           })
         },
       )
