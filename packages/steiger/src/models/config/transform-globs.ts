@@ -12,14 +12,12 @@ function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) 
     return `/${posix.join(...segmentsOfRoot, glob)}`
   }
 
-  // An extra check for the * at the beginning is required
-  // because it is treated as a relative path by the path.isAbsolute, but should not be converted.
-  const needsConversion = (glob: string) => !isAbsolute(glob) && !glob.startsWith('*')
+  const needsConversion = (glob: string) => !isAbsolute(glob)
 
   return globs.map((originalGlob) => {
     const globClearPath = getGlobPath(originalGlob)
 
-    return needsConversion(originalGlob)
+    return needsConversion(globClearPath)
       ? replaceGlobPath(originalGlob, composeAbsolutePath(rootPath, globClearPath))
       : originalGlob
   })

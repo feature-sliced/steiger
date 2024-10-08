@@ -49,13 +49,13 @@ describe('transformGlobs', () => {
 
     expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
       {
-        ignores: ['/projects/dummy-project/src/entities', '**/shared'],
+        ignores: ['/projects/dummy-project/src/entities', '/projects/dummy-project/**/shared'],
       },
       {
         rules: {
           rule1: 'warn',
         },
-        files: ['/projects/dummy-project/src/shared/ui', '**/pages'],
+        files: ['/projects/dummy-project/src/shared/ui', '/projects/dummy-project/**/pages'],
         ignores: ['/projects/dummy-project/src/shared/ui/index.ts'],
       },
     ])
@@ -98,7 +98,7 @@ describe('transformGlobs', () => {
         rules: {
           rule1: 'warn',
         },
-        files: ['!src/shared/ui/**/*'],
+        files: ['!**/shared/ui/**/*'],
         ignores: ['!src/shared/ui/index.ts'],
       },
     ]
@@ -111,7 +111,7 @@ describe('transformGlobs', () => {
         rules: {
           rule1: 'warn',
         },
-        files: ['!/projects/dummy-project/src/shared/ui/**/*'],
+        files: ['!/projects/dummy-project/**/shared/ui/**/*'],
         ignores: ['!/projects/dummy-project/src/shared/ui/index.ts'],
       },
     ])
