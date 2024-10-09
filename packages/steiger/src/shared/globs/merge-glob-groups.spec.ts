@@ -24,7 +24,7 @@ describe('mergeGlobGroups', () => {
     })
   })
 
-  it('should correctly merge glob groups that miss files and ignores', () => {
+  it('should correctly merge glob groups that miss files or ignores', () => {
     const merged = mergeGlobGroups([{ files: ['/src/shared/**'] }, { ignores: ['**/*.spec.ts'] }])
 
     expect(merged).toEqual({
