@@ -2,16 +2,16 @@ import { GlobGroup } from './types'
 
 export function mergeGlobGroups(globs: Array<GlobGroup>) {
   return globs.reduce((acc, { files, ignores }) => {
-    const globGroup: GlobGroup = {}
+    const interimGlobGroup: GlobGroup = { ...acc }
 
     if (files) {
-      globGroup.files = [...(acc.files || []), ...files]
+      interimGlobGroup.files = [...(acc.files || []), ...files]
     }
 
     if (ignores) {
-      globGroup.ignores = [...(acc.ignores || []), ...ignores]
+      interimGlobGroup.ignores = [...(acc.ignores || []), ...ignores]
     }
 
-    return globGroup
+    return interimGlobGroup
   })
 }
