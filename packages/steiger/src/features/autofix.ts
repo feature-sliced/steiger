@@ -1,8 +1,8 @@
 import { dirname, join } from 'node:path'
 import { rename, open, mkdir, rm } from 'node:fs/promises'
-import type { Diagnostic } from '@steiger/types'
+import type { PartialDiagnostic } from '@steiger/types'
 
-export async function applyAutofixes<T extends Diagnostic>(diagnostics: Array<T>): Promise<T[]> {
+export async function applyAutofixes<T extends PartialDiagnostic>(diagnostics: Array<T>): Promise<T[]> {
   const stillRelevantDiagnostics = []
   const fixableDiagnostics = []
 
@@ -31,7 +31,7 @@ export async function applyAutofixes<T extends Diagnostic>(diagnostics: Array<T>
   return stillRelevantDiagnostics
 }
 
-async function tryToApplyFixes(diagnostic: Diagnostic) {
+async function tryToApplyFixes(diagnostic: PartialDiagnostic) {
   const fixes = diagnostic.fixes ?? []
 
   return Promise.all(

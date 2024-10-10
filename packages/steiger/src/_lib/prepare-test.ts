@@ -1,7 +1,7 @@
 import { join, sep } from 'node:path'
 import type { readFileSync, existsSync } from 'node:fs'
 import type { FsdRoot } from '@feature-sliced/filesystem'
-import type { Folder, File, Diagnostic } from '@steiger/types'
+import type { Folder, File, PartialDiagnostic } from '@steiger/types'
 import { vi } from 'vitest'
 
 /** Parse a multi-line indented string with emojis for files and folders into an FSD root.
@@ -39,7 +39,7 @@ export function parseIntoFsdRoot(fsMarkup: string, mountTo?: string): FsdRoot {
   return parseFolder(lines, mountTo ?? joinFromRoot())
 }
 
-export function compareMessages(a: Diagnostic, b: Diagnostic): number {
+export function compareMessages(a: PartialDiagnostic, b: PartialDiagnostic): number {
   return a.message.localeCompare(b.message) || a.location.path.localeCompare(b.location.path)
 }
 

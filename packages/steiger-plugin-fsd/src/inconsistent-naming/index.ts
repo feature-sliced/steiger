@@ -3,7 +3,7 @@ import { partition } from 'lodash-es'
 import pluralize from 'pluralize'
 const { isPlural, plural, singular } = pluralize
 import { getLayers, getSlices } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/types'
 
 import { groupSlices } from '../_lib/group-slices.js'
 import { NAMESPACE } from '../constants.js'
@@ -12,7 +12,7 @@ import { NAMESPACE } from '../constants.js'
 const inconsistentNaming = {
   name: `${NAMESPACE}/inconsistent-naming`,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     const { entities } = getLayers(root)
     if (entities === undefined) {

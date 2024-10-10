@@ -1,6 +1,6 @@
 import { basename } from 'node:path'
 import { getAllSegments, conventionalSegmentNames } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/types'
 
 import { findAllRecursively } from '../_lib/find-all-recursively.js'
 import { NAMESPACE } from '../constants.js'
@@ -9,7 +9,7 @@ import { NAMESPACE } from '../constants.js'
 const noReservedFolderNames = {
   name: `${NAMESPACE}/no-reserved-folder-names`,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const { segment } of getAllSegments(root)) {
       if (segment.type === 'file') {
