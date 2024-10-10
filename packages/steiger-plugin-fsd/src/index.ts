@@ -10,10 +10,12 @@ import noPublicApiSidestep from './no-public-api-sidestep/index.js'
 import noReservedFolderNames from './no-reserved-folder-names/index.js'
 import noSegmentlessSlices from './no-segmentless-slices/index.js'
 import noSegmentsOnSlicedLayers from './no-segments-on-sliced-layers/index.js'
+import noUiInApp from './no-ui-in-app/index.js'
 import publicApi from './public-api/index.js'
 import repetitiveNaming from './repetitive-naming/index.js'
 import segmentsByPurpose from './segments-by-purpose/index.js'
 import sharedLibGrouping from './shared-lib-grouping/index.js'
+import typoInLayerName from './typo-in-layer-name/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json'
 
@@ -28,10 +30,12 @@ const rules = [
   noReservedFolderNames,
   noSegmentlessSlices,
   noSegmentsOnSlicedLayers,
+  noUiInApp,
   publicApi,
   repetitiveNaming,
   segmentsByPurpose,
   sharedLibGrouping,
+  typoInLayerName,
   noProcesses,
 ]
 

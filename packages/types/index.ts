@@ -22,10 +22,10 @@ export interface Rule<
 }
 
 export interface RuleResult {
-  diagnostics: Array<Diagnostic>
+  diagnostics: Array<PartialDiagnostic>
 }
 
-export interface Diagnostic {
+export interface PartialDiagnostic {
   message: string
   fixes?: Array<Fix>
   location: {
@@ -34,6 +34,12 @@ export interface Diagnostic {
     line?: number
     column?: number
   }
+}
+
+export interface Diagnostic extends PartialDiagnostic {
+  ruleName: string
+  severity: Exclude<Severity, 'off'>
+  getRuleDescriptionUrl(ruleName: string): URL
 }
 
 export type Fix =
@@ -61,7 +67,7 @@ export type Fix =
       content: string
     }
 
-export type Config<Rules extends Array<Rule>> = Array<ConfigObject<Rules> | Plugin<unknown, Rules>>
+export type Config<Rules extends Array<Rule>> = Array<ConfigObject<Rules> | Plugin<unknown, Rules> | GlobalIgnore>
 
 export type Severity = 'off' | 'warn' | 'error'
 
@@ -96,8 +102,10 @@ export interface ConfigObject<Rules extends Array<Rule>> {
   /** Globs of files to ignore. */
   ignores?: Array<string>
   /** Severity of rules and individual rule options. */
-  rules?: { [key in RuleNames<Rules>]?: Severity | [Severity, OptionsForRule<Rules, key>] }
+  rules: { [key in RuleNames<Rules>]?: Severity | [Severity, OptionsForRule<Rules, key>] }
 }
+
+export type GlobalIgnore = { ignores: Array<string> }
 
 export interface Plugin<Context = unknown, Rules extends Array<Rule<Context>> = Array<Rule>> {
   meta: {

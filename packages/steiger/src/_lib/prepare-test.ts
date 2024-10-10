@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import type { FsdRoot } from '@feature-sliced/filesystem'
-import type { Folder, File, Diagnostic } from '@steiger/types'
+import type { Folder, File, PartialDiagnostic } from '@steiger/types'
 
 /** Parse a multi-line indented string with emojis for files and folders into an FSD root.
  * @param fsMarkup - a file system tree represented in markup using file and folder emojis
@@ -37,7 +37,7 @@ export function parseIntoFsdRoot(fsMarkup: string, mountTo?: string): FsdRoot {
   return parseFolder(lines, mountTo ?? joinFromRoot())
 }
 
-export function compareMessages(a: Diagnostic, b: Diagnostic): number {
+export function compareMessages(a: PartialDiagnostic, b: PartialDiagnostic): number {
   return a.message.localeCompare(b.message) || a.location.path.localeCompare(b.location.path)
 }
 

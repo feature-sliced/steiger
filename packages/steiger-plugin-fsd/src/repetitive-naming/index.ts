@@ -1,5 +1,5 @@
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/toolkit'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 /**
@@ -18,7 +18,7 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 const repetitiveNaming = {
   name: `${NAMESPACE}/repetitive-naming` as const,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
       if (!isSliced(layer)) {

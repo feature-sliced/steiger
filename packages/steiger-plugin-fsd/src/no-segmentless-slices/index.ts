@@ -1,11 +1,11 @@
 import { getLayers, isSlice, isSliced } from '@feature-sliced/filesystem'
-import type { Folder, Diagnostic, Rule } from '@steiger/toolkit'
+import type { Folder, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 const noSegmentlessSlices = {
   name: `${NAMESPACE}/no-segmentless-slices` as const,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
       if (!isSliced(layer)) {

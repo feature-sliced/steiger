@@ -1,5 +1,5 @@
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/toolkit'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 const THRESHOLD = 15
@@ -8,7 +8,7 @@ const THRESHOLD = 15
 const sharedLibGrouping = {
   name: `${NAMESPACE}/shared-lib-grouping` as const,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     const { shared } = getLayers(root)
     if (!shared) {

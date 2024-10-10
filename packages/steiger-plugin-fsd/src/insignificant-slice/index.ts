@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import { sep, join } from 'node:path'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import { isSliced, resolveImport, unslicedLayers, type LayerName } from '@feature-sliced/filesystem'
-import type { Folder, Diagnostic, Rule } from '@steiger/toolkit'
+import type { Folder, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import precinct from 'precinct'
 const { paperwork } = precinct
 
@@ -12,7 +12,7 @@ import { NAMESPACE } from '../constants.js'
 const insignificantSlice = {
   name: `${NAMESPACE}/insignificant-slice` as const,
   async check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     const references = await traceSliceReferences(root)
 

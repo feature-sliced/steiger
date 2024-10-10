@@ -3,7 +3,7 @@ import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import { getIndex, getLayers, getSegments, isSliced, resolveImport } from '@feature-sliced/filesystem'
-import type { Folder, File, Diagnostic, Rule } from '@steiger/toolkit'
+import type { Folder, File, PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { NAMESPACE } from '../constants.js'
@@ -12,7 +12,7 @@ import { NAMESPACE } from '../constants.js'
 const noPublicApiSidestep = {
   name: `${NAMESPACE}/no-public-api-sidestep` as const,
   async check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
     const { tsconfig } = await parseNearestTsConfig(root.path)
     const sourceFileIndex = indexSourceFiles(root)
 

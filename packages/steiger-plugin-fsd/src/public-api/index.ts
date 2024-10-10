@@ -1,13 +1,13 @@
 import { join } from 'node:path'
 import { getLayers, getSegments, isSliced, getIndex, getSlices } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/toolkit'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {
   name: `${NAMESPACE}/public-api` as const,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
       if (!isSliced(layer)) {
