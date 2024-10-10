@@ -2,12 +2,12 @@ import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 import { LayerName, layerSequence } from '@feature-sliced/filesystem'
 import { distance } from 'fastest-levenshtein'
-import { basename } from 'node:path'
+import { basename, join } from 'node:path'
 
 const LEVENSHTEIN_DISTANCE_UPPER_BOUND = 3
 
 const typoInLayerName = {
-  name: `${NAMESPACE}/typo-in-layer-name`,
+  name: `${NAMESPACE}/typo-in-layer-name` as const,
   check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
 
@@ -56,7 +56,7 @@ const typoInLayerName = {
 
       diagnostics.push({
         message: `Layer "${layer.input}" potentially contains a typo. Did you mean "${layer.suggestion}"?`,
-        location: { path: layer.input },
+        location: { path: join(root.path, layer.input) },
       })
     })
 

@@ -3,7 +3,7 @@ import { NAMESPACE } from '../constants.js'
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
 
 const noUiInApp = {
-  name: `${NAMESPACE}/no-ui-in-app`,
+  name: `${NAMESPACE}/no-ui-in-app` as const,
   check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
 
