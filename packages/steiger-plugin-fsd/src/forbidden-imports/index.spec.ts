@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest'
 
-import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import forbiddenImports from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
@@ -23,7 +23,7 @@ vi.mock('tsconfck', async (importOriginal) => {
 
 vi.mock('node:fs', async (importOriginal) => {
   const originalFs = await importOriginal<typeof import('fs')>()
-  const { createFsMocks } = await import('../_lib/prepare-test.js')
+  const { createFsMocks } = await import('@steiger/toolkit')
 
   return createFsMocks(
     {

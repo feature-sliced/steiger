@@ -12,5 +12,5 @@ export async function runRule(vfs: Folder, rule: Rule) {
     return Promise.resolve({ diagnostics: [] })
   }
 
-  return Promise.resolve(rule.check(finalVfs, getRuleOptions(rule.name) || undefined))
+  return Promise.resolve(rule.check(finalVfs, getRuleOptions(rule.name) ?? {}))
 }

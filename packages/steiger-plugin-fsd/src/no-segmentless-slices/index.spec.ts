@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import noSegmentlessSlices from './index.js'
-import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project where every slice has at least one segment', () => {
   const root = parseIntoFsdRoot(`

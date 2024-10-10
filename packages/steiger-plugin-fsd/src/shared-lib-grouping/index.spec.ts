@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 
-import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import excessiveSlicing from './index.js'
 
 it('reports no errors on projects with no shared/lib', () => {

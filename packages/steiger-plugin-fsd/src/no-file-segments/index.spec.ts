@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 
-import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import noFileSegments from './index.js'
 
 it('reports no errors on a project with only folder segments', async () => {

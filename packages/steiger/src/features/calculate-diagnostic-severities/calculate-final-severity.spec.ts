@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
 
-import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
 import calculateFinalSeverities from './calculate-final-severity'
 import { GlobGroupWithSeverity } from '../../models/config'
 
@@ -16,7 +16,7 @@ vi.mock('../../models/config', async () => {
 
 describe('calculateFinalSeverity', () => {
   it('should return severities for paths', () => {
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui

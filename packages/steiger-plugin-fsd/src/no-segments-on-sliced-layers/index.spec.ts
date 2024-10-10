@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import noSegmentsOnSlicedLayers from './index.js'
-import { joinFromRoot, parseIntoFsdRoot, compareMessages } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 describe('no-segments-on-sliced-layers rule', () => {
   it('reports no errors on a project where the sliced layers has no segments in direct children', () => {

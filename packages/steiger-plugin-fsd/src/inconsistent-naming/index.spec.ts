@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 
-import { compareMessages, parseIntoFsdRoot, joinFromRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import inconsistentNaming from './index.js'
 
 it('reports no errors on slice names that are pluralized consistently', () => {

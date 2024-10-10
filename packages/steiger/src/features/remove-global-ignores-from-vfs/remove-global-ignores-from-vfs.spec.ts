@@ -1,11 +1,11 @@
 import { expect, it, describe } from 'vitest'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
 
 import removeGlobalIgnoresFromVfs from './remove-global-ignores-from-vfs'
-import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
 
 describe('removeGlobalIgnoresFromVfs', () => {
   it('should remove nodes that match global ignores from VFS', () => {
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 entities
         📂 user
@@ -17,11 +17,11 @@ describe('removeGlobalIgnoresFromVfs', () => {
           📂 ui
             📄 UserAvatar.tsx
             📄 UserAvatar.test.tsx
-          📄 index.ts 
+          📄 index.ts
       `,
       joinFromRoot('src'),
     )
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 entities
         📂 user
@@ -29,7 +29,7 @@ describe('removeGlobalIgnoresFromVfs', () => {
             📄 store.ts
           📂 ui
             📄 UserAvatar.tsx
-          📄 index.ts 
+          📄 index.ts
       `,
       joinFromRoot('src'),
     )
