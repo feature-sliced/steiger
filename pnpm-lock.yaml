@@ -78,9 +78,6 @@ importers:
 
   packages/steiger:
     dependencies:
-      '@feature-sliced/filesystem':
-        specifier: ^2.2.5
-        version: 2.2.5
       '@feature-sliced/steiger-plugin':
         specifier: workspace:*
         version: link:../steiger-plugin-fsd
