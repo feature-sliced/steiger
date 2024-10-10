@@ -1,12 +1,12 @@
-export function isNegated(pattern: string) {
+export function isNegatedGlob(pattern: string) {
   return pattern.startsWith('!')
 }
 
 export function getGlobPath(pattern: string) {
-  return isNegated(pattern) ? pattern.slice(1) : pattern
+  return isNegatedGlob(pattern) ? pattern.slice(1) : pattern
 }
 
 export function replaceGlobPath(pattern: string, replacement: string) {
   const sanitizedReplacement = getGlobPath(replacement)
-  return isNegated(pattern) ? `!${sanitizedReplacement}` : sanitizedReplacement
+  return isNegatedGlob(pattern) ? `!${sanitizedReplacement}` : sanitizedReplacement
 }

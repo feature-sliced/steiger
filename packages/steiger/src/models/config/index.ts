@@ -11,15 +11,15 @@ type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
 export { GlobGroupWithSeverity } from './types'
 
-export const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
+const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
 const setRuleInstructions = createEvent<RuleInstructionsPerRule>()
 $ruleInstructions.on(setRuleInstructions, (_state, payload) => payload)
 
-export const $globalIgnores = createStore<Array<GlobalIgnore>>([])
+const $globalIgnores = createStore<Array<GlobalIgnore>>([])
 const setGlobalIgnores = createEvent<Array<GlobalIgnore>>()
 $globalIgnores.on(setGlobalIgnores, (_state, payload) => payload)
 
-export const $plugins = createStore<Array<Plugin>>([])
+const $plugins = createStore<Array<Plugin>>([])
 const setPlugins = createEvent<Array<Plugin>>()
 $plugins.on(setPlugins, (_state, payload) => payload)
 
@@ -44,10 +44,6 @@ export function processConfiguration(rawConfig: Config, configLocationFolder: st
   setRuleInstructions(ruleInstructions)
 
   return validatedConfig
-}
-
-export function getPlugins() {
-  return $plugins.getState()
 }
 
 export function getEnabledRules() {

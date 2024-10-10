@@ -1,3 +1,4 @@
+import { isNegatedGlob } from './utilities'
 import { minimatch } from 'minimatch'
 
 // ! Don't use platform specific path separators in the glob patterns for globby/minimatch
@@ -6,10 +7,6 @@ import { minimatch } from 'minimatch'
 interface ApplyGlobsOptions {
   inclusions?: string[]
   exclusions?: string[]
-}
-
-export function isNegationPattern(pattern: string) {
-  return pattern.startsWith('!')
 }
 
 export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGlobsOptions) {
@@ -26,14 +23,12 @@ export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGl
     }
 
     if (matchesInclusionPatterns && thereAreExclusions) {
-      isIgnored = exclusions
-        .filter((pattern) => !isNegationPattern(pattern))
-        .some((pattern) => minimatch(path, pattern))
+      isIgnored = exclusions.filter((pattern) => !isNegatedGlob(pattern)).some((pattern) => minimatch(path, pattern))
 
       // If the path is ignored, check for any negated patterns that would include it back
       if (isIgnored) {
         const isNegated = exclusions.some(
-          (ignorePattern) => isNegationPattern(ignorePattern) && minimatch(path, ignorePattern.slice(1)),
+          (ignorePattern) => isNegatedGlob(ignorePattern) && minimatch(path, ignorePattern.slice(1)),
         )
 
         isIgnored = !isNegated

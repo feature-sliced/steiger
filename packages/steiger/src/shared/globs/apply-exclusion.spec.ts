@@ -211,4 +211,65 @@ describe('applyExclusion', () => {
 
     expect(applyExclusion(vfs, globs)).toEqual(expectedVfs)
   })
+
+  it('should correctly apply exclusions for brace sets', () => {
+    const globs = [{}, not({ files: ['**/*.spec.{ts,tsx}'] })]
+
+    const vfs = parseIntoFsdRoot(
+      `
+      📂 shared
+        📂 ui
+          📄 Button.ts
+          📄 Button.spec.tsx
+          📄 Input.ts
+          📄 Input.spec.tsx
+          📄 index.ts
+        📂 lib
+          📄 get-query-params.ts
+          📄 get-query-params.spec.ts
+          📄 device-detection.ts
+          📄 device-detection.spec.ts
+          📄 index.ts
+      📂 entities
+        📂 user
+          📂 ui
+            📄 UserAvatar.ts
+            📄 UserAvatar.spec.tsx
+          📄 Input.ts
+      📂 pages
+        📂 profile
+          📄 index.ts
+        📂 main
+          📄 index.ts
+      `,
+      joinFromRoot('src'),
+    )
+
+    const expectedVfs = parseIntoFsdRoot(
+      `
+      📂 shared
+        📂 ui
+          📄 Button.ts
+          📄 Input.ts
+          📄 index.ts
+        📂 lib
+          📄 get-query-params.ts
+          📄 device-detection.ts
+          📄 index.ts
+      📂 entities
+        📂 user
+          📂 ui
+            📄 UserAvatar.ts
+          📄 Input.ts
+      📂 pages
+        📂 profile
+          📄 index.ts
+        📂 main
+          📄 index.ts
+      `,
+      joinFromRoot('src'),
+    )
+
+    expect(applyExclusion(vfs, globs)).toEqual(expectedVfs)
+  })
 })

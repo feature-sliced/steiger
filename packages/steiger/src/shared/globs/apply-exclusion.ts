@@ -3,7 +3,7 @@ import { File, Folder } from '@steiger/types'
 import { createFilterAccordingToGlobs } from './create-filter-according-to-globs'
 import { GlobGroup, InvertedGlobGroup } from './index'
 
-export function removeEmptyFolders(node: Folder): Folder {
+function removeEmptyFolders(node: Folder): Folder {
   const children = node.children
     .map((node) => (node.type === 'folder' ? removeEmptyFolders(node) : node))
     .filter((node) => (node.type === 'folder' ? node.children.length > 0 : true))
@@ -14,7 +14,7 @@ export function removeEmptyFolders(node: Folder): Folder {
   }
 }
 
-export function copyNode<T extends Folder | File>(node: T, deep: boolean = false) {
+function copyNode<T extends Folder | File>(node: T, deep: boolean = false) {
   if (node.type === 'folder') {
     const newChildren: Array<Folder | File> = deep
       ? node.children.map((child) => (child.type === 'folder' ? copyNode(child, true) : child))

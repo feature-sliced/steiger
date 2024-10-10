@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { getGlobPath, replaceGlobPath, isNegated } from './utilities'
+import { getGlobPath, replaceGlobPath, isNegatedGlob } from './utilities'
 
 describe('isNegated', () => {
   it('should return true if the pattern is negated', () => {
-    expect(isNegated('!src/shared/ui/**')).toBe(true)
+    expect(isNegatedGlob('!src/shared/ui/**')).toBe(true)
   })
 
   it('should return false if the pattern is not negated', () => {
-    expect(isNegated('src/shared/ui/**')).toBe(false)
+    expect(isNegatedGlob('src/shared/ui/**')).toBe(false)
   })
 })
 
