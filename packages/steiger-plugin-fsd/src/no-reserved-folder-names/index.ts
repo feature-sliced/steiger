@@ -1,5 +1,5 @@
 import { basename } from 'node:path'
-import { getAllSegments, conventionalSegmentNames } from '@feature-sliced/filesystem'
+import { getAllSegments, conventionalSegmentNames, crossReferenceToken } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/types'
 
 import { findAllRecursively } from '../_lib/find-all-recursively.js'
@@ -23,12 +23,14 @@ const noReservedFolderNames = {
 
         for (const violatingFolder of findAllRecursively(
           child,
-          (entry) => entry.type === 'folder' && conventionalSegmentNames.concat('@x').includes(basename(entry.path)),
+          (entry) =>
+            entry.type === 'folder' &&
+            conventionalSegmentNames.concat(crossReferenceToken).includes(basename(entry.path)),
         )) {
           const reservedName = basename(violatingFolder.path)
-          if (reservedName === '@x') {
+          if (reservedName === crossReferenceToken) {
             diagnostics.push({
-              message: `Having a folder with the name "@x" inside a segment could be confusing because that name is reserved for cross-import public APIs. Consider renaming it.`,
+              message: `Having a folder with the name "${crossReferenceToken}" inside a segment could be confusing because that name is reserved for cross-import public APIs. Consider renaming it.`,
               location: { path: violatingFolder.path },
             })
           } else {

@@ -2,7 +2,14 @@ import * as fs from 'node:fs'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import { getIndex, getLayers, getSegments, isSliced, resolveImport } from '@feature-sliced/filesystem'
+import {
+  getIndex,
+  getLayers,
+  getSegments,
+  isSliced,
+  resolveImport,
+  crossReferenceToken,
+} from '@feature-sliced/filesystem'
 import type { Folder, File, PartialDiagnostic, Rule } from '@steiger/types'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
@@ -44,7 +51,7 @@ const noPublicApiSidestep = {
         }
 
         if (isSliced(dependencyLocation.layerName)) {
-          if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== '@x') {
+          if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== crossReferenceToken) {
             diagnostics.push({
               message: `Forbidden sidestep of public API when importing from "${dependency}".`,
               location: { path: sourceFile.file.path },
