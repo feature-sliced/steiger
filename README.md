@@ -38,7 +38,7 @@ npx steiger ./src --watch
 
 Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.
 
-Steiger is configurable via `cosmiconfig`. That means that you can create a `steiger.config.ts` or `steiger.config.js` file in the root of your project to configure the rules.
+Steiger is configurable via `cosmiconfig`. That means that you can create a `steiger.config.ts` or `steiger.config.js` file in the root of your project to configure the rules. Import `{ defineConfig } from "steiger"` to get autocompletion.
 
 The config file shape is highly inspired by ESLint's config file, so if you have configured ESLint before, you'll find it easy to configure Steiger.
 
@@ -46,8 +46,9 @@ The config file shape is highly inspired by ESLint's config file, so if you have
 
 Here are some rules on how configuration is processed:
 
-- Objects in the config array are processed in order, so later objects can override the objects before them.
-- If a rule has configurable options, then you can set it once in any of the objects in the array and these options will be applied to the entire codebase, regardless of `files` and `excludes`.
+- Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
+- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and permanently remove files from the linter's field of view, so you can't reassign severity to them in other later objects.
+- You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
 
 Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
 
@@ -80,7 +81,17 @@ export default defineConfig([
 ])
 ```
 
-For more details, see [examples](EXAMPLES.md).
+### Glob matching
+
+All globs are matched only against files, folder severities are computed based on the files inside them. The formula is simple: the folder severity is the highest severity of files inside it (from highest to lowest: error, warn, off).
+
+**Glob examples**:
+
+- `./src/shared/**` - matches all files in the `shared` folder and its subfolders
+- `./src/shared/*` - matches all files that are direct children of the `shared` folder
+- `./src/shared` - based on the fact that globs are matched against files, this one matches only `shared` file (without an extension) inside the `src` folder
+- `**/__mocks__/**` - matches all files in all `__mocks__` folders throughout the project
+- `**/*.{test,spec}.{ts,tsx}` - matches all test files in the project
 
 ### Migration from 0.4.0
 
