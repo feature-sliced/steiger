@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { Config, Rule } from '@steiger/types'
+import { joinFromRoot } from '@steiger/toolkit'
 
-import { joinFromRoot } from '../../_lib/prepare-test'
 import { transformGlobs } from './transform-globs'
 
 describe('transformGlobs', () => {

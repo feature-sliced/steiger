@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
 
 import { applyExclusion } from './apply-exclusion'
 import { not } from './not'
-import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
 
 describe('applyExclusion', () => {
   it('should apply exclusions with a normal glob group', () => {
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -31,7 +31,7 @@ describe('applyExclusion', () => {
       joinFromRoot('src'),
     )
 
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 shared
         📂 lib
@@ -58,7 +58,7 @@ describe('applyExclusion', () => {
   })
 
   it('should correctly apply exclusions with an inverted glob group', () => {
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -83,7 +83,7 @@ describe('applyExclusion', () => {
       joinFromRoot('src'),
     )
 
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 shared
         📂 lib
@@ -106,7 +106,7 @@ describe('applyExclusion', () => {
   })
 
   it('should correctly apply exclusions with several normal and inverted glob groups', () => {
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -136,7 +136,7 @@ describe('applyExclusion', () => {
       joinFromRoot('src'),
     )
 
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 shared
         📂 lib
@@ -170,7 +170,7 @@ describe('applyExclusion', () => {
   it('should correctly apply exclusions for an empty glob group', () => {
     const globs = [not({}), { files: ['/src/shared/ui/Button.ts'], ignores: [] }]
 
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -200,7 +200,7 @@ describe('applyExclusion', () => {
       joinFromRoot('src'),
     )
 
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -215,7 +215,7 @@ describe('applyExclusion', () => {
   it('should correctly apply exclusions for brace sets', () => {
     const globs = [{}, not({ files: ['**/*.spec.{ts,tsx}'] })]
 
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -245,7 +245,7 @@ describe('applyExclusion', () => {
       joinFromRoot('src'),
     )
 
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 shared
         📂 ui

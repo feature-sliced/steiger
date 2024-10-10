@@ -1,12 +1,12 @@
-import { prepareVfsForRuleRun } from './prepare-vfs-for-rule-run'
-
 import { describe, it, expect } from 'vitest'
-import { joinFromRoot, parseIntoFsdRoot } from '../../_lib/prepare-test'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
+
+import { prepareVfsForRuleRun } from './prepare-vfs-for-rule-run'
 import { GlobGroupWithSeverity } from '../../models/config'
 
 describe('prepareVfsForRuleRun', () => {
   it('should return vfs without off nodes', () => {
-    const vfs = parseIntoFsdRoot(
+    const vfs = parseIntoFolder(
       `
       📂 shared
         📂 ui
@@ -36,7 +36,7 @@ describe('prepareVfsForRuleRun', () => {
       joinFromRoot('src'),
     )
 
-    const expectedVfs = parseIntoFsdRoot(
+    const expectedVfs = parseIntoFolder(
       `
       📂 shared
         📂 ui

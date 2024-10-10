@@ -127,6 +127,9 @@ importers:
       '@steiger/pretty-reporter':
         specifier: workspace:*
         version: link:../pretty-reporter
+      '@steiger/toolkit':
+        specifier: workspace:*
+        version: link:../toolkit
       '@steiger/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig

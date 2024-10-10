@@ -114,9 +114,3 @@ export interface Plugin<Context = unknown, Rules extends Array<Rule<Context>> = 
   }
   ruleDefinitions: Rules
 }
-
-export interface AugmentedDiagnostic extends Diagnostic {
-  ruleName: string
-  severity: Exclude<Severity, 'off'>
-  getRuleDescriptionUrl(ruleName: string): URL
-}
