@@ -91,7 +91,7 @@ All globs are matched only against files, folder severities are computed based o
 - `./src/shared/*` - matches all files that are direct children of the `shared` folder
 - `./src/shared` - based on the fact that globs are matched against files, this one matches only `shared` file (without an extension) inside the `src` folder
 - `**/__mocks__/**` - matches all files in all `__mocks__` folders throughout the project
-- `**/*.(test|spec).ts` - matches all test files in the project
+- `**/*.{test,spec}.{ts,tsx}` - matches all test files in the project
 
 ### Migration from 0.4.0
 
