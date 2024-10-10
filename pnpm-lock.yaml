@@ -79,8 +79,8 @@ importers:
   packages/steiger:
     dependencies:
       '@feature-sliced/filesystem':
-        specifier: ^2.2.5
-        version: 2.2.5
+        specifier: ^2.4.0
+        version: 2.4.0
       '@feature-sliced/steiger-plugin':
         specifier: workspace:*
         version: link:../steiger-plugin-fsd
@@ -155,8 +155,8 @@ importers:
   packages/steiger-plugin-fsd:
     dependencies:
       '@feature-sliced/filesystem':
-        specifier: ^2.2.5
-        version: 2.2.5
+        specifier: ^2.4.0
+        version: 2.4.0
       fastest-levenshtein:
         specifier: ^1.0.16
         version: 1.0.16
@@ -768,8 +768,8 @@ packages:
     resolution: {integrity: sha512-HAbhAYKfsAC2EkTqve00ibWIZlaU74Z1EHwAjYr4PXF0YU2VEA1zSIKSSpKszRLRWwHzzRZXvK632u+uXzvsvw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@feature-sliced/filesystem@2.2.5':
-    resolution: {integrity: sha512-2z6qQQsbJ/jniNsYTxWgyVyUk28bBSq0uYdWrTFLJzTJgDrtU7Hx+5fji27VVoYzzyjdAr4wEEygJ7dYX59gkg==}
+  '@feature-sliced/filesystem@2.4.0':
+    resolution: {integrity: sha512-aOFdPACNvkFXYb+gNHId8UCRD5fm7Z9/RV6JgBPlgEvm1QtLS4idg2XeHMDGnHrNRCS4ki+0RauxVZxm+g9pvw==}
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -3625,7 +3625,7 @@ snapshots:
 
   '@eslint/object-schema@2.1.3': {}
 
-  '@feature-sliced/filesystem@2.2.5':
+  '@feature-sliced/filesystem@2.4.0':
     dependencies:
       typescript: 5.5.3
 

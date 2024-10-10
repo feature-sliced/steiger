@@ -70,7 +70,7 @@ async function traceSliceReferences(root: Folder) {
         continue
       }
       const dependencyLocation = sourceFileIndex[resolvedDependency]
-      if (dependencyLocation === undefined) {
+      if (dependencyLocation === undefined || sourceFile.layerName === dependencyLocation.layerName) {
         continue
       }
 

@@ -33,9 +33,12 @@ vi.mock('node:fs', async (importOriginal) => {
       '/src/shared/ui/index.ts': '',
       '/src/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
       '/src/entities/user/index.ts': '',
+      '/src/entities/user/@x/product.ts': '',
       '/src/entities/product/ui/ProductCard.tsx': 'import { UserAvatar } from "@/entities/user"',
+      '/src/entities/product/ui/GoodProductCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/src/entities/product/index.ts': '',
       '/src/entities/cart/ui/SmallCart.tsx': 'import { App } from "@/app"',
+      '/src/entities/cart/ui/BadSmallCart.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/src/entities/cart/lib/count-cart-items.ts': 'import root from "@/app/root.ts"',
       '/src/entities/cart/lib/index.ts': '',
       '/src/entities/cart/index.ts': '',
@@ -145,7 +148,7 @@ it('reports errors on a project where a feature imports from a page', async () =
   ])
 })
 
-it('reports errors in a project where a lower level imports from files that are direct children of a higher level', async () => {
+it('reports errors on a project where a lower level imports from files that are direct children of a higher level', async () => {
   const root = parseIntoFsdRoot(
     `
       📂 shared
@@ -187,6 +190,81 @@ it('reports errors in a project where a lower level imports from files that are 
     {
       message: `Forbidden import from higher layer "app".`,
       location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'SmallCart.tsx') },
+    },
+  ])
+})
+
+it('reports no errors on a project with cross-imports through @x', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 entities
+        📂 user
+          📂 @x
+            📄 product.ts
+          📂 ui
+            📄 UserAvatar.tsx
+          📄 index.ts
+        📂 product
+          📂 ui
+            📄 GoodProductCard.tsx
+          📄 index.ts
+      📂 pages
+        📂 editor
+          📂 ui
+            📄 EditorPage.tsx
+            📄 Editor.tsx
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+})
+
+it('reports errors on a project with incorrect cross-imports through @x', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 entities
+        📂 user
+          📂 @x
+            📄 product.ts
+          📂 ui
+            📄 UserAvatar.tsx
+          📄 index.ts
+        📂 product
+          📂 ui
+            📄 GoodProductCard.tsx
+          📄 index.ts
+        📂 cart
+          📂 ui
+            📄 BadSmallCart.tsx
+          📄 index.ts
+      📂 pages
+        📂 editor
+          📂 ui
+            📄 EditorPage.tsx
+            📄 Editor.tsx
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
+    {
+      message: `Forbidden cross-import from slice "user".`,
+      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx') },
     },
   ])
 })

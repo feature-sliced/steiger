@@ -37,6 +37,8 @@ Examples of project structures that fail this rule:
     📄 index.ts
     📂 lib // ❌
       📄 someUiFunction.ts
+    📂 @x // ❌
+      📄 justForFun.ts
 📂 entities
   📂 user
     📂 ui
