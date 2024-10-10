@@ -1,4 +1,4 @@
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/types'
 import { NAMESPACE } from '../constants.js'
 import { LayerName, layerSequence } from '@feature-sliced/filesystem'
 import { distance } from 'fastest-levenshtein'
@@ -10,7 +10,7 @@ const LEVENSHTEIN_DISTANCE_UPPER_BOUND = 3
 const typoInLayerName = {
   name: `${NAMESPACE}/typo-in-layer-name`,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     // construct list of suggestions, like [{ input: 'shraed', suggestion: 'shared', distance: 2 }, ...],
     // limit Levenshtein distance upper bound to 3,

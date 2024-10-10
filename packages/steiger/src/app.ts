@@ -1,78 +1,52 @@
-import { createEffect, sample, combine } from 'effector'
+import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import { Rule, Folder, Severity } from '@steiger/types'
-import type { AugmentedDiagnostic } from '@steiger/pretty-reporter'
+import { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $config, $rules } from './models/config'
+import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/config'
+import { runRule } from './features/run-rule'
+import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
+import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
 
 function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
-type Config = typeof $config
-type SeverityMap = Record<string, Exclude<Severity, 'off'>>
+async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
+  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
 
-function getSeverity(value: Severity | [Severity, Record<string, unknown>]): Severity {
-  return Array.isArray(value) ? value[0] : value
-}
+  const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
+  return ruleResults.flatMap((r, ruleResultsIndex) => {
+    const { diagnostics } = r
+    if (diagnostics.length === 0) {
+      return []
+    }
 
-function isEnabled([, value]: [string, Severity | [Severity, Record<string, unknown>]]): boolean {
-  return getSeverity(value) !== 'off'
-}
+    const ruleName = rules[ruleResultsIndex].name
+    const severities = calculateFinalSeverities(
+      vfsWithoutGlobalIgnores,
+      ruleName,
+      diagnostics.map((d) => d.location.path),
+    )
 
-const $enabledRules = combine($config, $rules, (config, rules) => {
-  const ruleConfigs = config?.rules
-
-  if (ruleConfigs === undefined) {
-    return rules
-  }
-
-  return rules.filter(
-    (rule) => !(rule.name in ruleConfigs) || ruleConfigs[rule.name as keyof typeof ruleConfigs] !== 'off',
-  )
-})
-
-const $severities = $config.map(
-  (config) =>
-    Object.fromEntries(
-      Object.entries(config?.rules ?? {})
-        .filter(isEnabled)
-        .map(([ruleName, severityOrTuple]) => [ruleName, getSeverity(severityOrTuple)]),
-    ) as SeverityMap,
-)
-
-const $ruleOptions = $config.map(
-  (config) =>
-    Object.fromEntries(
-      Object.entries(config?.rules ?? {})
-        .filter(isEnabled)
-        .map(([ruleName, severityOrTuple]) => [ruleName, Array.isArray(severityOrTuple) ? severityOrTuple[1] : {}]),
-    ) as Record<string, Record<string, unknown>>,
-)
-
-async function runRules({ vfs, rules, severities }: { vfs: Folder; rules: Array<Rule>; severities: SeverityMap }) {
-  const ruleResults = await Promise.all(
-    rules.map((rule) => {
-      const optionsForCurrentRule = $ruleOptions.getState()[rule.name]
-
-      return Promise.resolve(rule.check(vfs, optionsForCurrentRule)).then(({ diagnostics }) =>
-        diagnostics.map<AugmentedDiagnostic>((d) => ({
-          ...d,
-          ruleName: rule.name,
-          getRuleDescriptionUrl,
-          severity: severities[rule.name],
-        })),
-      )
-    }),
-  )
-  return ruleResults.flat()
+    return diagnostics.map((d, index) => ({
+      ...d,
+      ruleName,
+      getRuleDescriptionUrl,
+      severity: severities[index],
+    }))
+  })
 }
 
 export const linter = {
   run: (path: string) =>
-    scan(path).then((vfs) => runRules({ vfs, rules: $enabledRules.getState(), severities: $severities.getState() })),
+    scan(path).then((vfs) =>
+      runRules({
+        vfs,
+        rules: getEnabledRules(),
+      }),
+    ),
   watch: async (path: string) => {
     const { vfs, watcher } = await createWatcher(path)
 
@@ -81,7 +55,10 @@ export const linter = {
 
     sample({
       clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
-      source: { vfs: vfs.$tree, rules: $enabledRules, severities: $severities },
+      source: {
+        vfs: vfs.$tree,
+        rules: $enabledRules,
+      },
       target: runRulesFx,
     })
 
@@ -92,5 +69,3 @@ export const linter = {
 export function defineConfig(config: Config) {
   return config
 }
-
-export type { Config }

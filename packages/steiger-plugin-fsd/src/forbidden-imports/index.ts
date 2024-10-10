@@ -3,7 +3,7 @@ import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/types'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { NAMESPACE } from '../constants.js'
@@ -11,7 +11,7 @@ import { NAMESPACE } from '../constants.js'
 const forbiddenImports = {
   name: `${NAMESPACE}/forbidden-imports`,
   async check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
     const { tsconfig } = await parseNearestTsConfig(root.path)
     const sourceFileIndex = indexSourceFiles(root)
 
