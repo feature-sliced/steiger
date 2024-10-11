@@ -1,5 +1,6 @@
 import * as fs from 'node:fs'
-import { layerSequence, resolveImport } from '@feature-sliced/filesystem'
+import { join } from 'node:path'
+import { layerSequence, resolveImport, isCrossImportPublicApi } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
@@ -38,12 +39,15 @@ const forbiddenImports = {
           sourceFile.layerName === dependencyLocation.layerName &&
           sourceFile.sliceName !== dependencyLocation.sliceName
         ) {
-          if (dependencyLocation.sliceName === null) {
-            diagnostics.push({
-              message: `Forbidden cross-import from segment "${dependencyLocation.segmentName}".`,
-              location: { path: sourceFile.file.path },
+          if (
+            dependencyLocation.sliceName !== null &&
+            sourceFile.sliceName !== null &&
+            !isCrossImportPublicApi(dependencyLocation.file, {
+              inSlice: dependencyLocation.sliceName,
+              forSlice: sourceFile.sliceName,
+              layerPath: join(root.path, dependencyLocation.layerName),
             })
-          } else {
+          ) {
             diagnostics.push({
               message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
               location: { path: sourceFile.file.path },

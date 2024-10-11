@@ -7,6 +7,7 @@ Examples of imports that satisfy this rule:
 ```ts
 import { Button } from '@/shared/ui'
 import { UserAvatar } from '@/entities/user'
+import { UserAvatar } from '@/entities/user/@x/product'
 import { EditorPage } from '@/pages/editor'
 ```
 

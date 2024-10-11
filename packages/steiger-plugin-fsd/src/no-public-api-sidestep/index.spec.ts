@@ -20,9 +20,11 @@ vi.mock('node:fs', async (importOriginal) => {
       '/shared/ui/Button.tsx': 'import styles from "./styles";',
       '/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/shared/ui/index.ts': '',
+      '/entities/user/@x/product.ts': '',
       '/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
       '/entities/user/index.ts': '',
       '/entities/product/ui/ProductCard.tsx': 'import { UserAvatar } from "@/entities/user"',
+      '/entities/product/ui/CrossReferenceCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/entities/product/index.ts': '',
       '/features/comments/ui/CommentCard.tsx': 'import { styles } from "@/pages/editor"',
       '/features/comments/index.ts': '',
@@ -47,12 +49,15 @@ it('reports no errors on a project without public API sidesteps', async () => {
         📄 index.ts
     📂 entities
       📂 user
+        📂 @x
+          📄 product.ts
         📂 ui
           📄 UserAvatar.tsx
         📄 index.ts
       📂 product
         📂 ui
           📄 ProductCard.tsx
+          📄 CrossReferenceCard.tsx
         📄 index.ts
   `)
 
