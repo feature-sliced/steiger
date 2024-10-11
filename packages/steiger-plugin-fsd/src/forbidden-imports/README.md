@@ -36,6 +36,54 @@ flowchart BT
   pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
 ```
 
+```mermaid
+flowchart BT
+  subgraph shared
+    subgraph shared/ui[ui]
+      shared/ui/styles.ts[styles.ts]
+      shared/ui/Button.tsx[Button.tsx]
+      shared/ui/TextField.tsx[TextField.tsx]
+      shared/ui/index.ts[index.ts]
+    end
+  end
+
+  subgraph entities
+    subgraph entities/user[user]
+      subgraph entities/user/at-x[@x]
+        entities/user/at-x/product.ts[product.ts]
+      end
+      subgraph entities/user/ui[ui]
+        entities/user/ui/UserAvatar.tsx[UserAvatar.tsx]
+      end
+      entities/user/index.ts[index.ts]
+    end
+    subgraph entities/product[product]
+      subgraph entities/product/ui[ui]
+        entities/product/ui/ProductCard.tsx[ProductCard.tsx]
+      end
+      entities/product/index.ts[index.ts]
+    end
+  end
+
+  subgraph pages
+    subgraph pages/editor[editor]
+      subgraph pages/editor/ui[ui]
+        pages/editor/ui/EditorPage.tsx[EditorPage.tsx]
+        pages/editor/ui/Editor.tsx[Editor.tsx]
+      end
+      pages/editor/index.ts[index.ts]
+    end
+  end
+
+  shared/ui/Button.tsx --> shared/ui/styles.ts
+  shared/ui/TextField.tsx --> shared/ui/styles.ts
+  entities/user/ui/UserAvatar.tsx --> shared/ui/index.ts
+  entities/product/ui/ProductCard.tsx --> entities/user/at-x/product.ts
+  pages/editor/ui/Editor.tsx --> shared/ui/index.ts
+  pages/editor/ui/EditorPage.tsx --> shared/ui/index.ts
+  pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
+```
+
 Examples of project structures that fail this rule:
 
 ```mermaid
