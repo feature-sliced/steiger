@@ -216,10 +216,10 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
       tsup:
-        specifier: ^8.0.2
+        specifier: ^8.3.0
         version: 8.3.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.11))(postcss@8.4.47)(tsx@4.19.1)(typescript@5.6.3)(yaml@2.5.1)
       typescript:
-        specifier: ^5.5.3
+        specifier: ^5.6.3
         version: 5.6.3
       vitest:
         specifier: ^1.6.0
