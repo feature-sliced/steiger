@@ -6,9 +6,9 @@ import { getOptions, isConfigObject, isPlugin } from './raw-config'
 import { isEqual } from '../../shared/objects'
 
 const OLD_CONFIG_ERROR_MESSAGE =
-  'Old configuration structure noticed. We are evolving!\nPlease follow these easy 5-minute instructions to migrate to the new one:\nhttps://github.com/feature-sliced/steiger/blob/master/MIGRATION_GUIDE.md'
+  'Old configuration format detected. We are evolving!\nPlease follow this short guide to migrate to the new one:\nhttps://github.com/feature-sliced/steiger/blob/master/MIGRATION_GUIDE.md'
 const WRONG_CONFIG_SHAPE_ERROR_MESSAGE =
-  'The provided config has a wrong shape.\nPlease check your configuration file and follow the documentation to fix it:\nhttps://github.com/feature-sliced/steiger?tab=readme-ov-file#configuration'
+  'The config should be an Array, but the provided config is not.\nHere is a link to the documentation that might help to fix it:\nhttps://github.com/feature-sliced/steiger?tab=readme-ov-file#configuration'
 const NO_RULES_ERROR_MESSAGE = 'At least one rule must be provided by plugins!'
 const NO_CONFIG_OBJECTS_ERROR_MESSAGE = 'At least one config object must be provided!'
 
