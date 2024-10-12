@@ -3,7 +3,7 @@ import type { Config, GlobalIgnore, Plugin, Rule } from '@steiger/types'
 
 import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from './types'
-import buildValidationScheme from './build-validation-scheme'
+import { validateConfig } from './validate-config'
 import { isGlobalIgnore, isPlugin } from './raw-config'
 import { transformGlobs } from './transform-globs'
 
@@ -32,9 +32,7 @@ export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructi
 })
 
 export function processConfiguration(rawConfig: Config<Array<Rule>>, configLocationFolder: string | null) {
-  const validationScheme = buildValidationScheme(rawConfig)
-  const validatedConfig = validationScheme.parse(rawConfig)
-
+  const validatedConfig = validateConfig(rawConfig)
   const plugins = rawConfig.filter(isPlugin)
   const configTransformedGlobs = transformGlobs(validatedConfig, configLocationFolder)
   const ruleInstructions = createRuleInstructions(configTransformedGlobs)

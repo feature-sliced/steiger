@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { Config, Plugin, Rule } from '@steiger/types'
 
-import buildValidationScheme from './build-validation-scheme'
+import { buildValidationScheme, validateConfig } from './validate-config'
 import { isPlugin } from './raw-config'
 
 // The function maps a plugin object to a new object with the same properties as the original object,
@@ -311,5 +311,23 @@ describe('buildValidationScheme', () => {
     const scheme = buildValidationScheme(config)
 
     expect(() => scheme.parse(config)).toThrow()
+  })
+})
+
+describe('validateConfig', () => {
+  it('should throw an error when an old-style config is provided', () => {
+    // @ts-expect-error testing invalid input
+    expect(() => validateConfig({})).toThrow()
+  })
+
+  it('should throw an error when a config of wrong shape is provided ', () => {
+    // @ts-expect-error testing invalid input
+    expect(() => validateConfig('')).toThrow()
+
+    // @ts-expect-error testing invalid input
+    expect(() => validateConfig(234234234)).toThrow()
+
+    // @ts-expect-error testing invalid input
+    expect(() => validateConfig(true)).toThrow()
   })
 })
