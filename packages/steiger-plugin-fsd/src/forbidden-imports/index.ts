@@ -4,13 +4,13 @@ import { layerSequence, resolveImport, isCrossImportPublicApi } from '@feature-s
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import type { PartialDiagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { NAMESPACE } from '../constants.js'
 
 const forbiddenImports = {
-  name: `${NAMESPACE}/forbidden-imports`,
+  name: `${NAMESPACE}/forbidden-imports` as const,
   async check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
     const { tsconfig } = await parseNearestTsConfig(root.path)

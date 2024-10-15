@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { Config } from '@steiger/types'
+import type { Config, Rule } from '@steiger/types'
+import { joinFromRoot } from '@steiger/toolkit'
 
-import { joinFromRoot } from '../../_lib/prepare-test'
 import { transformGlobs } from './transform-globs'
 
 describe('transformGlobs', () => {
   it('should convert relative globs to absolute', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       {
         ignores: ['./src/entities/**'],
       },
@@ -34,7 +34,7 @@ describe('transformGlobs', () => {
   })
 
   it('should strip trailing slashes', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       {
         ignores: ['./src/entities/', '**/shared/'],
       },
@@ -62,7 +62,7 @@ describe('transformGlobs', () => {
   })
 
   it("should correctly transform globs that are relative but don't start with a dot", () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       {
         ignores: ['src/entities/**'],
       },
@@ -90,7 +90,7 @@ describe('transformGlobs', () => {
   })
 
   it('should correctly transform negated globs', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       {
         ignores: ['!src/entities/**'],
       },

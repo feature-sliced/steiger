@@ -1,4 +1,4 @@
-import { Config, Rule, Plugin, ConfigObject } from '@steiger/types'
+import { enableAllRules, type ConfigObjectOf, createPlugin, createConfigs } from '@steiger/toolkit'
 
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
@@ -19,7 +19,7 @@ import typoInLayerName from './typo-in-layer-name/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json'
 
-const allRules: Array<Rule> = [
+const rules = [
   ambiguousSliceNames,
   excessiveSlicing,
   forbiddenImports,
@@ -39,23 +39,21 @@ const allRules: Array<Rule> = [
   noProcesses,
 ]
 
-const allRulesEnabledConfig: ConfigObject = {
-  rules: allRules.reduce((acc, rule) => ({ ...acc, [rule.name]: 'error' }), {}),
-}
-
-const plugin: Plugin = {
+const plugin = createPlugin({
   meta: {
     name: 'steiger-plugin-fsd',
     version: packageJson.version,
   },
-  ruleDefinitions: allRules,
-}
+  ruleDefinitions: rules,
+})
 
-const configs: Record<string, Config> = {
-  recommended: [plugin, allRulesEnabledConfig],
-}
+const configs = createConfigs({
+  recommended: enableAllRules(plugin),
+})
 
 export default {
   plugin,
   configs,
 }
+
+export type FSDConfigObject = ConfigObjectOf<typeof plugin>

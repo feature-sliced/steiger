@@ -1,6 +1,6 @@
 import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import { Config, Folder, Rule } from '@steiger/types'
+import type { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
@@ -66,6 +66,6 @@ export const linter = {
   },
 }
 
-export function defineConfig(config: Config) {
+export function defineConfig<Rules extends Array<Rule> = Array<Rule>>(config: Config<Rules>) {
   return config
 }

@@ -3,7 +3,7 @@ import { resolveImport } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import type { PartialDiagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { NAMESPACE } from '../constants.js'

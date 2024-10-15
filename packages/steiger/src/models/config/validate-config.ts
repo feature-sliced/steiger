@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import { BaseRuleOptions, Config, Plugin, Severity } from '@steiger/types'
+import { BaseRuleOptions, Config, Plugin, Rule } from '@steiger/types'
 
 import { getOptions, isConfigObject, isPlugin } from './raw-config'
 import { isEqual } from '../../shared/objects'
@@ -17,7 +17,7 @@ function getAllRuleNames(plugins: Array<Plugin>) {
   return allRules.map((rule) => rule.name)
 }
 
-function validateConfigObjectsNumber(value: Config, ctx: z.RefinementCtx) {
+function validateConfigObjectsNumber(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
   const configObjects = value.filter(isConfigObject)
 
   if (configObjects.length === 0) {
@@ -28,7 +28,7 @@ function validateConfigObjectsNumber(value: Config, ctx: z.RefinementCtx) {
   }
 }
 
-function validateRuleUniqueness(value: Config, ctx: z.RefinementCtx) {
+function validateRuleUniqueness(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
   const allRuleNames = getAllRuleNames(value.filter(isPlugin))
   const uniqueNames = new Set<string>(allRuleNames)
 
@@ -42,34 +42,32 @@ function validateRuleUniqueness(value: Config, ctx: z.RefinementCtx) {
   }
 }
 
-function validateRuleOptions(value: Config, ctx: z.RefinementCtx) {
+function validateRuleOptions(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
   const ruleToOptions: Record<string, BaseRuleOptions | null> = {}
 
   value.forEach((configObject) => {
     if (isConfigObject(configObject)) {
-      Object.entries(configObject.rules).forEach(
-        ([ruleName, severityOrTuple]: [string, Severity | [Severity, Record<string, unknown>]]) => {
-          const prevOptions = ruleToOptions[ruleName]
-          const ruleOptions: BaseRuleOptions | null = getOptions(severityOrTuple)
+      Object.entries(configObject.rules).forEach(([ruleName, severityOrTuple]) => {
+        const prevOptions = ruleToOptions[ruleName]
+        const ruleOptions: BaseRuleOptions | null = getOptions(severityOrTuple)
 
-          if (!prevOptions) {
-            ruleToOptions[ruleName] = ruleOptions
-            return
-          }
+        if (!prevOptions) {
+          ruleToOptions[ruleName] = ruleOptions
+          return
+        }
 
-          if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `
-                Rule "${ruleName}" has multiple options provided! 
-                  ${JSON.stringify(ruleToOptions[ruleName])} 
+        if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `
+                Rule "${ruleName}" has multiple options provided!
+                  ${JSON.stringify(ruleToOptions[ruleName])}
                 and
                   ${JSON.stringify(ruleOptions)}.
                 You can only provide options for a rule once.`,
-            })
-          }
-        },
-      )
+          })
+        }
+      })
     }
   })
 }
@@ -77,7 +75,7 @@ function validateRuleOptions(value: Config, ctx: z.RefinementCtx) {
 /**
  * Dynamically build a validation scheme based on the rules provided by plugins.
  * */
-export function buildValidationScheme(rawConfig: Config) {
+export function buildValidationScheme(rawConfig: Config<Array<Rule>>) {
   const allRuleNames = getAllRuleNames(rawConfig.filter(isPlugin))
 
   // Make sure there's at least one rule registered by plugins
@@ -133,7 +131,7 @@ export function buildValidationScheme(rawConfig: Config) {
     .superRefine(validateRuleUniqueness)
 }
 
-export function validateConfig(rawConfig: Config) {
+export function validateConfig(rawConfig: Config<Array<Rule>>) {
   const isOldConfig = typeof rawConfig === 'object' && !Array.isArray(rawConfig)
   const isWrongShape = !Array.isArray(rawConfig)
 

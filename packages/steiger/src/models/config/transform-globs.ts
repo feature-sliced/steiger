@@ -1,5 +1,5 @@
 import { posix, sep, isAbsolute } from 'node:path'
-import { Config } from '@steiger/types'
+import { Config, Rule } from '@steiger/types'
 
 import { isConfigObject, isConfiguration } from './raw-config'
 import { getGlobPath, replaceGlobPath } from '../../shared/globs'
@@ -27,7 +27,7 @@ function stripTrailingSlashes(globs: Array<string>) {
   return globs.map((ignore) => ignore.replace(/\/$/, ''))
 }
 
-export function transformGlobs(config: Config, configLocationPath: string | null) {
+export function transformGlobs(config: Config<Array<Rule>>, configLocationPath: string | null) {
   if (!configLocationPath) {
     return config
   }

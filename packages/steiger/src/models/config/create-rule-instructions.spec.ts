@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { Config } from '@steiger/types'
+import type { Config, Rule } from '@steiger/types'
 
 import createRuleInstructions from './create-rule-instructions'
 
 describe('createRuleInstructions', () => {
   it('should create rule instructions for each rule present in the config', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       {
         rules: {
           rule1: 'warn',
@@ -56,7 +56,7 @@ describe('createRuleInstructions', () => {
   })
 
   it('should add several glob groups for a rule if they are provided in the config', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       {
         rules: {
           rule1: 'warn',

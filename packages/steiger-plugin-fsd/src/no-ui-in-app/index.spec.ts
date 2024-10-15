@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 import noUiInApp from './index.js'
-import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
 
 it('reports no errors on a project without the "ui" segment on the "app" layer', () => {
   const root = parseIntoFsdRoot(`

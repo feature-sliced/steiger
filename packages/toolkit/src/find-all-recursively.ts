@@ -1,7 +1,7 @@
 import { basename } from 'node:path'
 import type { Folder, File } from '@steiger/types'
 
-import { joinFromRoot, parseIntoFsdRoot as parseIntoFolder } from './prepare-test.js'
+import { joinFromRoot, parseIntoFolder } from './prepare-test.js'
 
 /** Recursively walk through a folder and return all entries that satisfy the predicate in a flat array. */
 export function findAllRecursively(folder: Folder, predicate: (entry: Folder | File) => boolean): Array<Folder | File> {

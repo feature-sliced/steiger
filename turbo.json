@@ -32,7 +32,7 @@
       "cache": false
     },
     "test": {
-      "dependsOn": ["transit"]
+      "dependsOn": ["transit", "build"]
     }
   }
 }
