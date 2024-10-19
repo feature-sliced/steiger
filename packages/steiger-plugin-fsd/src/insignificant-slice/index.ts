@@ -1,12 +1,14 @@
 import * as fs from 'node:fs'
 import { sep, join } from 'node:path'
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import { isSliced, resolveImport, unslicedLayers, type LayerName } from '@feature-sliced/filesystem'
+import { isSliced, unslicedLayers, type LayerName } from '@feature-sliced/filesystem'
 import type { Folder, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import precinct from 'precinct'
 const { paperwork } = precinct
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
+import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
+import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 
 const insignificantSlice = {
@@ -51,7 +53,8 @@ export default insignificantSlice
 
 async function traceSliceReferences(root: Folder) {
   const sourceFileIndex = indexSourceFiles(root)
-  const { tsconfig } = await parseNearestTsConfig(root.path)
+  const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
+  const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
   const references = new Map<string, Set<string>>()
 
   for (const sourceFile of Object.values(sourceFileIndex)) {
@@ -59,16 +62,17 @@ async function traceSliceReferences(root: Folder) {
 
     const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
     for (const dependency of dependencies) {
-      const resolvedDependency = resolveImport(
+      const resolvedDependency = resolveDependency(
         dependency,
         sourceFile.file.path,
-        tsconfig?.compilerOptions ?? {},
+        tsConfigs,
         fs.existsSync,
         fs.existsSync,
       )
       if (resolvedDependency === null) {
         continue
       }
+
       const dependencyLocation = sourceFileIndex[resolvedDependency]
       if (dependencyLocation === undefined || sourceFile.layerName === dependencyLocation.layerName) {
         continue
