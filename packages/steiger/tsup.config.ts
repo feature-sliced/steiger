@@ -1,4 +1,3 @@
-import { exec } from 'node:child_process'
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
@@ -7,14 +6,12 @@ export default defineConfig({
   outExtension: () => ({ js: '.mjs' }),
   dts: {
     entry: 'src/app.ts',
+    resolve: true,
   },
   treeshake: true,
   clean: true,
   inject: ['./cjs-shim.ts'],
   esbuildOptions(options) {
     options.define = { 'import.meta.vitest': 'undefined' }
-  },
-  onSuccess: async () => {
-    exec('tsc --emitDeclarationOnly')
   },
 })

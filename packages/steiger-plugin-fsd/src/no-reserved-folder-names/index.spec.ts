@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import noReservedFolderNames from './index.js'
-import { joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project without subfolders in segments that use reserved names', () => {
   const root = parseIntoFsdRoot(`
@@ -31,6 +31,8 @@ it('reports errors on a project with subfolders in segments that use reserved na
         📄 index.ts
         📂 lib
           📄 someUiFunction.ts
+        📂 @x
+          📄 justForFun.ts
     📂 entities
       📂 user
         📂 ui
@@ -48,6 +50,11 @@ it('reports errors on a project with subfolders in segments that use reserved na
       message:
         'Having a folder with the name "lib" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.',
       location: { path: joinFromRoot('shared', 'ui', 'lib') },
+    },
+    {
+      message:
+        'Having a folder with the name "@x" inside a segment could be confusing because that name is reserved for cross-import public APIs. Consider renaming it.',
+      location: { path: joinFromRoot('shared', 'ui', '@x') },
     },
   ])
 })

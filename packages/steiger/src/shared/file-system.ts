@@ -1,29 +1,31 @@
 import { File, Folder } from '@steiger/types'
 
-/**
- * Turn a tree folder structure into a flat array of files.
- * */
-export function flattenFolder(folder: Folder): File[] {
-  return folder.children.reduce((acc, child) => {
-    if (child.type === 'file') {
-      return [...acc, child]
+export function isPathInTree(vfs: Folder, paths: string | Array<string>) {
+  const pathsToCheck = Array.isArray(paths) ? paths : [paths]
+  const results: Array<boolean> = new Array(pathsToCheck.length).fill(false)
+  let found = 0
+
+  const stack: Array<File | Folder> = [vfs]
+
+  while (stack.length > 0) {
+    const node = stack.pop()!
+    const currentPathIndex = pathsToCheck.indexOf(node.path)
+
+    if (currentPathIndex !== -1) {
+      results[currentPathIndex] = true
+      found++
     }
 
-    return [...acc, ...flattenFolder(child)]
-  }, [] as File[])
-}
+    if (found === pathsToCheck.length) {
+      break
+    }
 
-export function copyFsEntity<T extends Folder | File>(fsEntity: T, deep: boolean = false) {
-  if (fsEntity.type === 'folder') {
-    const newChildren: Array<Folder | File> = deep
-      ? fsEntity.children.map((child) => (child.type === 'folder' ? copyFsEntity(child, true) : child))
-      : []
-
-    return {
-      ...fsEntity,
-      children: newChildren,
+    if (node.type === 'folder') {
+      for (let i = 0; i < node.children.length; i++) {
+        stack.push(node.children[i])
+      }
     }
   }
 
-  return { ...fsEntity }
+  return typeof paths === 'string' ? results[0] : results
 }

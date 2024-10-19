@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
 import { NAMESPACE } from '../constants.js'
@@ -14,9 +14,9 @@ const THRESHOLDS = {
 
 /** Warn about excessive amounts of ungrouped entities/features/widgets/pages. */
 const excessiveSlicing = {
-  name: `${NAMESPACE}/excessive-slicing`,
+  name: `${NAMESPACE}/excessive-slicing` as const,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
       if (!isSliced(layer) || !(layerName in THRESHOLDS)) {

@@ -1,5 +1,5 @@
 import { getIndex, getLayers } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 /** Layers that are allowed to have an index file. */
@@ -7,9 +7,9 @@ const exceptionLayers = ['app']
 
 /** Forbid index files on layer level. */
 const noLayerPublicApi = {
-  name: `${NAMESPACE}/no-layer-public-api`,
+  name: `${NAMESPACE}/no-layer-public-api` as const,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
       const index = getIndex(layer)

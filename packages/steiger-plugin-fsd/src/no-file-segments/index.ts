@@ -1,12 +1,12 @@
 import { basename } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 const noFileSegments = {
   name: `${NAMESPACE}/no-file-segments`,
   check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
       if (!isSliced(layer)) {

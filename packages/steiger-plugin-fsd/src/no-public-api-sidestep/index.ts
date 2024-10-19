@@ -2,8 +2,8 @@ import * as fs from 'node:fs'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import { getIndex, getLayers, getSegments, isSliced } from '@feature-sliced/filesystem'
-import type { Folder, File, Diagnostic, Rule } from '@steiger/types'
+import { getIndex, getLayers, getSegments, isSliced, crossReferenceToken } from '@feature-sliced/filesystem'
+import type { Folder, File, PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
@@ -12,9 +12,9 @@ import { NAMESPACE } from '../constants.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {
-  name: `${NAMESPACE}/no-public-api-sidestep`,
+  name: `${NAMESPACE}/no-public-api-sidestep` as const,
   async check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
     const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
     const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
     const sourceFileIndex = indexSourceFiles(root)
@@ -47,7 +47,7 @@ const noPublicApiSidestep = {
         }
 
         if (isSliced(dependencyLocation.layerName)) {
-          if (dependencyLocation.segmentName !== null) {
+          if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== crossReferenceToken) {
             diagnostics.push({
               message: `Forbidden sidestep of public API when importing from "${dependency}".`,
               location: { path: sourceFile.file.path },

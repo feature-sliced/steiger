@@ -1,9 +1,10 @@
 import * as fs from 'node:fs'
-import { layerSequence } from '@feature-sliced/filesystem'
+import { join } from 'node:path'
+import { layerSequence, isCrossImportPublicApi } from '@feature-sliced/filesystem'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import type { Diagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
@@ -11,9 +12,9 @@ import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 
 const forbiddenImports = {
-  name: `${NAMESPACE}/forbidden-imports`,
+  name: `${NAMESPACE}/forbidden-imports` as const,
   async check(root) {
-    const diagnostics: Array<Diagnostic> = []
+    const diagnostics: Array<PartialDiagnostic> = []
     const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
     const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
     const sourceFileIndex = indexSourceFiles(root)
@@ -42,12 +43,15 @@ const forbiddenImports = {
           sourceFile.layerName === dependencyLocation.layerName &&
           sourceFile.sliceName !== dependencyLocation.sliceName
         ) {
-          if (dependencyLocation.sliceName === null) {
-            diagnostics.push({
-              message: `Forbidden cross-import from segment "${dependencyLocation.segmentName}".`,
-              location: { path: sourceFile.file.path },
+          if (
+            dependencyLocation.sliceName !== null &&
+            sourceFile.sliceName !== null &&
+            !isCrossImportPublicApi(dependencyLocation.file, {
+              inSlice: dependencyLocation.sliceName,
+              forSlice: sourceFile.sliceName,
+              layerPath: join(root.path, dependencyLocation.layerName),
             })
-          } else {
+          ) {
             diagnostics.push({
               message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
               location: { path: sourceFile.file.path },

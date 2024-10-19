@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 import { join } from 'node:path'
 
-import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import insignificantSlice from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
@@ -13,7 +13,7 @@ vi.mock('tsconfck', async (importOriginal) => {
 
 vi.mock('node:fs', async (importOriginal) => {
   const originalFs = await importOriginal<typeof import('fs')>()
-  const { createFsMocks } = await import('../_lib/prepare-test.js')
+  const { createFsMocks } = await import('@steiger/toolkit')
 
   return createFsMocks(
     {
@@ -21,9 +21,11 @@ vi.mock('node:fs', async (importOriginal) => {
       '/shared/ui/Button.tsx': 'import styles from "./styles";',
       '/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/shared/ui/index.ts': '',
+      '/entities/user/@x/product.ts': '',
       '/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
       '/entities/user/index.ts': '',
       '/entities/product/ui/ProductCard.tsx': '',
+      '/entities/product/ui/CrossReferenceCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/entities/product/index.ts': '',
       '/features/comments/ui/CommentCard.tsx': '',
       '/features/comments/index.ts': '',
@@ -118,6 +120,39 @@ it('reports errors on a project with insignificant slices', async () => {
       📂 settings
         📂 ui
           📄 SettingsPage.tsx
+        📄 index.ts
+  `)
+
+  expect((await insignificantSlice.check(root)).diagnostics.sort(compareMessages)).toEqual([
+    {
+      message: `This slice has no references. Consider removing it.`,
+      location: { path: joinFromRoot('entities', 'product') },
+    },
+    {
+      message: `This slice has only one reference in slice "${join('pages', 'editor')}". Consider merging them.`,
+      location: { path: joinFromRoot('entities', 'user') },
+    },
+  ])
+})
+
+it('reports errors on a project where the only other reference to a slice is a cross-import', async () => {
+  const root = parseIntoFsdRoot(`
+    📂 entities
+      📂 user
+        📂 @x
+          📄 product.ts
+        📂 ui
+          📄 UserAvatar.tsx
+        📄 index.ts
+      📂 product
+        📂 ui
+          📄 CrossReferenceCard.tsx
+        📄 index.ts
+    📂 pages
+      📂 editor
+        📂 ui
+          📄 EditorPage.tsx
+          📄 Editor.tsx
         📄 index.ts
   `)
 
