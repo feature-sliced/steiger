@@ -7,19 +7,22 @@ Universal file structure and project architecture linter.
 > [!NOTE]
 > The project is in beta and in active development. Some APIs may change.
 
-# Features
+> [!NOTE]
+> Version 0.5.0 introduces a new config file format. Please refer to the [Configuration](#configuration) section for more information and migration guide.
+
+## Features
 
 - Built-in set of rules to validate adherence to [Feature-Sliced Design](https://feature-sliced.design/)
 - Watch mode
 - Rule configurability
 
-# Installation
+## Installation
 
 ```bash
 npm i -D steiger
 ```
 
-# Usage
+## Usage
 
 ```bash
 npx steiger ./src
@@ -31,23 +34,70 @@ To run in watch mode, add `-w`/`--watch` to the command:
 npx steiger ./src --watch
 ```
 
-# Configuration
+## Configuration
 
 Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.
 
 Steiger is configurable via `cosmiconfig`. That means that you can create a `steiger.config.ts` or `steiger.config.js` file in the root of your project to configure the rules. Import `{ defineConfig } from "steiger"` to get autocompletion.
 
-```ts
-import { defineConfig } from 'steiger'
+The config file shape is highly inspired by ESLint's config file, so if you have configured ESLint before, you'll find it easy to configure Steiger.
 
-export default defineConfig({
-  rules: {
-    'public-api': 'off',
+### Example
+
+Here are some rules on how configuration is processed:
+
+- Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
+- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and permanently remove files from the linter's field of view, so you can't reassign severity to them in other later objects.
+- You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
+
+Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
+
+```javascript
+// ./steiger.config.ts
+import fsd from '@feature-sliced/steiger-plugin'
+import defineConfig from 'steiger'
+
+export default defineConfig([
+  ...fsd.configs.recommended,
+  {
+    // ignore all mock files for all rules
+    ignores: ['**/__mocks__/**'],
   },
-})
+  {
+    files: ['./src/shared/**'],
+    rules: {
+      // disable public-api rule for files in /shared folder
+      'fsd/public-api': 'off',
+    },
+  },
+  {
+    files: ['./src/widgets/**'],
+    ignores: ['**/discount-offers/**'],
+    rules: {
+      // disable no-segmentless-slices rule for all widgets except /discount-offers
+      'fsd/no-segmentless-slices': 'off',
+    },
+  },
+])
 ```
 
-# Rules
+### Glob matching
+
+All globs are matched only against files, folder severities are computed based on the files inside them. The formula is simple: the folder severity is the highest severity of files inside it (from highest to lowest: error, warn, off).
+
+**Glob examples**:
+
+- `./src/shared/**` - matches all files in the `shared` folder and its subfolders
+- `./src/shared/*` - matches all files that are direct children of the `shared` folder
+- `./src/shared` - based on the fact that globs are matched against files, this one matches only `shared` file (without an extension) inside the `src` folder
+- `**/__mocks__/**` - matches all files in all `__mocks__` folders throughout the project
+- `**/*.{test,spec}.{ts,tsx}` - matches all test files in the project
+
+### Migration from 0.4.0
+
+Version 0.5.0 introduced a new config file format. Follow the [instructions](MIGRATION_GUIDE.md) to migrate your config file.
+
+## Rules
 
 Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://feature-sliced.design/).
 
@@ -80,12 +130,12 @@ Currently, Steiger is not extendable with more rules, though that will change in
 </tbody>
 </table>
 
-# Contribution
+## Contribution
 
 Feel free to report an issue or open a discussion. Ensure you read our [Code of Conduct](CODE_OF_CONDUCT.md) first though :)
 
 To get started with the codebase, see our [Contributing guide](CONTRIBUTING.md).
 
-# Legal info
+## Legal info
 
 Project licensed under [MIT License](LICENSE.md). [Here's what it means](https://choosealicense.com/licenses/mit/)
