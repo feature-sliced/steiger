@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { resolve, relative, dirname } from 'node:path'
+import { stat } from 'node:fs/promises'
 import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
@@ -68,8 +69,20 @@ try {
   }
 }
 
+const targetPath = resolve(consoleArgs._[0])
+
+try {
+  if (!(await stat(targetPath)).isDirectory()) {
+    console.error(`${consoleArgs._[0]} is a file, must be a folder`)
+    process.exit(102)
+  }
+} catch {
+  console.error(`Folder ${consoleArgs._[0]} does not exist`)
+  process.exit(101)
+}
+
 if (consoleArgs.watch) {
-  const [diagnosticsChanged, stopWatching] = await linter.watch(resolve(consoleArgs._[0]))
+  const [diagnosticsChanged, stopWatching] = await linter.watch(targetPath)
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
     reportPretty(state, process.cwd())
@@ -82,7 +95,7 @@ if (consoleArgs.watch) {
     unsubscribe()
   })
 } else {
-  const diagnostics = await linter.run(resolve(consoleArgs._[0]))
+  const diagnostics = await linter.run(targetPath)
   let stillRelevantDiagnostics = diagnostics
 
   reportPretty(diagnostics, process.cwd())
