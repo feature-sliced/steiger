@@ -99,6 +99,7 @@ export default defineConfig([
       },
     ])
   ```
+  [You can see more examples here](CONFIG_EXAMPLES.md)
 </details>
 
 ### Glob matching
