@@ -61,13 +61,14 @@ export default defineConfig([
 ])
 ```
 
-Here are some rules on how configuration is processed:
+> [!TIP]
+> If you want Steiger to ignore certain files, add an object like this to the config array:
+>
+> ```js
+> defineConfig([, /* … */ { ignores: ['**/__mocks__/**'] }])
+> ```
 
-- Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
-- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and permanently remove files from the linter's field of view, so you can't reassign severity to them in other later objects.
-- You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
-
-Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
+Here's an example of a more complex configuration:
 
 ```javascript
 // ./steiger.config.ts
