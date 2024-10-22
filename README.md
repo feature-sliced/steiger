@@ -44,6 +44,23 @@ The config file shape is highly inspired by ESLint's config file, so if you have
 
 ### Example
 
+```javascript
+// ./steiger.config.js
+import { defineConfig } from 'steiger'
+import fsd from '@feature-sliced/steiger-plugin'
+
+export default defineConfig([
+  ...fsd.configs.recommended,
+  {
+    // disable the `public-api` rule for files in the Shared layer
+    files: ['./src/shared/**'],
+    rules: {
+      'fsd/public-api': 'off',
+    },
+  },
+])
+```
+
 Here are some rules on how configuration is processed:
 
 - Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
