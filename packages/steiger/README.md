@@ -8,7 +8,7 @@ Universal file structure and project architecture linter.
 > The project is in beta and in active development. Some APIs may change.
 
 > [!NOTE]
-> Version 0.5.0 introduces a new config file format. Please refer to the [Configuration](#configuration) section for more information and migration guide.
+> Version 0.5.0 introduced a new config file format. We have a codemod to automatically update your config, see the [migration guide](./MIGRATION_GUIDE.md).
 
 ## Features
 
@@ -44,18 +44,37 @@ The config file shape is highly inspired by ESLint's config file, so if you have
 
 ### Example
 
-Here are some rules on how configuration is processed:
+```javascript
+// ./steiger.config.js
+import { defineConfig } from 'steiger'
+import fsd from '@feature-sliced/steiger-plugin'
 
-- Config objects are processed from top to bottom, so if there are multiple config object that match the same file for the same rule, the last one will be applied.
-- GlobalIgnore objects `{ ignores: ['**/__mocks__/**'] }` are applied to all rules, they are processed first and permanently remove files from the linter's field of view, so you can't reassign severity to them in other later objects.
-- You can set options for a rule once. When set, options are applied for the entire file system that is covered by Steiger.
+export default defineConfig([
+  ...fsd.configs.recommended,
+  {
+    // disable the `public-api` rule for files in the Shared layer
+    files: ['./src/shared/**'],
+    rules: {
+      'fsd/public-api': 'off',
+    },
+  },
+])
+```
 
-Note that this line `...fsd.configs.recommended,` just takes the plugin and the recommended rules configuration (all enabled with "error" severity by default) and puts it into the config array.
+> [!TIP]
+> If you want Steiger to ignore certain files, add an object like this to the config array:
+>
+> ```js
+> defineConfig([, /* … */ { ignores: ['**/__mocks__/**'] }])
+> ```
+
+<details>
+  <summary>Comprehensive showcase of the config file syntax</summary>
 
 ```javascript
 // ./steiger.config.ts
+import { defineConfig } from 'steiger'
 import fsd from '@feature-sliced/steiger-plugin'
-import defineConfig from 'steiger'
 
 export default defineConfig([
   ...fsd.configs.recommended,
@@ -81,21 +100,13 @@ export default defineConfig([
 ])
 ```
 
-### Glob matching
+[You can see more examples here](../../CONFIG_EXAMPLES.md)
 
-All globs are matched only against files, folder severities are computed based on the files inside them. The formula is simple: the folder severity is the highest severity of files inside it (from highest to lowest: error, warn, off).
-
-**Glob examples**:
-
-- `./src/shared/**` - matches all files in the `shared` folder and its subfolders
-- `./src/shared/*` - matches all files that are direct children of the `shared` folder
-- `./src/shared` - based on the fact that globs are matched against files, this one matches only `shared` file (without an extension) inside the `src` folder
-- `**/__mocks__/**` - matches all files in all `__mocks__` folders throughout the project
-- `**/*.{test,spec}.{ts,tsx}` - matches all test files in the project
+</details>
 
 ### Migration from 0.4.0
 
-Version 0.5.0 introduced a new config file format. Follow the [instructions](MIGRATION_GUIDE.md) to migrate your config file.
+Version 0.5.0 introduced a new config file format. Follow the [instructions](../../MIGRATION_GUIDE.md) to migrate your config file.
 
 ## Rules
 
@@ -132,10 +143,10 @@ Currently, Steiger is not extendable with more rules, though that will change in
 
 ## Contribution
 
-Feel free to report an issue or open a discussion. Ensure you read our [Code of Conduct](CODE_OF_CONDUCT.md) first though :)
+Feel free to report an issue or open a discussion. Ensure you read our [Code of Conduct](../../CODE_OF_CONDUCT.md) first though :)
 
-To get started with the codebase, see our [Contributing guide](CONTRIBUTING.md).
+To get started with the codebase, see our [Contributing guide](../../CONTRIBUTING.md).
 
 ## Legal info
 
-Project licensed under [MIT License](LICENSE.md). [Here's what it means](https://choosealicense.com/licenses/mit/)
+Project licensed under [MIT License](../../LICENSE.md). [Here's what it means](https://choosealicense.com/licenses/mit/)
