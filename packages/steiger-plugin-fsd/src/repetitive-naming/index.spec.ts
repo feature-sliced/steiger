@@ -121,30 +121,31 @@ it('still recognizes repetitive words inside slice groups', () => {
         📂 api
         📂 ui
         📄 index.ts
-      📂 session
-        📂 login-word
-          📂 api
-          📂 ui
-          📄 index.ts
-        📂 logout-word
-          📂 api
-          📂 ui
-          📄 index.ts
-        📂 register-word
-          📂 api
-          📂 ui
-          📄 index.ts
-        📂 word
-          📂 api
-          📂 ui
-          📄 index.ts
+      📂 group
+        📂 session
+          📂 login-word
+            📂 api
+            📂 ui
+            📄 index.ts
+          📂 logout-word
+            📂 api
+            📂 ui
+            📄 index.ts
+          📂 register-word
+            📂 api
+            📂 ui
+            📄 index.ts
+          📂 word
+            📂 api
+            📂 ui
+            📄 index.ts
   `)
 
   expect(repetitiveNaming.check(root)).toEqual({
     diagnostics: [
       {
         location: {
-          path: '/pages/session',
+          path: joinFromRoot('pages', 'group', 'session'),
         },
         message: 'Repetitive word "word" in slice names.',
       },
