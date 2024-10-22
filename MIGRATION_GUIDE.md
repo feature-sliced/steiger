@@ -67,7 +67,8 @@ export default defineConfig([
 
 </td></tr></tbody></table>
 
-**! Don't forget to check the changes after the migration and bring them to the code style adopted in your project**
+> [!NOTE]
+> The codemod will probably get the formatting wrong, so don't forget to check the file yourself after migration.
 
 **pnpm**:
 
