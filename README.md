@@ -8,7 +8,7 @@ Universal file structure and project architecture linter.
 > The project is in beta and in active development. Some APIs may change.
 
 > [!NOTE]
-> Version 0.5.0 introduces a new config file format. Please refer to the [Configuration](#configuration) section for more information and migration guide.
+> Version 0.5.0 introduced a new config file format. We have a codemod to automatically update your config, see the [migration guide](./MIGRATION_GUIDE.md).
 
 ## Features
 
