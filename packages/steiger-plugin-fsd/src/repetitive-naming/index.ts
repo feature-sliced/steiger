@@ -1,6 +1,9 @@
+import { join } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
+
 import { NAMESPACE } from '../constants.js'
+import { groupSlices } from '../_lib/group-slices.js'
 
 /**
  * Pattern that matches one word in different naming conventions.
@@ -25,22 +28,28 @@ const repetitiveNaming = {
         continue
       }
 
-      const sliceNames = Object.keys(getSlices(layer))
-      const wordsInSliceNames = sliceNames.map((name) =>
-        (name.match(wordPattern) ?? <Array<string>>[]).map((word) => word.toLowerCase()),
-      )
-      const mostCommonWords = wordsInSliceNames.flat().reduce((acc, word) => {
-        acc.set(word, (acc.get(word) ?? 0) + 1)
-        return acc
-      }, new Map<string, number>())
+      const sliceGroups = groupSlices(Object.keys(getSlices(layer)))
 
-      for (const [word, count] of mostCommonWords.entries()) {
-        if (
-          sliceNames.length > 2 &&
-          count >= sliceNames.length &&
-          wordsInSliceNames.every((words) => words.includes(word))
-        ) {
-          diagnostics.push({ message: `Repetitive word "${word}" in slice names.`, location: { path: layer.path } })
+      for (const [group, sliceNames] of Object.entries(sliceGroups)) {
+        const wordsInSliceNames = sliceNames.map((name) =>
+          (name.match(wordPattern) ?? <Array<string>>[]).map((word) => word.toLowerCase()),
+        )
+        const mostCommonWords = wordsInSliceNames.flat().reduce((acc, word) => {
+          acc.set(word, (acc.get(word) ?? 0) + 1)
+          return acc
+        }, new Map<string, number>())
+
+        for (const [word, count] of mostCommonWords.entries()) {
+          if (
+            sliceNames.length > 2 &&
+            count >= sliceNames.length &&
+            wordsInSliceNames.every((words) => words.includes(word))
+          ) {
+            diagnostics.push({
+              message: `Repetitive word "${word}" in slice names.`,
+              location: { path: join(layer.path, group) },
+            })
+          }
         }
       }
     }
