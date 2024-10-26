@@ -14,6 +14,7 @@ import { linter } from './app'
 import { processConfiguration } from './models/config'
 import { applyAutofixes } from './features/autofix'
 import fsd from '@feature-sliced/steiger-plugin'
+import type { Diagnostic } from '@steiger/types'
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('steiger')
@@ -33,6 +34,13 @@ const yargsProgram = yargs(hideBin(process.argv))
     demandOption: false,
     describe: 'exit with an error code if there are warnings',
     type: 'boolean',
+  })
+  .option('reporter', {
+    demandOption: false,
+    describe: 'specify output format (pretty or json)',
+    type: 'string',
+    choices: ['pretty', 'json'],
+    default: 'pretty',
   })
   .string('_')
   .check((argv) => {
@@ -81,11 +89,19 @@ try {
   process.exit(101)
 }
 
+const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
+  if (consoleArgs.reporter === 'json') {
+    console.log(JSON.stringify(diagnostics, null, 2))
+  } else {
+    reportPretty(diagnostics, process.cwd())
+  }
+}
+
 if (consoleArgs.watch) {
   const [diagnosticsChanged, stopWatching] = await linter.watch(targetPath)
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
-    reportPretty(state, process.cwd())
+    printDiagnostics(state)
     if (consoleArgs.fix) {
       applyAutofixes(state)
     }
@@ -98,7 +114,7 @@ if (consoleArgs.watch) {
   const diagnostics = await linter.run(targetPath)
   let stillRelevantDiagnostics = diagnostics
 
-  reportPretty(diagnostics, process.cwd())
+  printDiagnostics(diagnostics)
 
   if (consoleArgs.fix) {
     stillRelevantDiagnostics = await applyAutofixes(diagnostics)
