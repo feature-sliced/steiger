@@ -10,10 +10,11 @@ import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 
-import { type Diagnostics, linter } from './app'
+import { linter } from './app'
 import { processConfiguration } from './models/config'
 import { applyAutofixes } from './features/autofix'
 import fsd from '@feature-sliced/steiger-plugin'
+import type { Diagnostic } from '@steiger/types'
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('steiger')
@@ -88,7 +89,7 @@ try {
   process.exit(101)
 }
 
-const printDiagnostics = (diagnostics: Diagnostics) => {
+const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
   if (consoleArgs.reporter === 'json') {
     console.log(JSON.stringify(diagnostics, null, 2))
   } else {

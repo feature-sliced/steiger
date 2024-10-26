@@ -69,5 +69,3 @@ export const linter = {
 export function defineConfig<Rules extends Array<Rule> = Array<Rule>>(config: Config<Rules>) {
   return config
 }
-
-export type Diagnostics = Awaited<ReturnType<typeof runRules>>
