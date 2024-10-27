@@ -1,4 +1,5 @@
 import * as fs from 'node:fs'
+import { basename, relative, sep } from 'node:path'
 import precinct from 'precinct'
 const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
@@ -64,12 +65,30 @@ const noPublicApiSidestep = {
             continue
           }
 
-          const index = getIndex(segment)
-          if (resolvedDependency !== index?.path) {
-            diagnostics.push({
-              message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-              location: { path: sourceFile.file.path },
-            })
+          const segmentIndex = getIndex(segment)
+          if (segment.type === 'folder' && resolvedDependency !== segmentIndex?.path) {
+            if (dependencyLocation.layerName === 'shared' && ['ui', 'lib'].includes(dependencyLocation.segmentName)) {
+              // Special case for shared/ui and shared/lib
+              const pathInSegment = relative(segment.path, resolvedDependency)
+              const topLevelFolder = segment.children.find(
+                (child) => child.type === 'folder' && basename(child.path) === pathInSegment.split(sep)[0],
+              ) as Folder | undefined
+
+              if (topLevelFolder !== undefined) {
+                const topLevelFolderIndex = getIndex(topLevelFolder)
+                if (resolvedDependency !== topLevelFolderIndex?.path) {
+                  diagnostics.push({
+                    message: `Forbidden sidestep of public API when importing from "${dependency}".`,
+                    location: { path: sourceFile.file.path },
+                  })
+                }
+              }
+            } else {
+              diagnostics.push({
+                message: `Forbidden sidestep of public API when importing from "${dependency}".`,
+                location: { path: sourceFile.file.path },
+              })
+            }
           }
         }
       }

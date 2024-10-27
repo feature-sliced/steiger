@@ -78,6 +78,9 @@ it('reports errors on segments that are missing a public API', () => {
   const root = parseIntoFsdRoot(`
     📂 shared
       📂 ui
+        📄 button.ts
+      📂 config
+        📄 envs.ts
     📂 entities
       📂 users
         📂 ui
@@ -105,11 +108,42 @@ it('reports errors on segments that are missing a public API', () => {
       fixes: [
         {
           type: 'create-file',
-          path: joinFromRoot('shared', 'ui', 'index.js'),
+          path: joinFromRoot('shared', 'config', 'index.js'),
           content: '',
         },
       ],
-      location: { path: joinFromRoot('shared', 'ui') },
+      location: { path: joinFromRoot('shared', 'config') },
+    },
+  ])
+})
+
+it('reports errors on top-level folders in shared/lib and shared/ui that are missing a public API', () => {
+  const root = parseIntoFsdRoot(`
+    📂 shared
+      📂 ui
+        📄 index.ts
+        📂 button
+        📂 text-field
+      📂 lib
+        📂 dates
+          📄 index.ts
+        📂 arrays
+  `)
+
+  const diagnostics = publicApi.check(root).diagnostics.sort(compareMessages)
+  expect(diagnostics).toEqual([
+    {
+      fixes: [
+        {
+          content: '',
+          path: joinFromRoot('shared', 'lib', 'arrays', 'index.js'),
+          type: 'create-file',
+        },
+      ],
+      location: {
+        path: joinFromRoot('shared', 'lib', 'arrays'),
+      },
+      message: 'This top-level folder in shared/lib is missing a public API.',
     },
   ])
 })
