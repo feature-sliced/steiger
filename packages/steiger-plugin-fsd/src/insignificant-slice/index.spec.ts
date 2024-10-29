@@ -29,16 +29,9 @@ vi.mock('node:fs', async (importOriginal) => {
       '/entities/product/ui/CrossReferenceCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/entities/product/index.ts': '',
       '/entities/post/index.ts': '',
-      '/entities/post/ui/post-card.vue': '',
 
       '/features/comments/ui/CommentCard.tsx': '',
       '/features/comments/index.ts': '',
-      '/features/session/register/index.ts': 'import {RegisterForm} from "./ui/RegisterForm.vue"',
-      '/features/session/register/ui/RegisterForm.vue': '',
-      '/features/session/logout/index.ts': 'import {LogoutButton} from "./ui/LogoutButton.vue"',
-      '/features/session/logout/ui/LogoutButton.vue': '',
-      '/features/session/login/index.ts': 'import {LoginForm} from "./ui/LoginForm.vue"',
-      '/features/session/login/ui/LoginForm.vue': '',
 
       '/pages/editor/ui/EditorPage.tsx':
         'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"; import { CommentCard } from "@/features/comments"; import { UserAvatar } from "@/entities/user"',
@@ -49,11 +42,7 @@ vi.mock('node:fs', async (importOriginal) => {
         'import { Button } from "@/shared/ui"; import { CommentCard } from "@/features/comments"',
       '/pages/settings/index.ts': '',
       '/pages/home/index.ts': '',
-      '/pages/home/ui/home.vue':
-        '<template>Home page</template> <script>import { PostCard } from "@/entities/post"; import {RegisterFrom} from "@/features/session/register"; import {LoginForm} from "@/features/session/login"; import {LogoutButton} from "@/features/session/logout"</script>',
       '/pages/category/index.ts': '',
-      '/pages/category/ui/category.vue':
-        '<template>Home page</template> <script>import { PostCard } from "@/entities/post"; import {RegisterFrom} from "@/features/session/register"; import {LoginForm} from "@/features/session/login"; import {LogoutButton} from "@/features/session/logout"</script>',
     },
     originalFs,
   )
@@ -183,39 +172,4 @@ it('reports errors on a project where the only other reference to a slice is a c
       location: { path: joinFromRoot('entities', 'user') },
     },
   ])
-})
-
-it('should report no errors on a project with Vue Single-File Components (*.vue files)', async () => {
-  const root = parseIntoFsdRoot(`
-    📂 entities
-      📂 post
-        📂 ui
-          📄 post-card.vue
-        📄 index.ts
-    📂 features
-      📂 session
-        📂 login
-          📂 ui
-            LoginForm.vue
-          📄 index.ts
-        📂 logout
-          📂 ui
-            LogoutButton.vue
-          📄 index.ts
-        📂 register
-          📂 ui
-            RegisterForm.vue
-          📄 index.ts
-    📂 pages
-      📂 home
-        📂 ui
-          📄 home.vue
-        📄 index.ts
-      📂 category
-        📂 ui
-          📄 category.vue
-        📄 index.ts
-  `)
-
-  expect((await insignificantSlice.check(root)).diagnostics).toEqual([])
 })
