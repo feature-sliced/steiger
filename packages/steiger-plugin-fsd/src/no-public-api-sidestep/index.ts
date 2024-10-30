@@ -67,7 +67,8 @@ const noPublicApiSidestep = {
 
           const segmentIndex = getIndex(segment)
           if (segment.type === 'folder' && resolvedDependency !== segmentIndex?.path) {
-            if (dependencyLocation.layerName === 'shared' && ['ui', 'lib'].includes(dependencyLocation.segmentName)) {
+            const { layerName, segmentName } = dependencyLocation
+            if (layerName === 'shared' && ['ui', 'lib'].includes(segmentName)) {
               // Special case for shared/ui and shared/lib
               const pathInSegment = relative(segment.path, resolvedDependency)
               const topLevelFolder = segment.children.find(
