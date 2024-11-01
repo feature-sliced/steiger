@@ -1,0 +1,49 @@
+{
+  "name": "@steiger/toolkit",
+  "description": "Toolkit for writing rules for Steiger",
+  "version": "0.1.0",
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write . --cache",
+    "check-formatting": "prettier --check . --cache",
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
+  },
+  "type": "module",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Anton Medvedev",
+      "email": "unordinarity@yandex.ru",
+      "url": "https://github.com/unordinarity"
+    },
+    {
+      "name": "Lev Chelyadinov",
+      "email": "leva181777@gmail.com",
+      "url": "https://github.com/illright"
+    }
+  ],
+  "peerDependencies": {
+    "vitest": "^1.6.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@steiger/eslint-config": "workspace:*",
+    "@steiger/tsconfig": "workspace:*",
+    "@steiger/types": "workspace:*",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.3",
+    "vitest": "^1.6.0"
+  }
+}

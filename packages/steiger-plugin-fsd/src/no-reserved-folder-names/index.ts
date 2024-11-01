@@ -1,13 +1,12 @@
 import { basename } from 'node:path'
 import { getAllSegments, conventionalSegmentNames, crossReferenceToken } from '@feature-sliced/filesystem'
-import type { PartialDiagnostic, Rule } from '@steiger/types'
+import { findAllRecursively, type PartialDiagnostic, type Rule } from '@steiger/toolkit'
 
-import { findAllRecursively } from '../_lib/find-all-recursively.js'
 import { NAMESPACE } from '../constants.js'
 
 /** Forbid subfolders in segments that have names of common segments (e.g., shared/lib/ui). */
 const noReservedFolderNames = {
-  name: `${NAMESPACE}/no-reserved-folder-names`,
+  name: `${NAMESPACE}/no-reserved-folder-names` as const,
   check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
 

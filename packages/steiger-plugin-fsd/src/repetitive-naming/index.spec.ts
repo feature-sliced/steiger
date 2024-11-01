@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import repetitiveNaming from './index.js'
-import { compareMessages, joinFromRoot, parseIntoFsdRoot } from '../_lib/prepare-test.js'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project with no repetitive words in slices', () => {
   const root = parseIntoFsdRoot(`
@@ -91,4 +91,64 @@ it('does not complain about layers with just one slice', () => {
   `)
 
   expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
+})
+
+it('does not treat slice groups as repetitive words', () => {
+  const root = parseIntoFsdRoot(`
+    📂 features
+      📂 session
+        📂 login
+          📂 api
+          📂 ui
+          📄 index.ts
+        📂 logout
+          📂 api
+          📂 ui
+          📄 index.ts
+        📂 register
+          📂 api
+          📂 ui
+          📄 index.ts
+  `)
+
+  expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
+})
+
+it('still recognizes repetitive words inside slice groups', () => {
+  const root = parseIntoFsdRoot(`
+    📂 pages
+      📂 login-word
+        📂 api
+        📂 ui
+        📄 index.ts
+      📂 group
+        📂 session
+          📂 login-word
+            📂 api
+            📂 ui
+            📄 index.ts
+          📂 logout-word
+            📂 api
+            📂 ui
+            📄 index.ts
+          📂 register-word
+            📂 api
+            📂 ui
+            📄 index.ts
+          📂 word
+            📂 api
+            📂 ui
+            📄 index.ts
+  `)
+
+  expect(repetitiveNaming.check(root)).toEqual({
+    diagnostics: [
+      {
+        location: {
+          path: joinFromRoot('pages', 'group', 'session'),
+        },
+        message: 'Repetitive word "word" in slice names.',
+      },
+    ],
+  })
 })

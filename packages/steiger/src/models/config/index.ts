@@ -1,5 +1,5 @@
 import { combine, createEvent, createStore } from 'effector'
-import { Config, GlobalIgnore, Plugin } from '@steiger/types'
+import type { Config, GlobalIgnore, Plugin, Rule } from '@steiger/types'
 
 import createRuleInstructions from './create-rule-instructions'
 import { RuleInstructions } from './types'
@@ -31,7 +31,7 @@ export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructi
   return allRules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
 })
 
-export function processConfiguration(rawConfig: Config, configLocationFolder: string | null) {
+export function processConfiguration(rawConfig: Config<Array<Rule>>, configLocationFolder: string | null) {
   const validatedConfig = validateConfig(rawConfig)
   const plugins = rawConfig.filter(isPlugin)
   const configTransformedGlobs = transformGlobs(validatedConfig, configLocationFolder)

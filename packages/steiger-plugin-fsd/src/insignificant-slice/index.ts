@@ -1,22 +1,18 @@
 import * as fs from 'node:fs'
 import { sep, join } from 'node:path'
-import type { CompilerOptions } from 'typescript'
 import { parse as parseNearestTsConfig } from 'tsconfck'
-import { isSliced, resolveImport, unslicedLayers, type LayerName } from '@feature-sliced/filesystem'
-import type { Folder, PartialDiagnostic, Rule } from '@steiger/types'
+import { isSliced, unslicedLayers, type LayerName } from '@feature-sliced/filesystem'
+import type { Folder, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import precinct from 'precinct'
 const { paperwork } = precinct
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
+import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
+import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 
-interface TsConfigExcerpts {
-  extends: string
-  compilerOptions: CompilerOptions
-}
-
 const insignificantSlice = {
-  name: `${NAMESPACE}/insignificant-slice`,
+  name: `${NAMESPACE}/insignificant-slice` as const,
   async check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
 
@@ -57,9 +53,8 @@ export default insignificantSlice
 
 async function traceSliceReferences(root: Folder) {
   const sourceFileIndex = indexSourceFiles(root)
-  const { tsconfig, tsconfigFile } = await parseNearestTsConfig(root.path)
-
-  const resolvedConfig = resolveRelativePathsInConfigExtensions(tsconfig, tsconfigFile)
+  const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
+  const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
   const references = new Map<string, Set<string>>()
 
   for (const sourceFile of Object.values(sourceFileIndex)) {
@@ -67,16 +62,17 @@ async function traceSliceReferences(root: Folder) {
 
     const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
     for (const dependency of dependencies) {
-      const resolvedDependency = resolveImport(
+      const resolvedDependency = resolveDependency(
         dependency,
         sourceFile.file.path,
-        resolvedConfig?.compilerOptions ?? {},
+        tsConfigs,
         fs.existsSync,
         fs.existsSync,
       )
       if (resolvedDependency === null) {
         continue
       }
+
       const dependencyLocation = sourceFileIndex[resolvedDependency]
       if (dependencyLocation === undefined || sourceFile.layerName === dependencyLocation.layerName) {
         continue
@@ -102,24 +98,24 @@ async function traceSliceReferences(root: Folder) {
   return references
 }
 
-function resolveRelativePathsInConfigExtensions(tsconfig: TsConfigExcerpts, configPath: string) {
-  if (!tsconfig || !tsconfig.extends || !tsconfig.compilerOptions) {
-    return tsconfig
-  }
-
-  const paths = tsconfig.compilerOptions?.paths ?? {}
-
-  const newPaths = Object.fromEntries(
-    Object.entries(paths).map(([key, values]) => {
-      return [key, values.map((value: string) => join(configPath, '..', value))]
-    }),
-  )
-
-  return {
-    ...tsconfig,
-    compilerOptions: {
-      ...tsconfig.compilerOptions,
-      paths: newPaths,
-    },
-  }
-}
+// function resolveRelativePathsInConfigExtensions(tsconfig: TsConfigExcerpts, configPath: string) {
+//   if (!tsconfig || !tsconfig.extends || !tsconfig.compilerOptions) {
+//     return tsconfig
+//   }
+//
+//   const paths = tsconfig.compilerOptions?.paths ?? {}
+//
+//   const newPaths = Object.fromEntries(
+//     Object.entries(paths).map(([key, values]) => {
+//       return [key, values.map((value: string) => join(configPath, '..', value))]
+//     }),
+//   )
+//
+//   return {
+//     ...tsconfig,
+//     compilerOptions: {
+//       ...tsconfig.compilerOptions,
+//       paths: newPaths,
+//     },
+//   }
+// }

@@ -1,6 +1,6 @@
 import { basename } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
-import type { PartialDiagnostic, Rule } from '@steiger/types'
+import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
 const noFileSegments = {

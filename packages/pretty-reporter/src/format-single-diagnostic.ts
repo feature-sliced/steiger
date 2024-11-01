@@ -2,7 +2,6 @@ import { relative } from 'node:path'
 import figures from 'figures'
 import terminalLink from 'terminal-link'
 import chalk from 'chalk'
-
 import type { Diagnostic } from '@steiger/types'
 
 export function formatSingleDiagnostic(d: Diagnostic, cwd: string): string {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Config, Plugin } from '@steiger/types'
+import { Config, Plugin, Rule } from '@steiger/types'
 
 import { buildValidationScheme, validateConfig } from './validate-config'
 import { isPlugin } from './raw-config'
@@ -8,7 +8,7 @@ import { isPlugin } from './raw-config'
 // but with the check method expected to be just any function.
 // The reason why it's needed is that the original check method's .toString method returns [Function: check],
 // but after the validation it changes to [Function: anonymous] and fails the test.
-function expectCheckToBeAnyFunction(config: Config) {
+function expectCheckToBeAnyFunction(config: Config<Array<Rule>>) {
   return config.map((configObject) => {
     if (isPlugin(configObject)) {
       return {
@@ -54,7 +54,7 @@ describe('buildValidationScheme', () => {
           rule2: 'warn',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(scheme.parse(config)).toEqual(expectCheckToBeAnyFunction(config))
@@ -69,7 +69,7 @@ describe('buildValidationScheme', () => {
           rule2: ['error', {}],
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(scheme.parse(config)).toEqual(expectCheckToBeAnyFunction(config))
@@ -88,7 +88,7 @@ describe('buildValidationScheme', () => {
           rule2: 'warn',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
 
     const scheme = buildValidationScheme(config)
 
@@ -110,7 +110,7 @@ describe('buildValidationScheme', () => {
           rule2: 'warn',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(scheme.parse(config)).toEqual(expectCheckToBeAnyFunction(config))
@@ -132,7 +132,7 @@ describe('buildValidationScheme', () => {
           rule2: 'warn',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(scheme.parse(config)).toEqual(expectCheckToBeAnyFunction(config))
@@ -155,7 +155,7 @@ describe('buildValidationScheme', () => {
           rule2: 'warn',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(scheme.parse(config)).toEqual(expectCheckToBeAnyFunction(config))
@@ -168,21 +168,21 @@ describe('buildValidationScheme', () => {
           rule1: 'off',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     expect(() => buildValidationScheme(config)).toThrow('At least one rule must be provided by plugins!')
   })
 
   it('should throw an error if no config objects are provided', () => {
-    const config = [dummyPlugin] as Config
+    const config = [dummyPlugin] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(() => scheme.parse(config)).toThrow('At least one config object must be provided!')
   })
 
   it('should throw an error if a config object without rules is provided', () => {
-    const config = [dummyPlugin, {}] as Config
-    const config1 = [dummyPlugin, { files: ['/shared'] }] as Config
-    const config2 = [dummyPlugin, { ignores: ['**/*.test.ts'] }] as Config
+    const config = [dummyPlugin, {}] as Config<Array<Rule>>
+    const config1 = [dummyPlugin, { files: ['/shared'] }] as Config<Array<Rule>>
+    const config2 = [dummyPlugin, { ignores: ['**/*.test.ts'] }] as Config<Array<Rule>>
 
     const scheme = buildValidationScheme(config)
     const scheme1 = buildValidationScheme(config1)
@@ -202,7 +202,7 @@ describe('buildValidationScheme', () => {
           rule3: 'warn',
         },
       },
-    ] as Config
+    ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(() => scheme.parse(config)).toThrow()
@@ -245,7 +245,7 @@ describe('buildValidationScheme', () => {
   })
 
   it('should successfully validate when the config provides a rule with multiple but identical options', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       dummyPlugin,
       {
         rules: {
@@ -266,7 +266,7 @@ describe('buildValidationScheme', () => {
   })
 
   it('should throw an error when the config provides a rule with multiple but different options', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       dummyPlugin,
       {
         rules: {
@@ -292,7 +292,7 @@ describe('buildValidationScheme', () => {
   })
 
   it('should throw an error when duplicate rule definition are provided', () => {
-    const config: Config = [
+    const config: Config<Array<Rule>> = [
       dummyPlugin,
       dummyPlugin,
       {
