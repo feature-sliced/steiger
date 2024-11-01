@@ -1,4 +1,4 @@
-import { expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import noPublicApiSidestep from './index.js'
@@ -16,10 +16,16 @@ vi.mock('node:fs', async (importOriginal) => {
 
   return createFsMocks(
     {
+      '/shared/i18n/index.ts': '',
+      '/shared/i18n/translator.ts': '',
       '/shared/ui/styles.ts': '',
       '/shared/ui/Button.tsx': 'import styles from "./styles";',
       '/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/shared/ui/index.ts': '',
+      '/shared/lib/index.ts': '',
+      '/shared/lib/dates.ts': '',
+      '/shared/lib/i18n/index.ts': '',
+      '/shared/lib/i18n/translator.ts': '',
       '/entities/user/@x/product.ts': '',
       '/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
       '/entities/user/index.ts': '',
@@ -32,8 +38,13 @@ vi.mock('node:fs', async (importOriginal) => {
       '/pages/editor/ui/EditorPage.tsx': 'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"',
       '/pages/editor/ui/Editor.tsx':
         'import { TextField } from "@/shared/ui"; import { ProductCard } from "@/entities/product/ui/ProductCard.tsx"',
-      '/pages/editor/ui/SubmitButton.tsx': 'import { Button } from "@/shared/ui/Button"',
+      '/pages/editor/ui/SubmitButton.tsx':
+        'import { Button } from "@/shared/ui/Button"; import { translator } from "@/shared/i18n/translator"',
       '/pages/editor/index.ts': '',
+      '/pages/settings/index.ts': '',
+      '/pages/settings/ui/SettingsPage.tsx':
+        'import { Button } from "@/shared/ui"; import { dates } from "@/shared/lib/dates"; import { translator } from "@/shared/lib/i18n"',
+      '/pages/settings/ui/Password.tsx': 'import { translator } from "@/shared/lib/i18n/translator";',
     },
     originalFs,
   )
@@ -105,6 +116,9 @@ it('reports errors on a project with a public API sidestep on shared', async () 
         📄 Button.tsx
         📄 TextField.tsx
         📄 index.ts
+      📂 i18n
+        📄 index.ts
+        📄 translator.ts
     📂 pages
       📂 editor
         📂 ui
@@ -115,8 +129,57 @@ it('reports errors on a project with a public API sidestep on shared', async () 
 
   expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
     {
-      message: `Forbidden sidestep of public API when importing from "@/shared/ui/Button".`,
+      message: `Forbidden sidestep of public API when importing from "@/shared/i18n/translator".`,
       location: { path: joinFromRoot('pages', 'editor', 'ui', 'SubmitButton.tsx') },
     },
   ])
+})
+
+describe('specifics of shared/lib and shared/ui', () => {
+  it('knows that imports from shared/lib must be one layer deeper', async () => {
+    const root = parseIntoFsdRoot(`
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+        📂 lib
+          📄 dates.ts
+          📂 i18n
+            📄 index.ts
+            📄 translator.ts
+      📂 pages
+        📂 settings
+          📂 ui
+            📄 SettingsPage.tsx
+          📄 index.ts
+    `)
+
+    expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([])
+  })
+
+  it('still does not allow sidestepping the index of a single library', async () => {
+    const root = parseIntoFsdRoot(`
+      📂 shared
+        📂 lib
+          📄 dates.ts
+          📂 i18n
+            📄 index.ts
+            📄 translator.ts
+      📂 pages
+        📂 settings
+          📂 ui
+            📄 SettingsPage.tsx
+            📄 Password.tsx
+          📄 index.ts
+    `)
+
+    expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
+      {
+        message: `Forbidden sidestep of public API when importing from "@/shared/lib/i18n/translator".`,
+        location: { path: joinFromRoot('pages', 'settings', 'ui', 'Password.tsx') },
+      },
+    ])
+  })
 })

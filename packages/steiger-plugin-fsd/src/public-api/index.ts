@@ -15,20 +15,38 @@ const publicApi = {
           // The app layer is the top-level layer, there's no need for public API.
           continue
         }
-        for (const segment of Object.values(getSegments(layer))) {
+        for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
           if (getIndex(segment) === undefined) {
-            diagnostics.push({
-              message: 'This segment is missing a public API.',
-              fixes: [
-                {
-                  type: 'create-file',
-                  path: join(segment.path, `index.js`),
-                  // TODO: Infer better content for this file
-                  content: '',
-                },
-              ],
-              location: { path: segment.path },
-            })
+            if (!['ui', 'lib'].includes(segmentName)) {
+              diagnostics.push({
+                message: 'This segment is missing a public API.',
+                fixes: [
+                  {
+                    type: 'create-file',
+                    path: join(segment.path, `index.js`),
+                    // TODO: Infer better content for this file
+                    content: '',
+                  },
+                ],
+                location: { path: segment.path },
+              })
+            } else if (segment.type === 'folder') {
+              for (const child of segment.children) {
+                if (child.type === 'folder' && getIndex(child) === undefined) {
+                  diagnostics.push({
+                    message: `This top-level folder in shared/${segmentName} is missing a public API.`,
+                    fixes: [
+                      {
+                        type: 'create-file',
+                        path: join(child.path, `index.js`),
+                        content: '',
+                      },
+                    ],
+                    location: { path: child.path },
+                  })
+                }
+              }
+            }
           }
         }
       } else {
