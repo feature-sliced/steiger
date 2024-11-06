@@ -60,7 +60,7 @@ export function collectRelatedTsConfigs(payload: CollectRelatedTsConfigsPayload)
 }
 
 // As tsconfck does not resolve paths in merged configs,
-// namely it just takes paths from extended config and puts them to the final merged config we need to do it manually.
+// namely it just takes paths from extended configs and puts them to the final merged config, we need to do it manually.
 // (If some extended config is nested in a folder e.g. ./nuxt/tsconfig.json,
 // it applies path aliases like '@/': ['../*'] to the project root)
 function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsConfigsPayload) {
@@ -139,6 +139,66 @@ if (import.meta.vitest) {
       { files: [], references: [{ path: './tsconfig.node.json' }, { path: './tsconfig.app.json' }] },
       { extends: '@node/tsconfig.json' },
       { extends: '@app/tsconfig.json' },
+    ]
+
+    expect(collectRelatedTsConfigs(payload)).toEqual(expectedResult)
+  })
+
+  test('resolves paths in merged config if the initial config extends some other config', () => {
+    const payload: CollectRelatedTsConfigsPayload = {
+      extended: [
+        {
+          tsconfigFile: '/.nuxt/tsconfig.json',
+          tsconfig: {
+            compilerOptions: {
+              paths: {
+                '~': ['..'],
+                '~/*': ['../*'],
+              },
+              strict: true,
+              noUncheckedIndexedAccess: false,
+              forceConsistentCasingInFileNames: true,
+              noImplicitOverride: true,
+              module: 'ESNext',
+              noEmit: true,
+            },
+          },
+        },
+      ],
+      tsconfigFile: '/tsconfig.json',
+      tsconfig: {
+        extends: './nuxt/tsconfig.json',
+        compilerOptions: {
+          paths: {
+            '~': ['..'],
+            '~/*': ['../*'],
+          },
+          strict: true,
+          noUncheckedIndexedAccess: false,
+          forceConsistentCasingInFileNames: true,
+          noImplicitOverride: true,
+          module: 'ESNext',
+          noEmit: true,
+        },
+      },
+    }
+
+    const expectedResult = [
+      {
+        extends: './nuxt/tsconfig.json',
+        compilerOptions: {
+          paths: {
+            '~': ['/'],
+            '~/*': ['/*'],
+          },
+          strict: true,
+          noUncheckedIndexedAccess: false,
+          forceConsistentCasingInFileNames: true,
+          noImplicitOverride: true,
+          module: 'ESNext',
+          noEmit: true,
+        },
+      },
     ]
 
     expect(collectRelatedTsConfigs(payload)).toEqual(expectedResult)
