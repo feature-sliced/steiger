@@ -1,6 +1,5 @@
 import { TSConfckParseResult } from 'tsconfck'
 import { dirname, posix } from 'node:path'
-import path from 'node:path'
 
 export type CollectRelatedTsConfigsPayload = {
   tsconfig: TSConfckParseResult['tsconfig']
@@ -121,7 +120,7 @@ function makeRelativePathAliasesAbsolute(
   for (const entries of Object.entries(mergedConfig.compilerOptions.paths)) {
     const [key, paths] = entries as [key: string, paths: Array<string>]
     absolutePaths[key] = paths.map((relativePath: string) =>
-      path.resolve(path.dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
+      posix.resolve(dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
     )
   }
 
