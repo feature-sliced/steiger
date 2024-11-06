@@ -64,41 +64,6 @@ export function collectRelatedTsConfigs(payload: CollectRelatedTsConfigsPayload)
 // (If some extended config is nested in a folder e.g. ./nuxt/tsconfig.json,
 // it applies path aliases like '@/': ['../*'] to the project root)
 function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsConfigsPayload) {
-  function findFirstConfigWithPaths(
-    parseResult: CollectRelatedTsConfigsPayload,
-  ): CollectRelatedTsConfigsPayload | null {
-    if (parseResult.tsconfig.compilerOptions?.paths || !parseResult.tsconfigFile) {
-      return parseResult
-    }
-
-    // As we work with some king of globs, we need to use posix path separators
-    const extendAbsolutePath = posix.join(dirname(parseResult.tsconfigFile), parseResult.tsconfig.extends)
-    const extendedConfig = (extended || []).find(({ tsconfigFile }) => tsconfigFile === extendAbsolutePath)
-
-    return findFirstConfigWithPaths(extendedConfig!)
-  }
-
-  function turnPathAliasesIntoAbsolute(
-    finalConfig: CollectRelatedTsConfigsPayload,
-    firstConfigWithPaths: CollectRelatedTsConfigsPayload,
-  ) {
-    const { tsconfig: mergedConfig } = finalConfig
-    const absolutePaths: Record<string, Array<string>> = {}
-
-    if (!firstConfigWithPaths.tsconfigFile) {
-      return mergedConfig.compilerOptions.paths
-    }
-
-    for (const entries of Object.entries(mergedConfig.compilerOptions.paths)) {
-      const [key, paths] = entries as [key: string, paths: Array<string>]
-      absolutePaths[key] = paths.map((relativePath: string) =>
-        path.resolve(path.dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
-      )
-    }
-
-    return absolutePaths
-  }
-
   const { tsconfig: mergedConfig, extended } = configParseResult
 
   if (
@@ -115,8 +80,8 @@ function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsC
   }
 
   // Find the first config with paths in the "extends" chain as it overrides the others
-  const firstConfigWithPaths = findFirstConfigWithPaths(configParseResult)
-  const absolutePaths = turnPathAliasesIntoAbsolute(configParseResult, firstConfigWithPaths!)
+  const firstConfigWithPaths = findFirstConfigWithPaths(configParseResult, extended || [])
+  const absolutePaths = makeRelativePathAliasesAbsolute(configParseResult, firstConfigWithPaths!)
 
   return {
     ...mergedConfig,
@@ -125,6 +90,42 @@ function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsC
       paths: absolutePaths,
     },
   }
+}
+
+function findFirstConfigWithPaths(
+  parseResult: CollectRelatedTsConfigsPayload,
+  extended: TSConfckParseResult[],
+): CollectRelatedTsConfigsPayload | null {
+  if (parseResult.tsconfig.compilerOptions?.paths || !parseResult.tsconfigFile) {
+    return parseResult
+  }
+
+  // As we work with some king of globs, we need to use posix path separators
+  const extendAbsolutePath = posix.join(dirname(parseResult.tsconfigFile), parseResult.tsconfig.extends)
+  const extendedConfig = extended.find(({ tsconfigFile }) => tsconfigFile === extendAbsolutePath)
+
+  return findFirstConfigWithPaths(extendedConfig!, extended)
+}
+
+function makeRelativePathAliasesAbsolute(
+  finalConfig: CollectRelatedTsConfigsPayload,
+  firstConfigWithPaths: CollectRelatedTsConfigsPayload,
+) {
+  const { tsconfig: mergedConfig } = finalConfig
+  const absolutePaths: Record<string, Array<string>> = {}
+
+  if (!firstConfigWithPaths.tsconfigFile) {
+    return mergedConfig.compilerOptions.paths
+  }
+
+  for (const entries of Object.entries(mergedConfig.compilerOptions.paths)) {
+    const [key, paths] = entries as [key: string, paths: Array<string>]
+    absolutePaths[key] = paths.map((relativePath: string) =>
+      path.resolve(path.dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
+    )
+  }
+
+  return absolutePaths
 }
 
 if (import.meta.vitest) {
