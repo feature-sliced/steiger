@@ -1,5 +1,5 @@
 import { TSConfckParseResult } from 'tsconfck'
-import { dirname, join } from 'node:path'
+import { dirname, posix } from 'node:path'
 import path from 'node:path'
 
 export type CollectRelatedTsConfigsPayload = {
@@ -71,7 +71,8 @@ function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsC
       return parseResult
     }
 
-    const extendAbsolutePath = join(dirname(parseResult.tsconfigFile), parseResult.tsconfig.extends)
+    // As we work with some king of globs, we need to use posix path separators
+    const extendAbsolutePath = posix.join(dirname(parseResult.tsconfigFile), parseResult.tsconfig.extends)
     const extendedConfig = (extended || []).find(({ tsconfigFile }) => tsconfigFile === extendAbsolutePath)
 
     return findFirstConfigWithPaths(extendedConfig!)
