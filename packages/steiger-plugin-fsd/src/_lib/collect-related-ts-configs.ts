@@ -60,6 +60,8 @@ export function collectRelatedTsConfigs(payload: CollectRelatedTsConfigsPayload)
 
 // As tsconfck does not resolve paths in merged configs,
 // namely it just takes paths from extended configs and puts them to the final merged config, we need to do it manually.
+// Another reason to transform paths is that otherwise they are resolved relative
+// to the folder where Steiger is launched (__dirname), so we need to make them absolute.
 // (If some extended config is nested in a folder e.g. ./nuxt/tsconfig.json,
 // it applies path aliases like '@/': ['../*'] to the project root)
 function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsConfigsPayload) {
@@ -68,8 +70,6 @@ function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsC
   if (
     // if there's no config it needs to be handled somewhere else
     !mergedConfig ||
-    // if the merged config does not have "extends" there are no paths to resolve
-    !mergedConfig.extends ||
     // if the merged config does not have compilerOptions, there is nothing to resolve
     !mergedConfig.compilerOptions ||
     // if the merged config does not have paths in compilerOptions there's nothing to resolve
@@ -144,6 +144,12 @@ if (import.meta.vitest) {
     const payload: CollectRelatedTsConfigsPayload = {
       extended: [
         {
+          tsconfigFile: '/tsconfig.json',
+          tsconfig: {
+            extends: './.nuxt/tsconfig.json',
+          },
+        },
+        {
           tsconfigFile: '/.nuxt/tsconfig.json',
           tsconfig: {
             compilerOptions: {
@@ -186,6 +192,45 @@ if (import.meta.vitest) {
           paths: {
             '~': ['/'],
             '~/*': ['/*'],
+          },
+          strict: true,
+          noUncheckedIndexedAccess: false,
+          forceConsistentCasingInFileNames: true,
+          noImplicitOverride: true,
+          module: 'ESNext',
+          noEmit: true,
+        },
+      },
+    ]
+
+    expect(collectRelatedTsConfigs(payload)).toEqual(expectedResult)
+  })
+
+  test('resolves p', () => {
+    const payload: CollectRelatedTsConfigsPayload = {
+      tsconfigFile: '/user/projects/project-0/tsconfig.json',
+      tsconfig: {
+        compilerOptions: {
+          paths: {
+            '~': ['./src'],
+            '~/*': ['./src/*'],
+          },
+          strict: true,
+          noUncheckedIndexedAccess: false,
+          forceConsistentCasingInFileNames: true,
+          noImplicitOverride: true,
+          module: 'ESNext',
+          noEmit: true,
+        },
+      },
+    }
+
+    const expectedResult = [
+      {
+        compilerOptions: {
+          paths: {
+            '~': ['/user/projects/project-0/src'],
+            '~/*': ['/user/projects/project-0/src/*'],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
