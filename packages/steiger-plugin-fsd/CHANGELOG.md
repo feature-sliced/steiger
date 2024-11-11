@@ -1,5 +1,18 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.0
+
+### Minor Changes
+
+- 1bb6c4b: Add new `no-ui-in-app` rule
+- 7057543: Add new `typo-in-layer-name` rule
+
+### Patch Changes
+
+- b0dc51b: Add a Vue test case for insignificant-slice
+- 8291fc7: Fix the alias resolution in referenced TS configs
+- 9ce48b6: Relax the public API constraints on `shared/lib` and `shared/ui`
+
 ## 0.4.0
 
 ### Minor Changes
