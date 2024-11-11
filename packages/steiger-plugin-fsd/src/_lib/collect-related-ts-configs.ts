@@ -79,7 +79,7 @@ function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsC
   }
 
   // Find the first config with paths in the "extends" chain as it overrides the others
-  const firstConfigWithPaths = findFirstConfigWithPaths(configParseResult, extended || [])
+  const firstConfigWithPaths = findFirstConfigWithPaths(extended || []) || configParseResult
   const absolutePaths = makeRelativePathAliasesAbsolute(configParseResult, firstConfigWithPaths!)
 
   return {
@@ -91,19 +91,14 @@ function resolveRelativePathsInMergedConfig(configParseResult: CollectRelatedTsC
   }
 }
 
-function findFirstConfigWithPaths(
-  parseResult: CollectRelatedTsConfigsPayload,
-  extended: TSConfckParseResult[],
-): CollectRelatedTsConfigsPayload | null {
-  if (parseResult.tsconfig.compilerOptions?.paths || !parseResult.tsconfigFile) {
-    return parseResult
+function findFirstConfigWithPaths(extended: TSConfckParseResult[]): TSConfckParseResult | undefined {
+  for (const parseResult of extended) {
+    const { tsconfig } = parseResult
+
+    if (tsconfig.compilerOptions?.paths) {
+      return parseResult
+    }
   }
-
-  // As we work with some king of globs, we need to use posix path separators
-  const extendAbsolutePath = posix.join(dirname(parseResult.tsconfigFile), parseResult.tsconfig.extends)
-  const extendedConfig = extended.find(({ tsconfigFile }) => tsconfigFile === extendAbsolutePath)
-
-  return findFirstConfigWithPaths(extendedConfig!, extended)
 }
 
 function makeRelativePathAliasesAbsolute(
@@ -168,7 +163,7 @@ if (import.meta.vitest) {
       ],
       tsconfigFile: '/tsconfig.json',
       tsconfig: {
-        extends: './nuxt/tsconfig.json',
+        extends: './.nuxt/tsconfig.json',
         compilerOptions: {
           paths: {
             '~': ['..'],
@@ -186,7 +181,7 @@ if (import.meta.vitest) {
 
     const expectedResult = [
       {
-        extends: './nuxt/tsconfig.json',
+        extends: './.nuxt/tsconfig.json',
         compilerOptions: {
           paths: {
             '~': ['/'],
