@@ -21,14 +21,18 @@ vi.mock('node:fs', async (importOriginal) => {
       '/shared/ui/Button.tsx': 'import styles from "./styles";',
       '/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/shared/ui/index.ts': '',
+
       '/entities/user/@x/product.ts': '',
       '/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
       '/entities/user/index.ts': '',
       '/entities/product/ui/ProductCard.tsx': '',
       '/entities/product/ui/CrossReferenceCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/entities/product/index.ts': '',
+      '/entities/post/index.ts': '',
+
       '/features/comments/ui/CommentCard.tsx': '',
       '/features/comments/index.ts': '',
+
       '/pages/editor/ui/EditorPage.tsx':
         'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"; import { CommentCard } from "@/features/comments"; import { UserAvatar } from "@/entities/user"',
       '/pages/editor/ui/Editor.tsx':
@@ -37,6 +41,8 @@ vi.mock('node:fs', async (importOriginal) => {
       '/pages/settings/ui/SettingsPage.tsx':
         'import { Button } from "@/shared/ui"; import { CommentCard } from "@/features/comments"',
       '/pages/settings/index.ts': '',
+      '/pages/home/index.ts': '',
+      '/pages/category/index.ts': '',
     },
     originalFs,
   )

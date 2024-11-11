@@ -16,8 +16,8 @@ const noPublicApiSidestep = {
   name: `${NAMESPACE}/no-public-api-sidestep` as const,
   async check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
-    const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
-    const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
+    const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
+    const tsConfigs = collectRelatedTsConfigs(parseResult)
     const sourceFileIndex = indexSourceFiles(root)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {

@@ -53,8 +53,8 @@ export default insignificantSlice
 
 async function traceSliceReferences(root: Folder) {
   const sourceFileIndex = indexSourceFiles(root)
-  const { tsconfig, referenced } = await parseNearestTsConfig(root.path)
-  const tsConfigs = collectRelatedTsConfigs({ tsconfig, referenced })
+  const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
+  const tsConfigs = collectRelatedTsConfigs(parseResult)
   const references = new Map<string, Set<string>>()
 
   for (const sourceFile of Object.values(sourceFileIndex)) {
