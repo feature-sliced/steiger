@@ -206,7 +206,7 @@ if (import.meta.vitest) {
     expect(collectRelatedTsConfigs(payload)).toEqual(expectedResult)
   })
 
-  test('resolves p', () => {
+  test('resolves paths independently from the current directory', () => {
     const payload: CollectRelatedTsConfigsPayload = {
       tsconfigFile: '/user/projects/project-0/tsconfig.json',
       tsconfig: {
