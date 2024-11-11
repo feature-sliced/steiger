@@ -15,7 +15,7 @@ const forbiddenImports = {
   name: `${NAMESPACE}/forbidden-imports` as const,
   async check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
-    const parseResult = await parseNearestTsConfig(root.path)
+    const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
     const sourceFileIndex = indexSourceFiles(root)
 
