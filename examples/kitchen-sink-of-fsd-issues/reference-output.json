@@ -2,7 +2,7 @@
   {
     "message": "Forbidden import from higher layer \"app\".",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user/api/getUser.ts"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user/api/getUser.ts"
     },
     "ruleName": "fsd/forbidden-imports",
     "severity": "error"
@@ -12,12 +12,12 @@
     "fixes": [
       {
         "type": "rename",
-        "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user",
+        "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user",
         "newName": "users"
       }
     ],
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities"
     },
     "ruleName": "fsd/inconsistent-naming",
     "severity": "error"
@@ -25,7 +25,7 @@
   {
     "message": "This slice has no references. Consider removing it.",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/users"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/users"
     },
     "ruleName": "fsd/insignificant-slice",
     "severity": "error"
@@ -33,7 +33,7 @@
   {
     "message": "This slice has no references. Consider removing it.",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user"
     },
     "ruleName": "fsd/insignificant-slice",
     "severity": "error"
@@ -41,7 +41,7 @@
   {
     "message": "Forbidden sidestep of public API when importing from \"@/app/ui/App\".",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user/api/getUser.ts"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user/api/getUser.ts"
     },
     "ruleName": "fsd/no-public-api-sidestep",
     "severity": "error"
@@ -49,7 +49,7 @@
   {
     "message": "Having a folder with the name \"api\" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user/ui/api"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/entities/user/ui/api"
     },
     "ruleName": "fsd/no-reserved-folder-names",
     "severity": "error"
@@ -57,7 +57,7 @@
   {
     "message": "Layer \"app\" should not have \"ui\" segment.",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/app/ui"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/app/ui"
     },
     "ruleName": "fsd/no-ui-in-app",
     "severity": "error"
@@ -65,7 +65,7 @@
   {
     "message": "Layer \"processes\" is deprecated, avoid using it",
     "location": {
-      "path": "/Users/illright/work/steiger/examples/kitchen-sink-of-fsd-issues/src/processes"
+      "path": "/home/runner/work/steiger/examples/kitchen-sink-of-fsd-issues/src/processes"
     },
     "ruleName": "fsd/no-processes",
     "severity": "error"
