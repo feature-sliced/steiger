@@ -1,5 +1,6 @@
 import { TSConfckParseResult } from 'tsconfck'
-import { dirname, posix } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { joinFromRoot } from '@steiger/toolkit'
 
 export type CollectRelatedTsConfigsPayload = {
   tsconfig: TSConfckParseResult['tsconfig']
@@ -115,7 +116,7 @@ function makeRelativePathAliasesAbsolute(
   for (const entries of Object.entries(mergedConfig.compilerOptions.paths)) {
     const [key, paths] = entries as [key: string, paths: Array<string>]
     absolutePaths[key] = paths.map((relativePath: string) =>
-      posix.resolve(dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
+      resolve(dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
     )
   }
 
@@ -144,13 +145,13 @@ if (import.meta.vitest) {
     const payload: CollectRelatedTsConfigsPayload = {
       extended: [
         {
-          tsconfigFile: '/tsconfig.json',
+          tsconfigFile: joinFromRoot('/tsconfig.json'),
           tsconfig: {
             extends: './.nuxt/tsconfig.json',
           },
         },
         {
-          tsconfigFile: '/.nuxt/tsconfig.json',
+          tsconfigFile: joinFromRoot('/.nuxt', '/tsconfig.json'),
           tsconfig: {
             compilerOptions: {
               paths: {
@@ -167,7 +168,7 @@ if (import.meta.vitest) {
           },
         },
       ],
-      tsconfigFile: '/tsconfig.json',
+      tsconfigFile: joinFromRoot('/tsconfig.json'),
       tsconfig: {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
@@ -190,8 +191,8 @@ if (import.meta.vitest) {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
           paths: {
-            '~': ['/'],
-            '~/*': ['/*'],
+            '~': [joinFromRoot()],
+            '~/*': [joinFromRoot('*')],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
@@ -208,7 +209,7 @@ if (import.meta.vitest) {
 
   test('resolves paths independently from the current directory', () => {
     const payload: CollectRelatedTsConfigsPayload = {
-      tsconfigFile: '/user/projects/project-0/tsconfig.json',
+      tsconfigFile: joinFromRoot('user', 'projects', 'project-0', 'tsconfig.json'),
       tsconfig: {
         compilerOptions: {
           paths: {
@@ -229,8 +230,8 @@ if (import.meta.vitest) {
       {
         compilerOptions: {
           paths: {
-            '~': ['/user/projects/project-0/src'],
-            '~/*': ['/user/projects/project-0/src/*'],
+            '~': [joinFromRoot('user', 'projects', 'project-0', 'src')],
+            '~/*': [joinFromRoot('user', 'projects', 'project-0', 'src', '*')],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
