@@ -1,5 +1,11 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.1
+
+### Patch Changes
+
+- 06af3dd: Fix path resolution on Windows
+
 ## 0.5.0
 
 ### Minor Changes
