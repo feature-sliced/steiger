@@ -145,7 +145,7 @@ if (import.meta.vitest) {
     const payload: CollectRelatedTsConfigsPayload = {
       extended: [
         {
-          tsconfigFile: joinFromRoot('/tsconfig.json'),
+          tsconfigFile: joinFromRoot('tsconfig.json'),
           tsconfig: {
             extends: './.nuxt/tsconfig.json',
           },
