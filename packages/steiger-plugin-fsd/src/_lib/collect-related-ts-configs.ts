@@ -145,13 +145,13 @@ if (import.meta.vitest) {
     const payload: CollectRelatedTsConfigsPayload = {
       extended: [
         {
-          tsconfigFile: joinFromRoot('tsconfig.json'),
+          tsconfigFile: resolve(joinFromRoot('tsconfig.json')),
           tsconfig: {
             extends: './.nuxt/tsconfig.json',
           },
         },
         {
-          tsconfigFile: joinFromRoot('.nuxt', 'tsconfig.json'),
+          tsconfigFile: resolve(joinFromRoot('.nuxt', 'tsconfig.json')),
           tsconfig: {
             compilerOptions: {
               paths: {
@@ -168,7 +168,7 @@ if (import.meta.vitest) {
           },
         },
       ],
-      tsconfigFile: joinFromRoot('tsconfig.json'),
+      tsconfigFile: resolve(joinFromRoot('tsconfig.json')),
       tsconfig: {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
@@ -191,8 +191,8 @@ if (import.meta.vitest) {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
           paths: {
-            '~': [joinFromRoot()],
-            '~/*': [joinFromRoot('*')],
+            '~': [resolve(joinFromRoot())],
+            '~/*': [resolve(joinFromRoot('*'))],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
@@ -209,7 +209,7 @@ if (import.meta.vitest) {
 
   test('resolves paths independently from the current directory', () => {
     const payload: CollectRelatedTsConfigsPayload = {
-      tsconfigFile: joinFromRoot('user', 'projects', 'project-0', 'tsconfig.json'),
+      tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'tsconfig.json')),
       tsconfig: {
         compilerOptions: {
           paths: {
@@ -230,8 +230,8 @@ if (import.meta.vitest) {
       {
         compilerOptions: {
           paths: {
-            '~': [joinFromRoot('user', 'projects', 'project-0', 'src')],
-            '~/*': [joinFromRoot('user', 'projects', 'project-0', 'src', '*')],
+            '~': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src'))],
+            '~/*': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src', '*'))],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
