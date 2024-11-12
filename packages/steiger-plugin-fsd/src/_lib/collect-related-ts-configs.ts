@@ -151,7 +151,7 @@ if (import.meta.vitest) {
           },
         },
         {
-          tsconfigFile: joinFromRoot('/.nuxt', '/tsconfig.json'),
+          tsconfigFile: joinFromRoot('.nuxt', 'tsconfig.json'),
           tsconfig: {
             compilerOptions: {
               paths: {
