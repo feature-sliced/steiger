@@ -276,8 +276,8 @@ if (import.meta.vitest) {
         compilerOptions: {
           baseUrl: './src',
           paths: {
-            '~': [joinFromRoot('user', 'projects', 'project-0', 'src')],
-            '~/*': [joinFromRoot('user', 'projects', 'project-0', 'src', '*')],
+            '~': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src'))],
+            '~/*': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src', '*'))],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
