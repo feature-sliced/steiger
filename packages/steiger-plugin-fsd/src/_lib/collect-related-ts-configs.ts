@@ -107,16 +107,21 @@ function makeRelativePathAliasesAbsolute(
   firstConfigWithPaths: CollectRelatedTsConfigsPayload,
 ) {
   const { tsconfig: mergedConfig } = finalConfig
+  const {
+    compilerOptions: { paths, baseUrl },
+  } = mergedConfig
   const absolutePaths: Record<string, Array<string>> = {}
 
   if (!firstConfigWithPaths.tsconfigFile) {
     return mergedConfig.compilerOptions.paths
   }
 
-  for (const entries of Object.entries(mergedConfig.compilerOptions.paths)) {
+  for (const entries of Object.entries(paths)) {
     const [key, paths] = entries as [key: string, paths: Array<string>]
     absolutePaths[key] = paths.map((relativePath: string) =>
-      resolve(dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
+      baseUrl
+        ? resolve(dirname(firstConfigWithPaths.tsconfigFile!), baseUrl, relativePath)
+        : resolve(dirname(firstConfigWithPaths.tsconfigFile!), relativePath),
     )
   }
 
@@ -232,6 +237,47 @@ if (import.meta.vitest) {
           paths: {
             '~': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src'))],
             '~/*': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src', '*'))],
+          },
+          strict: true,
+          noUncheckedIndexedAccess: false,
+          forceConsistentCasingInFileNames: true,
+          noImplicitOverride: true,
+          module: 'ESNext',
+          noEmit: true,
+        },
+      },
+    ]
+
+    expect(collectRelatedTsConfigs(payload)).toEqual(expectedResult)
+  })
+
+  test('correctly resolves paths if baseUrl is set', () => {
+    const payload: CollectRelatedTsConfigsPayload = {
+      tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'tsconfig.json')),
+      tsconfig: {
+        compilerOptions: {
+          baseUrl: './src',
+          paths: {
+            '~': ['./'],
+            '~/*': ['./*'],
+          },
+          strict: true,
+          noUncheckedIndexedAccess: false,
+          forceConsistentCasingInFileNames: true,
+          noImplicitOverride: true,
+          module: 'ESNext',
+          noEmit: true,
+        },
+      },
+    }
+
+    const expectedResult = [
+      {
+        compilerOptions: {
+          baseUrl: './src',
+          paths: {
+            '~': [joinFromRoot('user', 'projects', 'project-0', 'src')],
+            '~/*': [joinFromRoot('user', 'projects', 'project-0', 'src', '*')],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
