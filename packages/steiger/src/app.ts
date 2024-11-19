@@ -9,8 +9,12 @@ import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
 
+// TODO: make this part of a plugin
 function getRuleDescriptionUrl(ruleName: string) {
-  return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
+  const withoutNamespace = ruleName.split('/')[1]
+  return new URL(
+    `https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${withoutNamespace}/README.md`,
+  )
 }
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
