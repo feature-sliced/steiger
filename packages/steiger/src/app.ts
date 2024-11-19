@@ -13,7 +13,7 @@ import { calculateFinalSeverities } from './features/calculate-diagnostic-severi
 function getRuleDescriptionUrl(ruleName: string) {
   const withoutNamespace = ruleName.split('/')[1]
   return new URL(
-    `https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${withoutNamespace}/README.md`,
+    `https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${withoutNamespace}`,
   )
 }
 
