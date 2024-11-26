@@ -15,6 +15,10 @@
     "types": "./dist/index.d.ts",
     "import": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "src"
+  ],
   "type": "module",
   "license": "MIT",
   "authors": [
