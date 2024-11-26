@@ -17,8 +17,7 @@
   },
   "files": [
     "dist",
-    "src",
-    "README.md"
+    "src"
   ],
   "type": "module",
   "license": "MIT",
