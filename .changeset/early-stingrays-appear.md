@@ -1,5 +1,5 @@
 ---
-'steiger': minor
+'steiger': patch
 ---
 
-Added support of the steiger config for windows
+Fix drive label handling in paths on Windows
