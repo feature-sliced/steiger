@@ -1,5 +1,12 @@
 # steiger
 
+## 0.5.3
+
+### Patch Changes
+
+- 114d59c: Fix drive label handling in paths on Windows
+- b3f7085: Fix 404s in rule description links
+
 ## 0.5.2
 
 ### Patch Changes
