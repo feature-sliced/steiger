@@ -1,5 +1,11 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.3
+
+### Patch Changes
+
+- Republish the package to fix a publishing error
+
 ## 0.5.2
 
 ### Patch Changes
