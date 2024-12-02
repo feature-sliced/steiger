@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest'
-import type { Config, Rule } from '@steiger/types'
-import { joinFromRoot } from '@steiger/toolkit'
-
+import { describe, expect, it } from 'vitest'
+import { Config, Rule } from '@steiger/types'
 import { transformGlobs } from './transform-globs'
 
+const platform = process.platform
+
 describe('transformGlobs', () => {
-  it('should convert relative globs to absolute', () => {
+  it.runIf(platform === 'linux')(`should convert relative globs to absolute`, () => {
     const config: Config<Array<Rule>> = [
       {
         ignores: ['./src/entities/**'],
@@ -19,7 +19,7 @@ describe('transformGlobs', () => {
       },
     ]
 
-    expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
+    expect(transformGlobs(config, '/projects/dummy-project')).toEqual([
       {
         ignores: ['/projects/dummy-project/src/entities/**'],
       },
@@ -33,7 +33,35 @@ describe('transformGlobs', () => {
     ])
   })
 
-  it('should strip trailing slashes', () => {
+  it.runIf(platform === 'win32')(`should convert relative globs to absolute`, () => {
+    const config: Config<Array<Rule>> = [
+      {
+        ignores: ['./src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['./src/shared/ui/**/*'],
+        ignores: ['./src/shared/ui/index.ts'],
+      },
+    ]
+
+    expect(transformGlobs(config, 'C:/projects/dummy-project')).toEqual([
+      {
+        ignores: ['C:/projects/dummy-project/src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['C:/projects/dummy-project/src/shared/ui/**/*'],
+        ignores: ['C:/projects/dummy-project/src/shared/ui/index.ts'],
+      },
+    ])
+  })
+
+  it.runIf(platform === 'linux')('should strip trailing slashes', () => {
     const config: Config<Array<Rule>> = [
       {
         ignores: ['./src/entities/', '**/shared/'],
@@ -47,7 +75,7 @@ describe('transformGlobs', () => {
       },
     ]
 
-    expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
+    expect(transformGlobs(config, '/projects/dummy-project')).toEqual([
       {
         ignores: ['/projects/dummy-project/src/entities', '/projects/dummy-project/**/shared'],
       },
@@ -61,35 +89,97 @@ describe('transformGlobs', () => {
     ])
   })
 
-  it("should correctly transform globs that are relative but don't start with a dot", () => {
+  it.runIf(platform === 'win32')('should strip trailing slashes', () => {
     const config: Config<Array<Rule>> = [
       {
-        ignores: ['src/entities/**'],
+        ignores: ['./src/entities/', '**/shared/'],
       },
       {
         rules: {
           rule1: 'warn',
         },
-        files: ['src/shared/ui/**/*'],
-        ignores: ['src/shared/ui/index.ts'],
+        files: ['./src/shared/ui/', '**/pages/'],
+        ignores: ['./src/shared/ui/index.ts'],
       },
     ]
 
-    expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
+    expect(transformGlobs(config, 'C:/projects/dummy-project')).toEqual([
       {
-        ignores: ['/projects/dummy-project/src/entities/**'],
+        ignores: ['C:/projects/dummy-project/src/entities', 'C:/projects/dummy-project/**/shared'],
       },
       {
         rules: {
           rule1: 'warn',
         },
-        files: ['/projects/dummy-project/src/shared/ui/**/*'],
-        ignores: ['/projects/dummy-project/src/shared/ui/index.ts'],
+        files: ['C:/projects/dummy-project/src/shared/ui', 'C:/projects/dummy-project/**/pages'],
+        ignores: ['C:/projects/dummy-project/src/shared/ui/index.ts'],
       },
     ])
   })
 
-  it('should correctly transform negated globs', () => {
+  it.runIf(platform === 'linux')(
+    "should correctly transform globs that are relative but don't start with a dot",
+    () => {
+      const config: Config<Array<Rule>> = [
+        {
+          ignores: ['src/entities/**'],
+        },
+        {
+          rules: {
+            rule1: 'warn',
+          },
+          files: ['src/shared/ui/**/*'],
+          ignores: ['src/shared/ui/index.ts'],
+        },
+      ]
+
+      expect(transformGlobs(config, '/projects/dummy-project')).toEqual([
+        {
+          ignores: ['/projects/dummy-project/src/entities/**'],
+        },
+        {
+          rules: {
+            rule1: 'warn',
+          },
+          files: ['/projects/dummy-project/src/shared/ui/**/*'],
+          ignores: ['/projects/dummy-project/src/shared/ui/index.ts'],
+        },
+      ])
+    },
+  )
+
+  it.runIf(platform === 'win32')(
+    "should correctly transform globs that are relative but don't start with a dot",
+    () => {
+      const config: Config<Array<Rule>> = [
+        {
+          ignores: ['src/entities/**'],
+        },
+        {
+          rules: {
+            rule1: 'warn',
+          },
+          files: ['src/shared/ui/**/*'],
+          ignores: ['src/shared/ui/index.ts'],
+        },
+      ]
+
+      expect(transformGlobs(config, 'C:/projects/dummy-project')).toEqual([
+        {
+          ignores: ['C:/projects/dummy-project/src/entities/**'],
+        },
+        {
+          rules: {
+            rule1: 'warn',
+          },
+          files: ['C:/projects/dummy-project/src/shared/ui/**/*'],
+          ignores: ['C:/projects/dummy-project/src/shared/ui/index.ts'],
+        },
+      ])
+    },
+  )
+
+  it.runIf(platform === 'linux')('should correctly transform negated globs', () => {
     const config: Config<Array<Rule>> = [
       {
         ignores: ['!src/entities/**'],
@@ -103,7 +193,7 @@ describe('transformGlobs', () => {
       },
     ]
 
-    expect(transformGlobs(config, joinFromRoot('projects', 'dummy-project'))).toEqual([
+    expect(transformGlobs(config, '/projects/dummy-project')).toEqual([
       {
         ignores: ['!/projects/dummy-project/src/entities/**'],
       },
@@ -113,6 +203,34 @@ describe('transformGlobs', () => {
         },
         files: ['!/projects/dummy-project/**/shared/ui/**/*'],
         ignores: ['!/projects/dummy-project/src/shared/ui/index.ts'],
+      },
+    ])
+  })
+
+  it.runIf(platform === 'win32')('should correctly transform negated globs', () => {
+    const config: Config<Array<Rule>> = [
+      {
+        ignores: ['!src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['!**/shared/ui/**/*'],
+        ignores: ['!src/shared/ui/index.ts'],
+      },
+    ]
+
+    expect(transformGlobs(config, 'C:/projects/dummy-project')).toEqual([
+      {
+        ignores: ['!C:/projects/dummy-project/src/entities/**'],
+      },
+      {
+        rules: {
+          rule1: 'warn',
+        },
+        files: ['!C:/projects/dummy-project/**/shared/ui/**/*'],
+        ignores: ['!C:/projects/dummy-project/src/shared/ui/index.ts'],
       },
     ])
   })
