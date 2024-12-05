@@ -9,7 +9,7 @@ import { transformGlobs } from './transform-globs'
 
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
-export { GlobGroupWithSeverity } from './types'
+export type { GlobGroupWithSeverity } from './types'
 
 const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
 const setRuleInstructions = createEvent<RuleInstructionsPerRule>()
@@ -19,7 +19,7 @@ const $globalIgnores = createStore<Array<GlobalIgnore>>([])
 const setGlobalIgnores = createEvent<Array<GlobalIgnore>>()
 $globalIgnores.on(setGlobalIgnores, (_state, payload) => payload)
 
-const $plugins = createStore<Array<Plugin>>([])
+export const $plugins = createStore<Array<Plugin>>([])
 const setPlugins = createEvent<Array<Plugin>>()
 $plugins.on(setPlugins, (_state, payload) => payload)
 

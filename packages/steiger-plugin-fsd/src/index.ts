@@ -41,7 +41,7 @@ const rules = [
 
 const plugin = createPlugin({
   meta: {
-    name: 'steiger-plugin-fsd',
+    name: '@feature-sliced/steiger-plugin',
     version: packageJson.version,
   },
   ruleDefinitions: rules,
