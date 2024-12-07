@@ -295,7 +295,7 @@ describe('applyExclusion', () => {
 
     expect(applyExclusion(vfs, globs)).toEqual({
       type: 'folder',
-      path: '/src',
+      path: joinFromRoot('src'),
       children: [],
     })
   })
