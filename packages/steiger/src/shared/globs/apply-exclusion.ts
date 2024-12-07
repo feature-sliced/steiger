@@ -1,6 +1,6 @@
 import { File, Folder } from '@steiger/types'
 
-import { createFilterAccordingToGlobs } from './create-filter-according-to-globs'
+import { createFilterAccordingToGlobs, isWellKnownIgnore } from './glob-matchers'
 import { GlobGroup, InvertedGlobGroup } from './index'
 
 function removeEmptyFolders(node: Folder): Folder {
@@ -33,6 +33,14 @@ function excludeFilesBasedOnGlobs(vfs: Folder, globs: Array<GlobGroup | Inverted
   const vfsCopy = copyNode(vfs, true)
 
   function isIncluded(path: string) {
+    /* Need to determine if it's an ignore because it skews the logic when an inverted glob group is applied.
+     * E.g. pattern: /src/widgets/** and the path is /src/widgets/.DS_Store.
+     * It should be excluded but ends up included as we invert the result of the glob match.
+     */
+    if (isWellKnownIgnore(path)) {
+      return false
+    }
+
     return globs.reduce((prev, { files, ignores, ...rest }) => {
       const invertedGlob = 'inverted' in rest
       const matches = createFilterAccordingToGlobs({ inclusions: files, exclusions: ignores })
