@@ -272,4 +272,31 @@ describe('applyExclusion', () => {
 
     expect(applyExclusion(vfs, globs)).toEqual(expectedVfs)
   })
+
+  it('should correctly apply exclusions when a well-known ignore is present in the tree', () => {
+    const globs = [{}, not({ files: ['/src/widgets/**'] })]
+
+    /* In this case .DS_Store is a well-known ignore */
+    const vfs = parseIntoFolder(
+      `
+        📂 widgets
+          📂 widget-1
+            📂 ui
+              📄 widget-1.ts
+            📄 index.ts
+          📂 widget-2
+            📂 ui
+              📄 widget-2.ts
+            📄 index.ts
+            📄 .DS_Store
+      `,
+      joinFromRoot('src'),
+    )
+
+    expect(applyExclusion(vfs, globs)).toEqual({
+      type: 'folder',
+      path: '/src',
+      children: [],
+    })
+  })
 })
