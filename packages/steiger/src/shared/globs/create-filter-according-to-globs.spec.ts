@@ -1,6 +1,6 @@
 import { expect, it, describe } from 'vitest'
 
-import { createFilterAccordingToGlobs, isWellKnownIgnore } from './glob-matchers'
+import { createFilterAccordingToGlobs } from './create-filter-according-to-globs'
 
 describe('createFilterAccordingToGlobs', () => {
   it('should return false if empty "files" are provided', () => {
@@ -243,15 +243,5 @@ describe('createFilterAccordingToGlobs', () => {
     const filteredFiles = files.filter(filter)
 
     expect(filteredFiles).toEqual(expected)
-  })
-})
-
-describe('isWellKnownIgnore', () => {
-  it('should behave as expected when a plain path is passed', () => {
-    expect(isWellKnownIgnore('/src/shared/ui/styles.css')).toBe(false)
-  })
-
-  it('should return false is a well-known ignore is passed', () => {
-    expect(isWellKnownIgnore('/src/widgets/footer/.DS_Store')).toBe(true)
   })
 })

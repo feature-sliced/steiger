@@ -40,14 +40,3 @@ export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGl
 
   return filterAccordingToGlobs
 }
-
-/**
- * Checks if a file/folder is a well-known ignore.
- *
- * If a path does not match the "any file/folder" pattern, it is considered a well-known ignore.
- * It looks like minimatch has some registry of such files, and it returns false for them regardless of the pattern.
- * It's the case for .DS_Store on macOS. Maybe there are other cases.
- * */
-export function isWellKnownIgnore(path: string) {
-  return !minimatch(path, '**')
-}
