@@ -1,0 +1,48 @@
+name: Publish Approved Pull Requests to pkg.pr.new
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  check:
+    # First, trigger a permissions check on the user approving the pull request.
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    outputs:
+      has-permissions: ${{ steps.checkPermissions.outputs.result }}
+    steps:
+      - name: Check permissions
+        id: checkPermissions
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          # The approver must have write access to the repository to trigger the package preview.
+          script: |
+            const { data: permission } = await github.repos.getCollaboratorPermissionLevel({
+              ...context.repo.owner,
+              username: context.actor
+            });
+            return permission === 'write' || permission === 'admin';
+
+  publish:
+    needs: check
+    # Publish the preview package only if the permissions check passed.
+    if: needs.check.outputs.has-permissions == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm exec turbo build
+
+      - run: pnpm dlx pkg-pr-new publish './packages/*'
