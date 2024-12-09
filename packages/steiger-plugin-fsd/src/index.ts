@@ -3,6 +3,7 @@ import { enableAllRules, type ConfigObjectOf, createPlugin, createConfigs } from
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
 import forbiddenImports from './forbidden-imports/index.js'
+import importLocality from './import-locality/index.js'
 import inconsistentNaming from './inconsistent-naming/index.js'
 import insignificantSlice from './insignificant-slice/index.js'
 import noLayerPublicApi from './no-layer-public-api/index.js'
@@ -23,6 +24,7 @@ const rules = [
   ambiguousSliceNames,
   excessiveSlicing,
   forbiddenImports,
+  importLocality,
   inconsistentNaming,
   insignificantSlice,
   noLayerPublicApi,
