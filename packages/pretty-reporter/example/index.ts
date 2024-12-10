@@ -4,6 +4,11 @@ function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
+function debug(x: unknown) {
+  console.log(x)
+  return x
+}
+
 reportPretty(
   [
     {
