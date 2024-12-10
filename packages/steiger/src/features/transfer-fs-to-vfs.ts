@@ -36,7 +36,6 @@ export async function createWatcher(path: string) {
     ignoreInitial: false,
     alwaysStat: true,
     awaitWriteFinish: true,
-    disableGlobbing: true,
     cwd: path,
   })
 
