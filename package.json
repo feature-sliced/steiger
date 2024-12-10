@@ -2,8 +2,8 @@
   "name": "@steiger/root",
   "private": true,
   "scripts": {
-    "format": "prettier --write . --cache",
-    "check-formatting": "prettier --check . --cache",
+    "format": "prettier --cache --write . \"!packages/**\" \"!tooling/**\"",
+    "check-formatting": "prettier --cache --check . \"!packages/**\" \"!tooling/**\"",
     "check-monorepo": "manypkg check",
     "prepare": "husky"
   },
