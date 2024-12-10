@@ -4,7 +4,8 @@ function getRuleDescriptionUrl(ruleName: string) {
   return new URL(`https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${ruleName}`)
 }
 
-reportPretty([
+reportPretty(
+  [
     {
       message: 'Inconsistent pluralization of slice names. Prefer all plural names',
       ruleName: 'inconsistent-naming',
