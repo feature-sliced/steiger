@@ -114,7 +114,7 @@ if (import.meta.vitest) {
     vi.spyOn(process, 'cwd').mockReturnValue(root)
     vol.fromNestedJSON(fileStructure, root)
 
-    expect(await resolveWithCorrections('src/app')).toBe('src/app')
-    expect(await resolveWithCorrections('scr/shad')).toBe('src/shared')
+    expect(await resolveWithCorrections(join('src', 'app'))).toBe(join('src', 'app'))
+    expect(await resolveWithCorrections(join('scr', 'shad'))).toBe(join('src', 'shared'))
   })
 }
