@@ -41,6 +41,7 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "figures": "^6.1.0",
+    "picocolors": "^1.1.1",
     "terminal-link": "^3.0.0"
   }
 }
