@@ -79,5 +79,5 @@ jobs:
                 const sizePR = sizesPR[packageName];
                 return [packageName, formatSize(size), sizePR === size ? 'No change' : formatSize(sizePR)];
               }).map((data) => ({ data })),
-            );
+            ]);
             core.summary.write();
