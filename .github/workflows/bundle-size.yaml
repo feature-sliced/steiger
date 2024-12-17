@@ -14,7 +14,7 @@ jobs:
       matrix:
         branch:
           - ${{ github.base_ref }}
-          - ${{ github.ref }}
+          - ${{ github.head_ref }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
             }
             const fs = require('fs');
             const sizes = parseDuOutput(fs.readFileSync('sizes-${{ github.base_ref }}.txt', 'utf8'));
-            const sizesPR = parseDuOutput(fs.readFileSync('sizes-${{ github.ref }}.txt', 'utf8'));
+            const sizesPR = parseDuOutput(fs.readFileSync('sizes-${{ github.head_ref }}.txt', 'utf8'));
             const report = [
               '### 📊 Package size report',
               '',
