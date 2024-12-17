@@ -54,7 +54,7 @@ jobs:
           result-encoding: string
           script: |
             function parseDuOutput(output) {
-              return Object.fromEntries(output.split('\n').map(line => {
+              return Object.fromEntries(output.trim().split('\n').map(line => {
                 const [size, folderName] = line.split(/\s+/);
                 const [_packages, packageName, _dist] = folderName.split('/');
                 return [packageName, parseInt(size, 10)];
