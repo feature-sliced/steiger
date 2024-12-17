@@ -71,14 +71,14 @@ jobs:
             const fs = require('fs');
             const sizes = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.base_ref) }}}.txt`, 'utf8'));
             const sizesPR = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.head_ref) }}}.txt`, 'utf8'));
-            const report = [
-              '### 📊 Package size report',
-              '',
-              '| Package | Before | After |',
-              ...Object.keys(sizes).map((packageName) => {
-                const size = sizes[packageName];
-                const sizePR = sizesPR[packageName];
-                return `| ${packageName} | ${formatSize(size)} | ${sizePR === size ? 'No change' : formatSize(sizePR)} |`;
-              }),
-            ].join('\n');
-            core.summary.addRaw(report, /* addEOL: */ true);
+            core.summary.addHeading('📊 Package size report', '3');
+            core.summary.addTable([
+              { data: 'Package', header: true },
+              { data: 'Before', header: true },
+              { data: 'After', header: true },
+            ].concat(Object.keys(sizes).flatMap((packageName) => {
+              const size = sizes[packageName];
+              const sizePR = sizesPR[packageName];
+              return [packageName, formatSize(size), sizePR === size ? 'No change' : formatSize(sizePR)];
+            }));
+            core.summary.write();
