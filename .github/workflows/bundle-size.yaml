@@ -44,6 +44,9 @@ jobs:
     steps:
       - name: Download the sizes
         uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: '.'
 
       - name: Create the report
         uses: actions/github-script@v7
