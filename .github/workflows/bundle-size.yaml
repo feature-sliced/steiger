@@ -1,0 +1,84 @@
+name: Bundle size
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build on the base branch and the PR branch
+    strategy:
+      matrix:
+        branch:
+          - ${{ github.base_ref }}
+          - ${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build the packages
+        run: turbo run build
+
+      - name: Collect sizes in bytes
+        id: sizes
+        run: du -sb packages/*/dist | cut -f 1 > sizes-${{ matrix.branch }}.txt
+
+      - name: Upload the sizes
+        uses: actions/upload-artifact@v4
+        with:
+          name: sizes-${{ matrix.branch }}
+          path: sizes-${{ matrix.branch }}.txt
+
+  print:
+    name: Print the sizes
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Download the sizes
+        uses: actions/download-artifact@v4
+
+      - name: Create the report
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            function parseDuOutput(output) {
+              return Object.fromEntries(output.split('\n').map(line => {
+                const [size, folderName] = line.split(/\s+/);
+                const [_packages, packageName, _dist] = folderName.split('/');
+                return [packageName, parseInt(size, 10)];
+              }));
+            }
+            function formatSize(sizeInBytes) {
+              if (sizeInBytes < 1000) {
+                return `${sizeInBytes} B`;
+              } else {
+                const sizeInKb = sizeInBytes / 1000;
+                return `${sizeInKb.toFixed(2)} KB`;
+              }
+            }
+            const fs = require('fs');
+            const sizes = parseDuOutput(fs.readFileSync('sizes-${{ github.base_ref }}.txt', 'utf8'));
+            const sizesPR = parseDuOutput(fs.readFileSync('sizes-${{ github.ref }}.txt', 'utf8'));
+            const report = [
+              '### 📊 Package size report',
+              '',
+              '| Package | Before | After |',
+              ...Object.keys(sizes).map((packageName) => {
+                const size = sizes[packageName];
+                const sizePR = sizesPR[packageName];
+                return `| ${packageName} | ${formatSize(size)} | ${sizePR === size ? 'No change' : formatSize(sizePR)} |`;
+              }),
+            ].join('\n');
+            core.summary.addRaw(report, /* addEOL: */ true);
