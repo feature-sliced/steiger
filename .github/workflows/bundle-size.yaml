@@ -80,5 +80,5 @@ jobs:
               const size = sizes[packageName];
               const sizePR = sizesPR[packageName];
               return [packageName, formatSize(size), sizePR === size ? 'No change' : formatSize(sizePR)];
-            }));
+            })));
             core.summary.write();
