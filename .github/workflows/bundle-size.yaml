@@ -73,7 +73,7 @@ jobs:
             const sizesPR = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.head_ref) }}}.txt`, 'utf8'));
             core.summary.addHeading('📊 Package size report', '3');
             core.summary.addTable([
-              (['Package', 'Before', 'After'].map((data) => ({ data, header: true }))),
+              ['Package', 'Before', 'After'].map((data) => ({ data, header: true })),
               ...Object.keys(sizes).map((packageName) => {
                 const size = sizes[packageName];
                 const sizePR = sizesPR[packageName];
