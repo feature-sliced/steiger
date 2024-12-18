@@ -18,10 +18,11 @@ jobs:
           result-encoding: string
           # The approver must have write access to the repository to trigger the package preview.
           script: |
-            const { data: permission } = await github.repos.getCollaboratorPermissionLevel({
-              ...context.repo.owner,
-              username: context.actor
-            });
+            const { data: { permission } } =
+              await github.rest.repos.getCollaboratorPermissionLevel({
+                ...context.repo,
+                username: context.actor,
+              });
             return permission === 'write' || permission === 'admin';
 
   publish:
