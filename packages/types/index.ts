@@ -112,5 +112,6 @@ export interface Plugin<Context = unknown, Rules extends Array<Rule<Context>> = 
     name: string
     version: string
   }
+  getRuleDescriptionUrl(ruleName: string): URL
   ruleDefinitions: Rules
 }

@@ -4,18 +4,10 @@ import type { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/config'
+import { $enabledRules, getEnabledRules, getGlobalIgnores, getPluginByRuleName } from './models/config'
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
-
-// TODO: make this part of a plugin
-function getRuleDescriptionUrl(ruleName: string) {
-  const withoutNamespace = ruleName.split('/')[1]
-  return new URL(
-    `https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/${withoutNamespace}`,
-  )
-}
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
@@ -28,6 +20,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
     }
 
     const ruleName = rules[ruleResultsIndex].name
+    const pluginProvidedTheRule = getPluginByRuleName(ruleName)
     const severities = calculateFinalSeverities(
       vfsWithoutGlobalIgnores,
       ruleName,
@@ -37,7 +30,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
     return diagnostics.map((d, index) => ({
       ...d,
       ruleName,
-      getRuleDescriptionUrl,
+      getRuleDescriptionUrl: pluginProvidedTheRule.getRuleDescriptionUrl,
       severity: severities[index],
     }))
   })
