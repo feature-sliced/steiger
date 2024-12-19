@@ -86,14 +86,15 @@ const yargsProgram = yargs(hideBin(process.argv))
   .showHelpOnFail(true)
 
 const consoleArgs = yargsProgram.parseSync()
+const inputPaths = consoleArgs._
 
 let targetPath: string | undefined
-if (consoleArgs._.length > 0) {
-  if (await existsAndIsFolder(consoleArgs._[0])) {
-    targetPath = resolve(consoleArgs._[0])
+if (inputPaths.length > 0) {
+  if (await existsAndIsFolder(inputPaths[0])) {
+    targetPath = resolve(inputPaths[0])
   } else {
     try {
-      targetPath = resolve(await chooseRootFolderFromSimilar(consoleArgs._[0]))
+      targetPath = resolve(await chooseRootFolderFromSimilar(inputPaths[0]))
     } catch (e) {
       if (e instanceof ExitException) {
         process.exit(0)
