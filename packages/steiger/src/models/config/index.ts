@@ -48,6 +48,11 @@ export function getEnabledRules() {
   return $enabledRules.getState()
 }
 
+export function getPluginByRuleName(ruleName: string) {
+  // Always returns a plugin because if a rule exists than the plugin provided it must exist too
+  return $plugins.getState().find((plugin) => plugin.ruleDefinitions.some((rule) => rule.name === ruleName))!
+}
+
 export function getRuleOptions(ruleName: string) {
   return $ruleInstructions.getState()?.[ruleName].options || null
 }

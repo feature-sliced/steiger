@@ -114,6 +114,7 @@ export function buildValidationScheme(rawConfig: Config<Array<Rule>>) {
             name: z.string(),
             version: z.string(),
           }),
+          getRuleDescriptionUrl: z.function().args(z.string()).returns(z.any()),
           ruleDefinitions: z.array(
             z.object({
               name: z.string(),
