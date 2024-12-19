@@ -1,0 +1,44 @@
+# This workflow builds the packages on the base branch and the PR branch, and then records the sizes of the built packages.
+# The size comparison is done in a separate workflow because this one can't leave PR comments.
+
+name: Bundle size
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build on the base branch and the PR branch
+    strategy:
+      matrix:
+        branch:
+          - ${{ github.base_ref }}
+          - ${{ github.head_ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build the packages
+        run: turbo run build
+
+      - name: Collect sizes in bytes
+        id: sizes
+        run: du -sb packages/*/dist > sizes-${{ matrix.branch }}.txt
+
+      - name: Upload the sizes
+        uses: actions/upload-artifact@v4
+        with:
+          name: sizes-${{ matrix.branch }}
+          path: sizes-${{ matrix.branch }}.txt
