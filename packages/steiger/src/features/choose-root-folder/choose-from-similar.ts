@@ -1,6 +1,7 @@
 import { readdir } from 'node:fs/promises'
 import { parse, relative, sep, join } from 'node:path'
 import pc from 'picocolors'
+import { isGitIgnored } from 'globby'
 
 import { distance } from 'fastest-levenshtein'
 import { isCancel, outro, select, confirm } from '@clack/prompts'
@@ -9,8 +10,7 @@ import { ExitException } from './exit-exception'
 
 /** The maximum Levenshtein distance between the input and the reference for the input to be considered a typo. */
 const typoThreshold = 5
-/** Patterns for folder names that are never suggested. */
-const nonCandidates = [/^node_modules$/, /^dist$/, /^\./]
+const isIgnored = await isGitIgnored()
 
 /** Present the user with a choice of folders based on similarity to a given input. */
 export async function chooseFromSimilar(input: string): Promise<string> {
@@ -19,7 +19,7 @@ export async function chooseFromSimilar(input: string): Promise<string> {
   const existingDir = await resolveWithCorrections(dir || '.')
 
   const candidates = (await readdir(existingDir, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory() && nonCandidates.every((pattern) => !pattern.test(entry.name)))
+    .filter((entry) => entry.isDirectory() && !isIgnored(join(existingDir, entry.name)))
     .map((entry) => entry.name)
   const withDistances = candidates.map((candidate) => [candidate, distance(candidate, base)] as const)
   const suggestions = withDistances
