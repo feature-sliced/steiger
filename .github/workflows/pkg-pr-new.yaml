@@ -3,6 +3,10 @@ on:
   pull_request_review:
     types: [submitted]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   check:
     # First, trigger a permissions check on the user approving the pull request.
