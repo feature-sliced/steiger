@@ -68,4 +68,3 @@ jobs:
           message: ${{ steps.create-report.outputs.result }}
           pr-number: ${{ github.event.workflow_run.pull_requests.number }}
           comment-tag: bundle-size
-          mode: recreate
