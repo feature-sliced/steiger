@@ -20,7 +20,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
     }
 
     const ruleName = rules[ruleResultsIndex].name
-    const pluginProvidedTheRule = getPluginByRuleName(ruleName)
+    const ruleSourcePlugin = getPluginByRuleName(ruleName)
     const severities = calculateFinalSeverities(
       vfsWithoutGlobalIgnores,
       ruleName,
