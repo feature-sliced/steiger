@@ -30,7 +30,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
     return diagnostics.map((d, index) => ({
       ...d,
       ruleName,
-      getRuleDescriptionUrl: pluginProvidedTheRule.getRuleDescriptionUrl,
+      getRuleDescriptionUrl: ruleSourcePlugin.getRuleDescriptionUrl,
       severity: severities[index],
     }))
   })
