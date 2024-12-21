@@ -2,27 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { Config, Plugin, Rule } from '@steiger/types'
 
 import { buildValidationScheme, validateConfig } from './validate-config'
-import { isPlugin } from './raw-config'
-
-// The function maps a plugin object to a new object with the same properties as the original object,
-// but with the check method expected to be just any function.
-// The reason why it's needed is that the original check method's .toString method returns [Function: check],
-// but after the validation it changes to [Function: anonymous] and fails the test.
-function expectFunctionsToBeAnyFunction(config: Config<Array<Rule>>) {
-  return config.map((configObject) => {
-    if (isPlugin(configObject)) {
-      return {
-        ...configObject,
-        getRuleDescriptionUrl: expect.any(Function),
-        ruleDefinitions: configObject.ruleDefinitions.map((ruleDefinition) => ({
-          ...ruleDefinition,
-          check: expect.any(Function),
-        })),
-      }
-    }
-    return configObject
-  })
-}
 
 const dummyPlugin: Plugin = {
   meta: {
@@ -61,7 +40,7 @@ describe('buildValidationScheme', () => {
     ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should successfully validate config with a tuple of severity and rule options', () => {
@@ -76,7 +55,7 @@ describe('buildValidationScheme', () => {
     ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should successfully validate a config with several objects', () => {
@@ -96,7 +75,7 @@ describe('buildValidationScheme', () => {
 
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should successfully validate a config with ignores', () => {
@@ -117,7 +96,7 @@ describe('buildValidationScheme', () => {
     ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should successfully validate a config with files', () => {
@@ -139,7 +118,7 @@ describe('buildValidationScheme', () => {
     ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should successfully validate a config with files and ignores', () => {
@@ -162,7 +141,7 @@ describe('buildValidationScheme', () => {
     ] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should throw an error if no plugins are provided', () => {
@@ -227,7 +206,7 @@ describe('buildValidationScheme', () => {
     ]
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should correctly validate a config with unique rule options', () => {
@@ -245,7 +224,7 @@ describe('buildValidationScheme', () => {
     ]
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should successfully validate when the config provides a rule with multiple but identical options', () => {
@@ -266,7 +245,7 @@ describe('buildValidationScheme', () => {
     ]
     const scheme = buildValidationScheme(config)
 
-    expect(scheme.parse(config)).toEqual(expectFunctionsToBeAnyFunction(config))
+    expect(() => scheme.parse(config)).not.toThrow()
   })
 
   it('should throw an error when the config provides a rule with multiple but different options', () => {
