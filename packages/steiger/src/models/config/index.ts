@@ -50,7 +50,12 @@ export function getEnabledRules() {
 
 export function getPluginByRuleName(ruleName: string) {
   // Always returns a plugin because if a rule exists than the plugin provided it must exist too
-  return $plugins.getState().find((plugin) => plugin.ruleDefinitions.some((rule) => rule.name === ruleName))!
+  const sourcePlugin = $plugins.getState().find((plugin) => plugin.ruleDefinitions.some((rule) => rule.name === ruleName))
+  if (sourcePlugin === undefined) {
+    throw new Error(`Expected to find a source plugin for the rule "${ruleName}", but didn't`)
+  }
+  
+  return sourcePlugin
 }
 
 export function getRuleOptions(ruleName: string) {
