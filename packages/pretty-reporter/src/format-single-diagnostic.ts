@@ -1,18 +1,18 @@
 import { relative } from 'node:path'
 import figures from 'figures'
 import terminalLink from 'terminal-link'
-import chalk from 'chalk'
+import pc from 'picocolors'
 import type { Diagnostic } from '@steiger/types'
 
 export function formatSingleDiagnostic(d: Diagnostic, cwd: string): string {
-  const x = d.severity === 'error' ? chalk.red(figures.cross) : chalk.yellow(figures.warning)
-  const s = chalk.reset(figures.lineDownRight)
-  const bar = chalk.reset(figures.lineVertical)
-  const e = chalk.reset(figures.lineUpRight)
-  const message = chalk.reset(d.message)
-  const autofixable = d.fixes !== undefined && d.fixes.length > 0 ? chalk.green(`${figures.tick} Auto-fixable`) : null
-  const location = chalk.gray(formatLocation(d.location, cwd))
-  const ruleName = chalk.blue(terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString()))
+  const x = d.severity === 'error' ? pc.red(figures.cross) : pc.yellow(figures.warning)
+  const s = pc.reset(figures.lineDownRight)
+  const bar = pc.reset(figures.lineVertical)
+  const e = pc.reset(figures.lineUpRight)
+  const message = pc.reset(d.message)
+  const autofixable = d.fixes !== undefined && d.fixes.length > 0 ? pc.green(`${figures.tick} Auto-fixable`) : null
+  const location = pc.underline(formatLocation(d.location, cwd))
+  const ruleName = pc.blue(terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString()))
 
   return `
 ${s} ${location}

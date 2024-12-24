@@ -41,6 +41,9 @@ importers:
       figures:
         specifier: ^6.1.0
         version: 6.1.0
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
       terminal-link:
         specifier: ^3.0.0
         version: 3.0.0
