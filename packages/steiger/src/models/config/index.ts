@@ -48,6 +48,17 @@ export function getEnabledRules() {
   return $enabledRules.getState()
 }
 
+export function getPluginByRuleName(ruleName: string) {
+  const sourcePlugin = $plugins
+    .getState()
+    .find((plugin) => plugin.ruleDefinitions.some((rule) => rule.name === ruleName))
+  if (sourcePlugin === undefined) {
+    throw new Error(`Expected to find a source plugin for the rule "${ruleName}", but didn't`)
+  }
+
+  return sourcePlugin
+}
+
 export function getRuleOptions(ruleName: string) {
   return $ruleInstructions.getState()?.[ruleName].options || null
 }

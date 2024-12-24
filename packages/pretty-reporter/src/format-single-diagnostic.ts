@@ -12,7 +12,9 @@ export function formatSingleDiagnostic(d: Diagnostic, cwd: string): string {
   const message = chalk.reset(d.message)
   const autofixable = d.fixes !== undefined && d.fixes.length > 0 ? chalk.green(`${figures.tick} Auto-fixable`) : null
   const location = chalk.gray(formatLocation(d.location, cwd))
-  const ruleName = chalk.blue(terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString()))
+  const ruleName = d.getRuleDescriptionUrl
+    ? chalk.blue(terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString()))
+    : chalk.reset(d.ruleName)
 
   return `
 ${s} ${location}
