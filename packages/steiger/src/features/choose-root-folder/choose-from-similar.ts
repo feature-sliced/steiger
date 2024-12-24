@@ -2,6 +2,7 @@ import { readdir } from 'node:fs/promises'
 import { parse, relative, sep, join } from 'node:path'
 import pc from 'picocolors'
 import { isGitIgnored } from 'globby'
+import * as find from 'empathic/find'
 
 import { distance } from 'fastest-levenshtein'
 import { isCancel, outro, select, confirm } from '@clack/prompts'
@@ -10,7 +11,7 @@ import { ExitException } from './exit-exception'
 
 /** The maximum Levenshtein distance between the input and the reference for the input to be considered a typo. */
 const typoThreshold = 5
-const isIgnored = await isGitIgnored()
+const isIgnored = await isGitIgnored({ cwd: find.up('.git') })
 
 /** Present the user with a choice of folders based on similarity to a given input. */
 export async function chooseFromSimilar(input: string): Promise<string> {

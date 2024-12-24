@@ -1,26 +1,10 @@
-import { join, sep, resolve, parse, dirname } from 'node:path'
-import { existsSync } from 'node:fs'
+import { join, sep } from 'node:path'
 import chokidar from 'chokidar'
+import * as find from 'empathic/find'
 import type { Folder } from '@steiger/types'
 import { isGitIgnored } from 'globby'
 
 import { createVfsRoot } from '../models/vfs'
-
-function findGitRoot(startDir: string): string | null {
-  let currentDir = resolve(startDir)
-
-  while (currentDir !== parse(currentDir).root) {
-    const gitFolderOrLinkPath = join(currentDir, '.git')
-
-    if (existsSync(gitFolderOrLinkPath)) {
-      return currentDir
-    }
-    // Move up one directory
-    currentDir = dirname(currentDir)
-  }
-
-  return null
-}
 
 /**
  * Start watching a given path with chokidar.
@@ -29,7 +13,7 @@ function findGitRoot(startDir: string): string | null {
  */
 export async function createWatcher(path: string) {
   const vfs = createVfsRoot(path)
-  const isIgnored = await isGitIgnored({ cwd: findGitRoot(path) || path })
+  const isIgnored = await isGitIgnored({ cwd: find.up('.git', { cwd: path }) ?? path })
 
   const watcher = chokidar.watch(path, {
     ignored: (path) => path.split(sep).includes('node_modules') || isIgnored(path),

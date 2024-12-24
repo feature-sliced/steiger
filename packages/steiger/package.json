@@ -45,6 +45,7 @@
     "chokidar": "^4.0.1",
     "cosmiconfig": "^9.0.0",
     "effector": "^23.2.3",
+    "empathic": "^1.0.0",
     "fastest-levenshtein": "^1.0.16",
     "globby": "^14.0.2",
     "immer": "^10.1.1",
