@@ -33,6 +33,9 @@ vi.mock('node:fs', async (importOriginal) => {
       '/features/comments/ui/CommentCard.tsx': '',
       '/features/comments/index.ts': '',
 
+      '/widgets/sidebar/ui/Sidebar.tsx': '',
+      '/widgets/sidebar/index.ts': '',
+
       '/pages/editor/ui/EditorPage.tsx':
         'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"; import { CommentCard } from "@/features/comments"; import { UserAvatar } from "@/entities/user"',
       '/pages/editor/ui/Editor.tsx':
@@ -43,6 +46,8 @@ vi.mock('node:fs', async (importOriginal) => {
       '/pages/settings/index.ts': '',
       '/pages/home/index.ts': '',
       '/pages/category/index.ts': '',
+
+      '/app/layouts/BaseLayout.tsx': 'import { Sidebar } from "@/widgets/sidebar"',
     },
     originalFs,
   )
@@ -90,6 +95,21 @@ it('reports no errors on a project with no insignificant slices', async () => {
         📂 ui
           📄 SettingsPage.tsx
         📄 index.ts
+  `)
+
+  expect((await insignificantSlice.check(root)).diagnostics).toEqual([])
+})
+
+it('reports no errors when the only usage of a slice is on the App layer', async () => {
+  const root = parseIntoFsdRoot(`
+    📂 widgets
+      📂 sidebar
+        📂 ui
+          📄 Sidebar.tsx
+        📄 index.ts
+    📂 app
+      📂 layouts
+        📄 BaseLayout.tsx
   `)
 
   expect((await insignificantSlice.check(root)).diagnostics).toEqual([])
