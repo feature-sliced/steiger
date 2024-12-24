@@ -27,12 +27,22 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
       diagnostics.map((d) => d.location.path),
     )
 
-    return diagnostics.map((d, index) => ({
-      ...d,
-      ruleName,
-      getRuleDescriptionUrl: ruleSourcePlugin.getRuleDescriptionUrl,
-      severity: severities[index],
-    }))
+    return diagnostics.map((d, index) => {
+      const finalDiagnostic = {
+        ...d,
+        ruleName,
+        severity: severities[index],
+      }
+
+      if (ruleSourcePlugin.getRuleDescriptionUrl) {
+        return {
+          ...finalDiagnostic,
+          getRuleDescriptionUrl: ruleSourcePlugin.getRuleDescriptionUrl,
+        }
+      }
+
+      return finalDiagnostic
+    })
   })
 }
 

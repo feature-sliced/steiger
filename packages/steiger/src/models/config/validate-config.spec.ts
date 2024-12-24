@@ -3,7 +3,7 @@ import { Config, Plugin, Rule } from '@steiger/types'
 
 import { buildValidationScheme, validateConfig } from './validate-config'
 
-const dummyPlugin: Plugin = {
+const dummyPluginWithGetRuleDescriptionUrl: Plugin = {
   meta: {
     name: 'dummy',
     version: '1.0.0',
@@ -27,10 +27,31 @@ const dummyPlugin: Plugin = {
   ],
 }
 
+const dummyPluginWithoutGetRuleDescriptionUrl: Plugin = {
+  meta: {
+    name: 'dummy',
+    version: '1.0.0',
+  },
+  ruleDefinitions: [
+    {
+      name: 'rule1',
+      check() {
+        return { diagnostics: [] }
+      },
+    },
+    {
+      name: 'rule2',
+      check() {
+        return { diagnostics: [] }
+      },
+    },
+  ],
+}
+
 describe('buildValidationScheme', () => {
   it('should successfully validate config with plain severities', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         rules: {
           rule1: 'off',
@@ -45,7 +66,7 @@ describe('buildValidationScheme', () => {
 
   it('should successfully validate config with a tuple of severity and rule options', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithoutGetRuleDescriptionUrl,
       {
         rules: {
           rule1: ['warn', {}],
@@ -60,7 +81,7 @@ describe('buildValidationScheme', () => {
 
   it('should successfully validate a config with several objects', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         rules: {
           rule1: 'off',
@@ -80,7 +101,7 @@ describe('buildValidationScheme', () => {
 
   it('should successfully validate a config with ignores', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         ignores: ['/shared'],
         rules: {
@@ -101,7 +122,7 @@ describe('buildValidationScheme', () => {
 
   it('should successfully validate a config with files', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
 
       {
         files: ['/shared'],
@@ -123,7 +144,7 @@ describe('buildValidationScheme', () => {
 
   it('should successfully validate a config with files and ignores', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         files: ['/shared'],
         ignores: ['**/*.test.ts'],
@@ -156,16 +177,16 @@ describe('buildValidationScheme', () => {
   })
 
   it('should throw an error if no config objects are provided', () => {
-    const config = [dummyPlugin] as Config<Array<Rule>>
+    const config = [dummyPluginWithGetRuleDescriptionUrl] as Config<Array<Rule>>
     const scheme = buildValidationScheme(config)
 
     expect(() => scheme.parse(config)).toThrow('At least one config object must be provided!')
   })
 
   it('should throw an error if a config object without rules is provided', () => {
-    const config = [dummyPlugin, {}] as Config<Array<Rule>>
-    const config1 = [dummyPlugin, { files: ['/shared'] }] as Config<Array<Rule>>
-    const config2 = [dummyPlugin, { ignores: ['**/*.test.ts'] }] as Config<Array<Rule>>
+    const config = [dummyPluginWithGetRuleDescriptionUrl, {}] as Config<Array<Rule>>
+    const config1 = [dummyPluginWithGetRuleDescriptionUrl, { files: ['/shared'] }] as Config<Array<Rule>>
+    const config2 = [dummyPluginWithGetRuleDescriptionUrl, { ignores: ['**/*.test.ts'] }] as Config<Array<Rule>>
 
     const scheme = buildValidationScheme(config)
     const scheme1 = buildValidationScheme(config1)
@@ -178,7 +199,7 @@ describe('buildValidationScheme', () => {
 
   it('should throw an error if a non-existent rule is provided', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         rules: {
           rule1: 'off',
@@ -193,7 +214,7 @@ describe('buildValidationScheme', () => {
 
   it('should correctly validate a config with global ignores', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         ignores: ['/src/shared/**'],
       },
@@ -211,7 +232,7 @@ describe('buildValidationScheme', () => {
 
   it('should correctly validate a config with unique rule options', () => {
     const config = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         ignores: ['/src/shared/**'],
       },
@@ -229,7 +250,7 @@ describe('buildValidationScheme', () => {
 
   it('should successfully validate when the config provides a rule with multiple but identical options', () => {
     const config: Config<Array<Rule>> = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         rules: {
           rule1: ['warn', { option1: 'value1' }],
@@ -250,7 +271,7 @@ describe('buildValidationScheme', () => {
 
   it('should throw an error when the config provides a rule with multiple but different options', () => {
     const config: Config<Array<Rule>> = [
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         rules: {
           rule1: ['warn', { option1: 'value1' }],
@@ -276,8 +297,8 @@ describe('buildValidationScheme', () => {
 
   it('should throw an error when duplicate rule definition are provided', () => {
     const config: Config<Array<Rule>> = [
-      dummyPlugin,
-      dummyPlugin,
+      dummyPluginWithGetRuleDescriptionUrl,
+      dummyPluginWithGetRuleDescriptionUrl,
       {
         rules: {
           rule1: ['warn', { option1: 'value1' }],
