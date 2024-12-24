@@ -11,7 +11,7 @@ export function formatSingleDiagnostic(d: Diagnostic, cwd: string): string {
   const e = pc.reset(figures.lineUpRight)
   const message = pc.reset(d.message)
   const autofixable = d.fixes !== undefined && d.fixes.length > 0 ? pc.green(`${figures.tick} Auto-fixable`) : null
-  const location = pc.dim(formatLocation(d.location, cwd))
+  const location = pc.underline(formatLocation(d.location, cwd))
   const ruleName = pc.blue(terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString()))
 
   return `
