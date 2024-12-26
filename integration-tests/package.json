@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "name": "@steiger/integration-tests",
+  "description": "Integration tests for Steiger",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "vitest run",
+    "update-windows-snapshots": "node ./scripts/update-windows-snapshots.mjs"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "type": "module",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Anton Medvedev",
+      "email": "unordinarity@yandex.ru",
+      "url": "https://github.com/unordinarity"
+    },
+    {
+      "name": "Lev Chelyadinov",
+      "email": "leva181777@gmail.com",
+      "url": "https://github.com/illright"
+    }
+  ],
+  "devDependencies": {
+    "@steiger/eslint-config": "workspace:*",
+    "@steiger/tsconfig": "workspace:*",
+    "@total-typescript/ts-reset": "^0.6.1",
+    "@types/node": "^18.11.9",
+    "eslint": "^9.16.0",
+    "get-bin-path": "^11.0.0",
+    "prettier": "^3.4.2",
+    "tinyexec": "^0.3.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "steiger": "workspace:*"
+  }
+}

@@ -21,12 +21,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
 
   const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
-  return ruleResults.flatMap((r, ruleResultsIndex) => {
-    const { diagnostics } = r
-    if (diagnostics.length === 0) {
-      return []
-    }
-
+  return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
     const ruleName = rules[ruleResultsIndex].name
     const severities = calculateFinalSeverities(
       vfsWithoutGlobalIgnores,
@@ -34,12 +29,14 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
       diagnostics.map((d) => d.location.path),
     )
 
-    return diagnostics.map((d, index) => ({
-      ...d,
-      ruleName,
-      getRuleDescriptionUrl,
-      severity: severities[index],
-    }))
+    return diagnostics
+      .sort((a, b) => a.location.path.localeCompare(b.location.path))
+      .map((d, index) => ({
+        ...d,
+        ruleName,
+        getRuleDescriptionUrl,
+        severity: severities[index],
+      }))
   })
 }
 
