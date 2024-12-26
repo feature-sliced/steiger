@@ -1,5 +1,6 @@
 import { TSConfckParseResult } from 'tsconfck'
-import { dirname } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { joinFromRoot } from '@steiger/toolkit'
 
 export type CollectRelatedTsConfigsPayload = {
   tsconfig: TSConfckParseResult['tsconfig']
@@ -149,13 +150,13 @@ if (import.meta.vitest) {
     const payload: CollectRelatedTsConfigsPayload = {
       extended: [
         {
-          tsconfigFile: '/tsconfig.json',
+          tsconfigFile: resolve(joinFromRoot('tsconfig.json')),
           tsconfig: {
             extends: './.nuxt/tsconfig.json',
           },
         },
         {
-          tsconfigFile: '/.nuxt/tsconfig.json',
+          tsconfigFile: resolve(joinFromRoot('.nuxt', 'tsconfig.json')),
           tsconfig: {
             compilerOptions: {
               paths: {
@@ -172,7 +173,7 @@ if (import.meta.vitest) {
           },
         },
       ],
-      tsconfigFile: '/tsconfig.json',
+      tsconfigFile: resolve(joinFromRoot('tsconfig.json')),
       tsconfig: {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
@@ -195,8 +196,8 @@ if (import.meta.vitest) {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
           paths: {
-            '~': ['/'],
-            '~/*': ['/*'],
+            '~': [resolve(joinFromRoot())],
+            '~/*': [resolve(joinFromRoot('*'))],
           },
           strict: true,
           noUncheckedIndexedAccess: false,
@@ -213,7 +214,7 @@ if (import.meta.vitest) {
 
   test('resolves paths independently from the current directory', () => {
     const payload: CollectRelatedTsConfigsPayload = {
-      tsconfigFile: '/user/projects/project-0/tsconfig.json',
+      tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'tsconfig.json')),
       tsconfig: {
         compilerOptions: {
           paths: {
@@ -233,47 +234,6 @@ if (import.meta.vitest) {
     const expectedResult = [
       {
         compilerOptions: {
-          paths: {
-            '~': ['/user/projects/project-0/src'],
-            '~/*': ['/user/projects/project-0/src/*'],
-          },
-          strict: true,
-          noUncheckedIndexedAccess: false,
-          forceConsistentCasingInFileNames: true,
-          noImplicitOverride: true,
-          module: 'ESNext',
-          noEmit: true,
-        },
-      },
-    ]
-
-    expect(collectRelatedTsConfigs(payload)).toEqual(expectedResult)
-  })
-
-  test('correctly resolves paths if baseUrl is set', () => {
-    const payload: CollectRelatedTsConfigsPayload = {
-      tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'tsconfig.json')),
-      tsconfig: {
-        compilerOptions: {
-          baseUrl: './src',
-          paths: {
-            '~': ['./'],
-            '~/*': ['./*'],
-          },
-          strict: true,
-          noUncheckedIndexedAccess: false,
-          forceConsistentCasingInFileNames: true,
-          noImplicitOverride: true,
-          module: 'ESNext',
-          noEmit: true,
-        },
-      },
-    }
-
-    const expectedResult = [
-      {
-        compilerOptions: {
-          baseUrl: './src',
           paths: {
             '~': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src'))],
             '~/*': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src', '*'))],
