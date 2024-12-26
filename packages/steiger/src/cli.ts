@@ -11,10 +11,27 @@ import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
-import { processConfiguration } from './models/config'
+import { processConfiguration, $plugins } from './models/config'
 import { applyAutofixes } from './features/autofix'
 import fsd from '@feature-sliced/steiger-plugin'
 import type { Diagnostic } from '@steiger/types'
+import packageJson from '../package.json'
+
+const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
+const defaultConfig = fsd.configs.recommended
+
+try {
+  const configLocationDirectory = filepath ? dirname(filepath) : null
+  // use FSD recommended config as a default
+  processConfiguration(config || defaultConfig, configLocationDirectory)
+} catch (err) {
+  if (filepath !== undefined) {
+    console.error(
+      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
+    )
+    process.exit(100)
+  }
+}
 
 const yargsProgram = yargs(hideBin(process.argv))
   .scriptName('steiger')
@@ -55,27 +72,21 @@ const yargsProgram = yargs(hideBin(process.argv))
   })
   .help('help', 'display help message')
   .alias('help', 'h')
-  .version()
+  .version(
+    [
+      packageJson.version,
+      $plugins
+        .getState()
+        .map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
+        .join('\n'),
+    ]
+      .filter(Boolean)
+      .join('\n\n'),
+  )
   .alias('version', 'v')
   .showHelpOnFail(true)
 
 const consoleArgs = yargsProgram.parseSync()
-
-const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
-const defaultConfig = fsd.configs.recommended
-
-try {
-  const configLocationDirectory = filepath ? dirname(filepath) : null
-  // use FSD recommended config as a default
-  processConfiguration(config || defaultConfig, configLocationDirectory)
-} catch (err) {
-  if (filepath !== undefined) {
-    console.error(
-      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
-    )
-    process.exit(100)
-  }
-}
 
 const targetPath = resolve(consoleArgs._[0])
 

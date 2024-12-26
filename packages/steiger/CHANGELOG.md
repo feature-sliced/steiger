@@ -1,5 +1,26 @@
 # steiger
 
+## 0.5.3
+
+### Patch Changes
+
+- 114d59c: Fix drive label handling in paths on Windows
+- b3f7085: Fix 404s in rule description links
+
+## 0.5.2
+
+### Patch Changes
+
+- Updated dependencies [9c1fec9]
+  - @feature-sliced/steiger-plugin@0.5.2
+
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [06af3dd]
+  - @feature-sliced/steiger-plugin@0.5.1
+
 ## 0.5.0
 
 This release brings a new configuration format! Now you can disable rules only in certain parts of the project, pass options to rules, and set the severity for rules. Also this configuration format allows you to pass third-party plugins and even write your own rules.
@@ -60,6 +81,7 @@ export default {
 ### Minor Changes
 
 - Support the new configuration format
+- Add a JSON reporter (use `--reporter json`)
 - 281aaca: Add error messages for old and invalid config shapes
 - b184bb7: Support warning severity for diagnostics
 

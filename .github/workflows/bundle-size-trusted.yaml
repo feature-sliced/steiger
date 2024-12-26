@@ -1,0 +1,70 @@
+# This is the trusted counterpart of the Bundle size workflow.
+# It generates a report and posts a comment on the PR.
+
+name: Bundle size (trusted)
+
+on:
+  workflow_run:
+    workflows: [Bundle size]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+
+jobs:
+  print:
+    name: Print the sizes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the sizes
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: '.'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Create the report
+        id: create-report
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            function parseDuOutput(output) {
+              return Object.fromEntries(output.trim().split('\n').map(line => {
+                const [size, folderName] = line.split(/\s+/);
+                const [_packages, packageName, _dist] = folderName.split('/');
+                return [packageName, parseInt(size, 10)];
+              }));
+            }
+            function formatSize(sizeInBytes) {
+              if (sizeInBytes < 1000) {
+                return `${sizeInBytes} B`;
+              } else {
+                const sizeInKb = sizeInBytes / 1000;
+                return `${sizeInKb.toFixed(2)} KB`;
+              }
+            }
+            const fs = require('fs');
+            const sizes = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.base_ref) }}}.txt`, 'utf8'));
+            const sizesPR = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.head_ref) }}}.txt`, 'utf8'));
+            core.summary.addHeading('📊 Package size report', '3');
+            core.summary.addTable([
+              ['Package', 'Before', 'After'].map((data) => ({ data, header: true })),
+              ...Object.keys(sizes).map((packageName) => {
+                const size = sizes[packageName];
+                const sizePR = sizesPR[packageName];
+                return [packageName, formatSize(size), sizePR === size ? 'No change' : formatSize(sizePR)];
+              }),
+            ]);
+            const report = core.summary.stringify();
+            core.summary.write();
+            return report;
+
+      - name: Post the report to the PR
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
+        with:
+          message: ${{ steps.create-report.outputs.result }}
+          pr-number: ${{ github.event.workflow_run.pull_requests.number }}
+          comment-tag: bundle-size

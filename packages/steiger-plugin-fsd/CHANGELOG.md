@@ -1,5 +1,23 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.3
+
+### Patch Changes
+
+- Republish the package to fix a publishing error
+
+## 0.5.2
+
+### Patch Changes
+
+- 9c1fec9: Fix path alias resolution when `baseUrl` is present in tsconfig
+
+## 0.5.1
+
+### Patch Changes
+
+- 06af3dd: Fix path resolution on Windows
+
 ## 0.5.0
 
 ### Minor Changes

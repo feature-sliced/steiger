@@ -6,6 +6,6 @@
     "base.json"
   ],
   "devDependencies": {
-    "@tsconfig/node-lts": "^20.1.3"
+    "@tsconfig/node18": "^18.2.4"
   }
 }

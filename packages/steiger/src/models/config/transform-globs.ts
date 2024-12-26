@@ -1,24 +1,17 @@
-import { posix, sep, isAbsolute } from 'node:path'
+import { isAbsolute, resolve } from 'node:path'
 import { Config, Rule } from '@steiger/types'
 
 import { isConfigObject, isConfiguration } from './raw-config'
 import { getGlobPath, replaceGlobPath } from '../../shared/globs'
 
 function convertRelativeGlobsToAbsolute(rootPath: string, globs: Array<string>) {
-  function composeAbsolutePath(root: string, glob: string) {
-    // Remove '/'. The root has platform-specific separators
-    const segmentsOfRoot = root.slice(1).split(sep)
-
-    return `/${posix.join(...segmentsOfRoot, glob)}`
-  }
-
   const needsConversion = (glob: string) => !isAbsolute(glob)
 
   return globs.map((originalGlob) => {
     const globClearPath = getGlobPath(originalGlob)
 
     return needsConversion(globClearPath)
-      ? replaceGlobPath(originalGlob, composeAbsolutePath(rootPath, globClearPath))
+      ? replaceGlobPath(originalGlob, resolve(rootPath, globClearPath).replace(/\\/g, '/'))
       : originalGlob
   })
 }

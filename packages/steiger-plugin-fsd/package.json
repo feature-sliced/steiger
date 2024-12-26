@@ -1,7 +1,7 @@
 {
   "name": "@feature-sliced/steiger-plugin",
   "description": "A set of rules to verify correct usage of Feature-Sliced Design",
-  "version": "0.5.0",
+  "version": "0.5.3",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write . --cache",
@@ -15,6 +15,10 @@
     "types": "./dist/index.d.ts",
     "import": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "src"
+  ],
   "type": "module",
   "license": "MIT",
   "authors": [
@@ -41,11 +45,11 @@
     "@steiger/eslint-config": "workspace:*",
     "@steiger/toolkit": "workspace:*",
     "@steiger/tsconfig": "workspace:*",
-    "@total-typescript/ts-reset": "^0.5.1",
+    "@total-typescript/ts-reset": "^0.6.1",
     "@types/lodash-es": "^4.17.12",
     "@types/pluralize": "^0.0.33",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.3",
-    "vitest": "^1.6.0"
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }
