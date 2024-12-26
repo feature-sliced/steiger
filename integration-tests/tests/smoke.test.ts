@@ -18,7 +18,7 @@ test('basic functionality in the kitchen sink example project', async () => {
   await fs.rm(project, { recursive: true, force: true })
   await fs.cp(kitchenSinkExample, project, { recursive: true })
 
-  const { stderr } = await exec('node', [steiger, 'src'], { nodeOptions: { cwd: project } })
+  const { stderr } = await exec('node', [steiger, 'src'], { nodeOptions: { cwd: project, env: { NO_COLOR: '1' } } })
 
   await expect(stderr).toMatchFileSnapshot(join('__snapshots__', `smoke-stderr-${pathPlatform}.txt`))
 })
