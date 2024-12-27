@@ -20,7 +20,7 @@ export async function chooseFromSimilar(input: string): Promise<string> {
   const existingDir = await resolveWithCorrections(dir || '.')
 
   const candidates = (await readdir(existingDir, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory() && !isIgnored(join(existingDir, entry.name)))
+    .filter((entry) => entry.isDirectory() && entry.name !== '.git' && !isIgnored(join(existingDir, entry.name)))
     .map((entry) => entry.name)
   const withDistances = candidates.map((candidate) => [candidate, distance(candidate, base)] as const)
   const suggestions = withDistances

@@ -16,7 +16,7 @@ export async function createWatcher(path: string) {
   const isIgnored = await isGitIgnored({ cwd: find.up('.git', { cwd: path }) ?? path })
 
   const watcher = chokidar.watch(path, {
-    ignored: (path) => path.split(sep).includes('node_modules') || isIgnored(path),
+    ignored: (path) => path.split(sep).includes('node_modules') || path.split(sep).includes('.git') || isIgnored(path),
     ignoreInitial: false,
     alwaysStat: true,
     awaitWriteFinish: true,
