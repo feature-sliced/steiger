@@ -11,13 +11,7 @@
     ".": "./src/index.ts"
   },
   "type": "module",
-  "license": "MIT",
   "authors": [
-    {
-      "name": "Anton Medvedev",
-      "email": "unordinarity@yandex.ru",
-      "url": "https://github.com/unordinarity"
-    },
     {
       "name": "Lev Chelyadinov",
       "email": "leva181777@gmail.com",

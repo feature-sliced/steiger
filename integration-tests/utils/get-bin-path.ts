@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { getBinPath } from 'get-bin-path'
 
 /**
- * Resolve the full path to the built JS file of the CLI.
+ * Resolve the full path to the built JS file of Steiger.
  *
  * Rejects if the file doesn't exist.
  */
@@ -14,7 +14,7 @@ export async function getSteigerBinPath() {
   try {
     await fs.stat(steiger)
   } catch {
-    console.error('Run `npm run build` before running integration tests')
+    console.error('Run `turbo build` before running integration tests')
     process.exit(1)
   }
 

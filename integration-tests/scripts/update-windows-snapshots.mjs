@@ -1,3 +1,9 @@
+/**
+ * Run this script on Mac or Linux when you update test snapshots to port these changes over to Windows snapshots.
+ *
+ * $ pnpm run update-windows-snapshots
+ */
+
 import * as fs from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
