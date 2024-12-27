@@ -54,6 +54,9 @@ importers:
       eslint:
         specifier: ^9.16.0
         version: 9.16.0
+      figures:
+        specifier: ^6.1.0
+        version: 6.1.0
       get-bin-path:
         specifier: ^11.0.0
         version: 11.0.0

@@ -30,6 +30,7 @@
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/node": "^18.11.9",
     "eslint": "^9.16.0",
+    "figures": "^6.1.0",
     "get-bin-path": "^11.0.0",
     "prettier": "^3.4.2",
     "tinyexec": "^0.3.1",
