@@ -6,7 +6,9 @@ import importLocality from './index.js'
 vi.mock('tsconfck', async (importOriginal) => {
   return {
     ...(await importOriginal<typeof import('tsconfck')>()),
-    parse: vi.fn(() => Promise.resolve({ tsconfig: { compilerOptions: { paths: { '@/*': ['/*'] } } } })),
+    parse: vi.fn(() =>
+      Promise.resolve({ tsconfig: { compilerOptions: { paths: { '@/*': ['/users/user/project/src/*'] } } } }),
+    ),
   }
 })
 
@@ -16,28 +18,31 @@ vi.mock('node:fs', async (importOriginal) => {
 
   return createFsMocks(
     {
-      '/shared/ui/styles.ts': '',
-      '/shared/ui/Button.tsx': 'import styles from "./styles";',
-      '/shared/ui/TextField.tsx': 'import styles from "./styles";',
-      '/shared/ui/index.ts': '',
-      '/entities/user/ui/Name.tsx': 'import { Button } from "@/shared/ui"',
-      '/entities/user/ui/Status.tsx': 'import { Button } from "@/shared/ui"; import { Name } from "@/entities/user"',
-      '/entities/user/ui/UserAvatar.tsx':
+      '/users/user/project/src/shared/ui/styles.ts': '',
+      '/users/user/project/src/shared/ui/Button.tsx': 'import styles from "./styles";',
+      '/users/user/project/src/shared/ui/TextField.tsx': 'import styles from "./styles";',
+      '/users/user/project/src/shared/ui/index.ts': '',
+      '/users/user/project/src/entities/user/ui/Name.tsx': 'import { Button } from "@/shared/ui"',
+      '/users/user/project/src/entities/user/ui/Status.tsx':
+        'import { Button } from "@/shared/ui"; import { Name } from "@/entities/user"',
+      '/users/user/project/src/entities/user/ui/UserAvatar.tsx':
         'import { Button } from "@/shared/ui"; import { Name } from "@/entities/user/ui/Name"',
-      '/entities/user/index.ts': '',
-      '/features/comments/ui/CommentCard.tsx': 'import { Name } from "../../../entities/user"',
-      '/features/comments/index.ts': '',
-      '/pages/editor/ui/styles.ts': '',
-      '/pages/editor/ui/EditorPage.tsx': 'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"',
-      '/pages/editor/ui/Editor.tsx': 'import { TextField } from "@/shared/ui"',
-      '/pages/editor/index.ts': '',
+      '/users/user/project/src/entities/user/index.ts': '',
+      '/users/user/project/src/features/comments/ui/CommentCard.tsx': 'import { Name } from "../../../entities/user"',
+      '/users/user/project/src/features/comments/index.ts': '',
+      '/users/user/project/src/pages/editor/ui/styles.ts': '',
+      '/users/user/project/src/pages/editor/ui/EditorPage.tsx':
+        'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"',
+      '/users/user/project/src/pages/editor/ui/Editor.tsx': 'import { TextField } from "@/shared/ui"',
+      '/users/user/project/src/pages/editor/index.ts': '',
     },
     originalFs,
   )
 })
 
 it('reports no errors on a project with relative imports within slices and absolute imports outside', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 styles.ts
@@ -50,13 +55,16 @@ it('reports no errors on a project with relative imports within slices and absol
           📄 EditorPage.tsx
           📄 Editor.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect((await importLocality.check(root)).diagnostics).toEqual([])
 })
 
 it('reports errors on a project with absolute imports within a slice', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 styles.ts
@@ -75,18 +83,21 @@ it('reports errors on a project with absolute imports within a slice', async () 
           📄 EditorPage.tsx
           📄 Editor.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
       message: `Import from "@/entities/user/ui/Name" should be relative.`,
-      location: { path: joinFromRoot('entities', 'user', 'ui', 'UserAvatar.tsx') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'user', 'ui', 'UserAvatar.tsx') },
     },
   ])
 })
 
 it('reports errors on a project with absolute imports from the index within a slice', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 styles.ts
@@ -105,18 +116,21 @@ it('reports errors on a project with absolute imports from the index within a sl
           📄 EditorPage.tsx
           📄 Editor.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
       message: `Import from "@/entities/user" should be relative.`,
-      location: { path: joinFromRoot('entities', 'user', 'ui', 'Status.tsx') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'user', 'ui', 'Status.tsx') },
     },
   ])
 })
 
 it('reports errors on a project with relative imports between slices', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 styles.ts
@@ -139,12 +153,16 @@ it('reports errors on a project with relative imports between slices', async () 
           📄 EditorPage.tsx
           📄 Editor.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect((await importLocality.check(root)).diagnostics).toEqual([
     {
       message: `Import from "../../../entities/user" should not be relative.`,
-      location: { path: joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx') },
+      location: {
+        path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'ui', 'CommentCard.tsx'),
+      },
     },
   ])
 })

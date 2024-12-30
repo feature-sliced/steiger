@@ -150,13 +150,13 @@ if (import.meta.vitest) {
     const payload: CollectRelatedTsConfigsPayload = {
       extended: [
         {
-          tsconfigFile: resolve(joinFromRoot('tsconfig.json')),
+          tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'src', 'tsconfig.json')),
           tsconfig: {
             extends: './.nuxt/tsconfig.json',
           },
         },
         {
-          tsconfigFile: resolve(joinFromRoot('.nuxt', 'tsconfig.json')),
+          tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'src', '.nuxt', 'tsconfig.json')),
           tsconfig: {
             compilerOptions: {
               paths: {
@@ -173,7 +173,7 @@ if (import.meta.vitest) {
           },
         },
       ],
-      tsconfigFile: resolve(joinFromRoot('tsconfig.json')),
+      tsconfigFile: resolve(joinFromRoot('user', 'projects', 'project-0', 'src', 'tsconfig.json')),
       tsconfig: {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
@@ -196,8 +196,8 @@ if (import.meta.vitest) {
         extends: './.nuxt/tsconfig.json',
         compilerOptions: {
           paths: {
-            '~': [resolve(joinFromRoot())],
-            '~/*': [resolve(joinFromRoot('*'))],
+            '~': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src'))],
+            '~/*': [resolve(joinFromRoot('user', 'projects', 'project-0', 'src', '*'))],
           },
           strict: true,
           noUncheckedIndexedAccess: false,

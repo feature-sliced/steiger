@@ -4,7 +4,8 @@ import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } fr
 import inconsistentNaming from './index.js'
 
 it('reports no errors on slice names that are pluralized consistently', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -12,13 +13,16 @@ it('reports no errors on slice names that are pluralized consistently', () => {
       📂 posts
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(inconsistentNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports an error on slice names that are not pluralized consistently', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 user
         📂 ui
@@ -26,7 +30,9 @@ it('reports an error on slice names that are not pluralized consistently', () =>
       📂 posts
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
@@ -35,17 +41,18 @@ it('reports an error on slice names that are not pluralized consistently', () =>
       fixes: [
         {
           type: 'rename',
-          path: joinFromRoot('entities', 'user'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'user'),
           newName: 'users',
         },
       ],
-      location: { path: joinFromRoot('entities') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities') },
     },
   ])
 })
 
 it('prefers the singular form when there are more singular slices', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 user
         📂 ui
@@ -56,7 +63,9 @@ it('prefers the singular form when there are more singular slices', () => {
       📂 comments
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
@@ -65,11 +74,11 @@ it('prefers the singular form when there are more singular slices', () => {
       fixes: [
         {
           type: 'rename',
-          path: joinFromRoot('entities', 'comments'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'comments'),
           newName: 'comment',
         },
       ],
-      location: { path: joinFromRoot('entities') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities') },
     },
   ])
 })
