@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { resolve, relative, dirname } from 'node:path'
-import { stat } from 'node:fs/promises'
 import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
@@ -13,9 +12,11 @@ import { cosmiconfig } from 'cosmiconfig'
 import { linter } from './app'
 import { processConfiguration, $plugins } from './models/config'
 import { applyAutofixes } from './features/autofix'
+import { chooseRootFolderFromGuesses, chooseRootFolderFromSimilar, ExitException } from './features/choose-root-folder'
 import fsd from '@feature-sliced/steiger-plugin'
 import type { Diagnostic } from '@steiger/types'
 import packageJson from '../package.json'
+import { existsAndIsFolder } from './shared/file-system'
 
 const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
 const defaultConfig = fsd.configs.recommended
@@ -64,8 +65,6 @@ const yargsProgram = yargs(hideBin(process.argv))
     const filePaths = argv._
     if (filePaths.length > 1) {
       throw new Error('Pass only one path to watch')
-    } else if (filePaths.length === 0) {
-      throw new Error('Pass a path to watch')
     } else {
       return true
     }
@@ -87,17 +86,33 @@ const yargsProgram = yargs(hideBin(process.argv))
   .showHelpOnFail(true)
 
 const consoleArgs = yargsProgram.parseSync()
+const inputPaths = consoleArgs._
 
-const targetPath = resolve(consoleArgs._[0])
-
-try {
-  if (!(await stat(targetPath)).isDirectory()) {
-    console.error(`${consoleArgs._[0]} is a file, must be a folder`)
-    process.exit(102)
+let targetPath: string | undefined
+if (inputPaths.length > 0) {
+  if (await existsAndIsFolder(inputPaths[0])) {
+    targetPath = resolve(inputPaths[0])
+  } else {
+    try {
+      targetPath = resolve(await chooseRootFolderFromSimilar(inputPaths[0]))
+    } catch (e) {
+      if (e instanceof ExitException) {
+        process.exit(0)
+      } else {
+        throw e
+      }
+    }
   }
-} catch {
-  console.error(`Folder ${consoleArgs._[0]} does not exist`)
-  process.exit(101)
+} else {
+  try {
+    targetPath = resolve(await chooseRootFolderFromGuesses())
+  } catch (e) {
+    if (e instanceof ExitException) {
+      process.exit(0)
+    } else {
+      throw e
+    }
+  }
 }
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
