@@ -8,12 +8,13 @@ import { $enabledRules, getEnabledRules, getGlobalIgnores, getPluginByRuleName }
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
+import { collapseDiagnostics } from './features/collapse-diagnostics'
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
 
   const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
-  return ruleResults.flatMap((r, ruleResultsIndex) => {
+  const diagnosticsPerRule = ruleResults.map((r, ruleResultsIndex) => {
     const { diagnostics } = r
     if (diagnostics.length === 0) {
       return []
@@ -44,6 +45,9 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
       return finalDiagnostic
     })
   })
+  const collapsedDiagnostics = collapseDiagnostics(diagnosticsPerRule)
+
+  return collapsedDiagnostics.flat()
 }
 
 export const linter = {
