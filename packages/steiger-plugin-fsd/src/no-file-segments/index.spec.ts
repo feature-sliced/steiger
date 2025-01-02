@@ -4,7 +4,8 @@ import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } fr
 import noFileSegments from './index.js'
 
 it('reports no errors on a project with only folder segments', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 styles.ts
@@ -17,13 +18,16 @@ it('reports no errors on a project with only folder segments', async () => {
           📄 EditorPage.tsx
           📄 Editor.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(noFileSegments.check(root).diagnostics).toEqual([])
 })
 
 it('reports no errors on a project with folder segments on sliced layers', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 styles.ts
@@ -42,22 +46,25 @@ it('reports no errors on a project with folder segments on sliced layers', async
         📂 ui
           📄 SettingsPage.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(noFileSegments.check(root).diagnostics).toEqual([
     {
       message: 'This segment is a file. Prefer folder segments.',
-      location: { path: joinFromRoot('features', 'comments', 'ui.tsx') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'ui.tsx') },
     },
     {
       message: 'This segment is a file. Prefer folder segments.',
-      location: { path: joinFromRoot('pages', 'editor', 'ui.tsx') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui.tsx') },
     },
   ])
 })
 
 it('reports errors on a project with folder segments in Shared', async () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📄 routes.ts
       📂 ui
@@ -89,12 +96,14 @@ it('reports errors on a project with folder segments in Shared', async () => {
         📂 ui
           📄 SettingsPage.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(noFileSegments.check(root).diagnostics.sort(compareMessages)).toEqual([
     {
       message: 'This segment is a file. Prefer folder segments.',
-      location: { path: joinFromRoot('shared', 'routes.ts') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'routes.ts') },
     },
   ])
 })

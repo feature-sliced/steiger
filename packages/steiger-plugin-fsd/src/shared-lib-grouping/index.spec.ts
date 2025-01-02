@@ -4,7 +4,8 @@ import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/tool
 import excessiveSlicing from './index.js'
 
 it('reports no errors on projects with no shared/lib', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -16,7 +17,9 @@ it('reports no errors on projects with no shared/lib', () => {
       📂 ui
         📄 index.ts
         📄 Button.tsx
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const { diagnostics } = excessiveSlicing.check(root)
 
@@ -24,7 +27,8 @@ it('reports no errors on projects with no shared/lib', () => {
 })
 
 it('reports no errors on projects with shared/lib below threshold', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -40,7 +44,9 @@ it('reports no errors on projects with shared/lib below threshold', () => {
         📄 index.ts
         📄 dates.ts
         📄 collections.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const { diagnostics } = excessiveSlicing.check(root)
 
@@ -48,7 +54,8 @@ it('reports no errors on projects with shared/lib below threshold', () => {
 })
 
 it('reports errors on a project with shared/lib above threshold', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -80,14 +87,16 @@ it('reports errors on a project with shared/lib above threshold', () => {
         📄 is.ts
         📄 other.ts
         📄 people.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const { diagnostics } = excessiveSlicing.check(root)
 
   expect(diagnostics).toEqual([
     {
       message: 'Shared/lib has 19 modules, which is above the recommended threshold of 15. Consider grouping them.',
-      location: { path: joinFromRoot('shared', 'lib') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'lib') },
     },
   ])
 })

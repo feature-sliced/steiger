@@ -5,7 +5,8 @@ import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } fr
 
 describe('no-segments-on-sliced-layers rule', () => {
   it('reports no errors on a project where the sliced layers has no segments in direct children', () => {
-    const root = parseIntoFsdRoot(`
+    const root = parseIntoFsdRoot(
+      `
       📂 shared
         📂 ui
           📄 index.ts
@@ -25,13 +26,16 @@ describe('no-segments-on-sliced-layers rule', () => {
         📂 home
           📂 ui
           📄 index.ts
-    `)
+    `,
+      joinFromRoot('users', 'user', 'project', 'src'),
+    )
 
     expect(noSegmentsOnSlicedLayers.check(root)).toEqual({ diagnostics: [] })
   })
 
   it('reports errors on a project where a sliced layer has segments among its direct children', () => {
-    const root = parseIntoFsdRoot(`
+    const root = parseIntoFsdRoot(
+      `
       📂 shared
         📂 ui
           📄 index.ts
@@ -69,7 +73,9 @@ describe('no-segments-on-sliced-layers rule', () => {
             📄 index.ts
         📂 lib
           📄 index.ts
-    `)
+    `,
+      joinFromRoot('users', 'user', 'project', 'src'),
+    )
 
     const diagnostics = noSegmentsOnSlicedLayers.check(root).diagnostics.sort(compareMessages)
 
@@ -77,22 +83,22 @@ describe('no-segments-on-sliced-layers rule', () => {
       {
         message:
           'Conventional segment "api" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('features', 'api') },
+        location: { path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'api') },
       },
       {
         message:
           'Conventional segment "config" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('widgets', 'config') },
+        location: { path: joinFromRoot('users', 'user', 'project', 'src', 'widgets', 'config') },
       },
       {
         message:
           'Conventional segment "lib" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('pages', 'lib') },
+        location: { path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'lib') },
       },
       {
         message:
           'Conventional segment "ui" should not be a direct child of a sliced layer. Consider moving it inside a slice or, if that is a slice, consider a different name for it to avoid confusion with segments.',
-        location: { path: joinFromRoot('entities', 'ui') },
+        location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'ui') },
       },
     ])
   })

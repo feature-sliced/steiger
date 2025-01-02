@@ -56,7 +56,8 @@ export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest
   test('indexSourceFiles', () => {
-    const root = parseIntoFsdRoot(`
+    const root = parseIntoFsdRoot(
+      `
       📂 shared
         📂 ui
           📄 styles.ts
@@ -80,120 +81,122 @@ if (import.meta.vitest) {
           📄 index.ts
         📄 root.ts
         📄 index.ts
-    `)
+    `,
+      joinFromRoot('users', 'user', 'project', 'src'),
+    )
 
     expect(indexSourceFiles(root)).toEqual({
-      [joinFromRoot('features', 'comments', 'index.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'index.ts')]: {
         file: {
-          path: joinFromRoot('features', 'comments', 'index.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'index.ts'),
           type: 'file',
         },
         layerName: 'features',
         segmentName: null,
         sliceName: 'comments',
       },
-      [joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'ui', 'CommentCard.tsx')]: {
         file: {
-          path: joinFromRoot('features', 'comments', 'ui', 'CommentCard.tsx'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'ui', 'CommentCard.tsx'),
           type: 'file',
         },
         layerName: 'features',
         segmentName: 'ui',
         sliceName: 'comments',
       },
-      [joinFromRoot('pages', 'editor', 'index.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'index.ts')]: {
         file: {
-          path: joinFromRoot('pages', 'editor', 'index.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'index.ts'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: null,
         sliceName: 'editor',
       },
-      [joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui', 'Editor.tsx')]: {
         file: {
-          path: joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui', 'Editor.tsx'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: 'ui',
         sliceName: 'editor',
       },
-      [joinFromRoot('pages', 'editor', 'ui', 'EditorPage.tsx')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui', 'EditorPage.tsx')]: {
         file: {
-          path: joinFromRoot('pages', 'editor', 'ui', 'EditorPage.tsx'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui', 'EditorPage.tsx'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: 'ui',
         sliceName: 'editor',
       },
-      [joinFromRoot('pages', 'editor', 'ui', 'styles.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui', 'styles.ts')]: {
         file: {
-          path: joinFromRoot('pages', 'editor', 'ui', 'styles.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'editor', 'ui', 'styles.ts'),
           type: 'file',
         },
         layerName: 'pages',
         segmentName: 'ui',
         sliceName: 'editor',
       },
-      [joinFromRoot('shared', 'ui', 'Button.tsx')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'Button.tsx')]: {
         file: {
-          path: joinFromRoot('shared', 'ui', 'Button.tsx'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'Button.tsx'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      [joinFromRoot('shared', 'ui', 'TextField.tsx')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'TextField.tsx')]: {
         file: {
-          path: joinFromRoot('shared', 'ui', 'TextField.tsx'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'TextField.tsx'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      [joinFromRoot('shared', 'ui', 'index.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'index.ts')]: {
         file: {
-          path: joinFromRoot('shared', 'ui', 'index.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'index.ts'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      [joinFromRoot('shared', 'ui', 'styles.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'styles.ts')]: {
         file: {
-          path: joinFromRoot('shared', 'ui', 'styles.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'styles.ts'),
           type: 'file',
         },
         layerName: 'shared',
         segmentName: 'ui',
         sliceName: null,
       },
-      [joinFromRoot('app', 'ui', 'index.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'app', 'ui', 'index.ts')]: {
         file: {
-          path: joinFromRoot('app', 'ui', 'index.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'app', 'ui', 'index.ts'),
           type: 'file',
         },
         layerName: 'app',
         segmentName: 'ui',
         sliceName: null,
       },
-      [joinFromRoot('app', 'root.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'app', 'root.ts')]: {
         file: {
-          path: joinFromRoot('app', 'root.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'app', 'root.ts'),
           type: 'file',
         },
         layerName: 'app',
         segmentName: 'root',
         sliceName: null,
       },
-      [joinFromRoot('app', 'index.ts')]: {
+      [joinFromRoot('users', 'user', 'project', 'src', 'app', 'index.ts')]: {
         file: {
-          path: joinFromRoot('app', 'index.ts'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'app', 'index.ts'),
           type: 'file',
         },
         layerName: 'app',

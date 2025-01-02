@@ -4,7 +4,8 @@ import noSegmentlessSlices from './index.js'
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project where every slice has at least one segment', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -24,13 +25,16 @@ it('reports no errors on a project where every slice has at least one segment', 
       📂 home
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(noSegmentlessSlices.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project where some slices have no segments', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -48,17 +52,19 @@ it('reports errors on a project where some slices have no segments', () => {
         📂 profile
           📄 ProfilePage.tsx
           📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = noSegmentlessSlices.check(root).diagnostics
   expect(diagnostics).toEqual([
     {
       message: 'This slice has no segments. Consider dividing the code inside into segments.',
-      location: { path: joinFromRoot('entities', 'user') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'user') },
     },
     {
       message: 'This slice has no segments. Consider dividing the code inside into segments.',
-      location: { path: joinFromRoot('pages', 'settings', 'profile') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'settings', 'profile') },
     },
   ])
 })

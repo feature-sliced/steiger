@@ -4,7 +4,8 @@ import segmentsByPurpose from './index.js'
 import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project with good segments', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -19,13 +20,16 @@ it('reports no errors on a project with good segments', () => {
       📂 home
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(segmentsByPurpose.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project with bad segments', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -46,29 +50,31 @@ it('reports errors on a project with bad segments', () => {
       📂 home
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = segmentsByPurpose.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('entities', 'user', 'components') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'user', 'components') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'helpers') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'helpers') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'hooks') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'hooks') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'modals') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'modals') },
     },
     {
       message: "This segment's name should describe the purpose of its contents, not what the contents are.",
-      location: { path: joinFromRoot('shared', 'utils') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'utils') },
     },
   ])
 })
