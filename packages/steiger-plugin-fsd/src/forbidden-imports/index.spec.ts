@@ -10,9 +10,9 @@ vi.mock('tsconfck', async (importOriginal) => {
       Promise.resolve({
         tsconfig: {
           compilerOptions: {
-            baseUrl: '/src/',
+            baseUrl: '/users/user/project/src/',
             paths: {
-              '@/*': ['/users/user/project/src/*'],
+              '@/*': ['./*'],
             },
           },
         },
