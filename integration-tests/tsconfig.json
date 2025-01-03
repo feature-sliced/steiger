@@ -1,6 +1,6 @@
 {
   "extends": "@steiger/tsconfig/base.json",
-  "include": ["./tests", "./reset.d.ts", "utils/get-bin-path.ts"],
+  "include": ["./tests", "./utils", "./scripts", "./reset.d.ts"],
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   }
