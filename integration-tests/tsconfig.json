@@ -1,0 +1,7 @@
+{
+  "extends": "@steiger/tsconfig/base.json",
+  "include": ["./tests", "./utils", "./scripts", "./reset.d.ts"],
+  "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+  }
+}
