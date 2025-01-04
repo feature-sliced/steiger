@@ -3,6 +3,8 @@ import figures from 'figures'
 import type { Diagnostic } from '@steiger/types'
 
 import { formatSingleDiagnostic } from './format-single-diagnostic.js'
+import { collapseDiagnostics } from './collapse-diagnostics.js'
+import { groupDiagnosticsByRule } from './group-diagnostics-by-rule.js'
 import { s } from './pluralization.js'
 
 export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
@@ -10,8 +12,12 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
     return chalk.green(`${figures.tick} No problems found!`)
   }
 
-  const errors = diagnostics.filter((d) => d.severity === 'error')
-  const warnings = diagnostics.filter((d) => d.severity === 'warn')
+  const collapsedDiagnostics = collapseDiagnostics(groupDiagnosticsByRule(diagnostics)).flat()
+  const collapsedDiagnosticsCount = collapsedDiagnostics.length
+  const initialDiagnosticsCount = diagnostics.length
+
+  const errors = collapsedDiagnostics.filter((d) => d.severity === 'error')
+  const warnings = collapsedDiagnostics.filter((d) => d.severity === 'warn')
 
   let footer =
     'Found ' +
@@ -22,8 +28,12 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
       .filter(Boolean)
       .join(' and ')
 
-  const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
-  if (autofixable.length === diagnostics.length) {
+  if (collapsedDiagnosticsCount < initialDiagnosticsCount) {
+    footer += `, ${chalk.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics were hidden`
+  }
+
+  const autofixable = collapsedDiagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
+  if (autofixable.length === collapsedDiagnostics.length) {
     footer += ` (all can be fixed automatically with ${chalk.green.bold('--fix')})`
   } else if (autofixable.length > 0) {
     footer += ` (${autofixable.length} can be fixed automatically with ${chalk.green.bold('--fix')})`

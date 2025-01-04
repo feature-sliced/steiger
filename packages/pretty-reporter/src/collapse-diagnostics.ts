@@ -1,5 +1,7 @@
 import { Diagnostic } from '@steiger/types'
 
+const DEFAULT_QUOTA = 20
+
 function distributeQuota(buckets: Array<number>, quota: number) {
   // const allItems = buckets.reduce((acc, bucket) => acc + bucket, 0)
   const quotaPerBucket = buckets.slice(0).fill(0)
@@ -31,3 +33,6 @@ export function trimDiagnosticsToMeetQuota(diagnosticsPerRule: Array<Array<Diagn
 
   return diagnosticsPerRule.map((diagnostics, i) => diagnostics.slice(0, quotaPerRule[i]))
 }
+
+export const collapseDiagnostics = (diagnosticPerRule: Array<Array<Diagnostic>>) =>
+  trimDiagnosticsToMeetQuota(diagnosticPerRule, DEFAULT_QUOTA)

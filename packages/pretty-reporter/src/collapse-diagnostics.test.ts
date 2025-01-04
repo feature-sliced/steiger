@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { trimDiagnosticsToMeetQuota } from './diagnostic-quota'
+import { trimDiagnosticsToMeetQuota } from './collapse-diagnostics.js'
 
 const defaultLocation = {
   path: '/users/user/file',
