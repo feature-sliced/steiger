@@ -2,7 +2,7 @@
   "private": true,
   "name": "@steiger/pretty-reporter",
   "description": "A reporter that can print Steiger's diagnostics nice and pretty",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "example": "tsx example/index.ts",
     "lint": "eslint .",
