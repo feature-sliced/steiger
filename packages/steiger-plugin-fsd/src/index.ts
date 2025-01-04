@@ -3,6 +3,7 @@ import { enableAllRules, type ConfigObjectOf, createPlugin, createConfigs } from
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
 import forbiddenImports from './forbidden-imports/index.js'
+import importLocality from './import-locality/index.js'
 import inconsistentNaming from './inconsistent-naming/index.js'
 import insignificantSlice from './insignificant-slice/index.js'
 import noLayerPublicApi from './no-layer-public-api/index.js'
@@ -19,10 +20,13 @@ import typoInLayerName from './typo-in-layer-name/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json' with { type: 'json' }
 
+const FSD_RULE_DESC_SOURCE = 'https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/'
+
 const rules = [
   ambiguousSliceNames,
   excessiveSlicing,
   forbiddenImports,
+  importLocality,
   inconsistentNaming,
   insignificantSlice,
   noLayerPublicApi,
@@ -43,6 +47,10 @@ const plugin = createPlugin({
   meta: {
     name: '@feature-sliced/steiger-plugin',
     version: packageJson.version,
+  },
+  getRuleDescriptionUrl(ruleName: string) {
+    const ruleNameWithoutNamespace = ruleName.split('/')[1]
+    return new URL(`${FSD_RULE_DESC_SOURCE}${ruleNameWithoutNamespace}`)
   },
   ruleDefinitions: rules,
 })

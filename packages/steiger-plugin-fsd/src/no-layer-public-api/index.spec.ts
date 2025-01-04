@@ -4,7 +4,8 @@ import noLayerPublicApi from './index.js'
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project without index files on layer level', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -19,13 +20,16 @@ it('reports no errors on a project without index files on layer level', () => {
       📂 home
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(noLayerPublicApi.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project with index files on layer level', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -46,11 +50,19 @@ it('reports errors on a project with index files on layer level', () => {
       📂 ui
         📄 index.ts
       📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = noLayerPublicApi.check(root).diagnostics
   expect(diagnostics).toEqual([
-    { message: 'Layer "shared" should not have an index file', location: { path: joinFromRoot('shared', 'index.ts') } },
-    { message: 'Layer "pages" should not have an index file', location: { path: joinFromRoot('pages', 'index.ts') } },
+    {
+      message: 'Layer "shared" should not have an index file',
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'index.ts') },
+    },
+    {
+      message: 'Layer "pages" should not have an index file',
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'index.ts') },
+    },
   ])
 })

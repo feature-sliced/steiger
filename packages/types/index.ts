@@ -39,7 +39,7 @@ export interface PartialDiagnostic {
 export interface Diagnostic extends PartialDiagnostic {
   ruleName: string
   severity: Exclude<Severity, 'off'>
-  getRuleDescriptionUrl(ruleName: string): URL
+  getRuleDescriptionUrl?(ruleName: string): URL
 }
 
 export type Fix =
@@ -112,5 +112,6 @@ export interface Plugin<Context = unknown, Rules extends Array<Rule<Context>> = 
     name: string
     version: string
   }
+  getRuleDescriptionUrl?(ruleName: string): URL
   ruleDefinitions: Rules
 }

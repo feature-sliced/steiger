@@ -56,8 +56,12 @@ reportPretty(
       severity: 'error',
       getRuleDescriptionUrl,
     },
+    {
+      message: 'Example of a diagnostic without a description URL',
+      ruleName: 'dummy/rule-name',
+      location: { path: '/home/user/project/src/pages' },
+      severity: 'error',
+    },
   ],
   '/home/user/project',
 )
-
-// reportPretty([], '/home/user/project')

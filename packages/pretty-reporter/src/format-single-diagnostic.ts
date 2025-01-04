@@ -12,11 +12,13 @@ export function formatSingleDiagnostic(d: Diagnostic, cwd: string): string {
   const message = pc.reset(d.message)
   const autofixable = d.fixes !== undefined && d.fixes.length > 0 ? pc.green(`${figures.tick} Auto-fixable`) : null
   const location = pc.underline(formatLocation(d.location, cwd))
-  const ruleName = pc.blue(
-    terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString(), {
-      fallback: (text, url) => `${pc.reset(text)}: ${pc.blue(url)}`,
-    }),
-  )
+  const ruleName = d.getRuleDescriptionUrl
+    ? pc.blue(
+        terminalLink(d.ruleName, d.getRuleDescriptionUrl(d.ruleName).toString(), {
+          fallback: (text, url) => `${pc.reset(text)}: ${pc.blue(url)}`,
+        }),
+      )
+    : pc.reset(d.ruleName)
 
   return `
 ${s} ${location}
