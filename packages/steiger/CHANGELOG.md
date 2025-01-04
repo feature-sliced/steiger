@@ -1,5 +1,13 @@
 # steiger
 
+## 0.5.4
+
+### Patch Changes
+
+- 5aaf1a3: Prevent hidden files like .DS_Store from breaking glob exclusions
+- 80d9f46: Interactively suggest folders when a missing folder was specified in the command or when it wasn't specified at all
+- b55545e: Fix the "--version" command outputting "unknown"
+
 ## 0.5.3
 
 ### Patch Changes

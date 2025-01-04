@@ -1,5 +1,12 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.4
+
+### Patch Changes
+
+- b55545e: Change the plugin name string to match the npm package name
+- 26130b5: Add an exception to the `insignificant-slice` rule when the only usage site is the App layer
+
 ## 0.5.3
 
 ### Patch Changes
