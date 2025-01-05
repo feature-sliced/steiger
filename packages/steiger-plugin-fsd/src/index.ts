@@ -18,7 +18,7 @@ import segmentsByPurpose from './segments-by-purpose/index.js'
 import sharedLibGrouping from './shared-lib-grouping/index.js'
 import typoInLayerName from './typo-in-layer-name/index.js'
 import noProcesses from './no-processes/index.js'
-import packageJson from '../package.json'
+import packageJson from '../package.json' with { type: 'json' }
 
 const FSD_RULE_DESC_SOURCE = 'https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/'
 

@@ -1,5 +1,15 @@
 # @steiger/pretty-reporter
 
+## 0.3.0
+
+### Minor Changes
+
+- 5bc4f60: Make printed diagnostic location more readable
+
+### Patch Changes
+
+- 5c0225f: Prevent links to rule descriptions being broken in some terminals
+
 ## 0.2.0
 
 ### Minor Changes
