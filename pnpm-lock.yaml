@@ -48,7 +48,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       vitest:
-        specifier: 3.0.0-beta.2
+        specifier: ^3.0.0-beta.2
         version: 3.0.0-beta.2(@types/node@18.19.70)
     devDependencies:
       '@steiger/eslint-config':
