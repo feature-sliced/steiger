@@ -16,8 +16,8 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   const collapsedDiagnosticsCount = collapsedDiagnostics.length
   const initialDiagnosticsCount = diagnostics.length
 
-  const errors = collapsedDiagnostics.filter((d) => d.severity === 'error')
-  const warnings = collapsedDiagnostics.filter((d) => d.severity === 'warn')
+  const errors = diagnostics.filter((d) => d.severity === 'error')
+  const warnings = diagnostics.filter((d) => d.severity === 'warn')
 
   let footer =
     'Found ' +
@@ -27,10 +27,6 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
     ]
       .filter(Boolean)
       .join(' and ')
-
-  if (collapsedDiagnosticsCount < initialDiagnosticsCount) {
-    footer += `, ${chalk.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics were hidden`
-  }
 
   const autofixable = collapsedDiagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
   if (autofixable.length === collapsedDiagnostics.length) {
@@ -43,13 +39,16 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
 
   return (
     '\n' +
-    diagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
+    collapsedDiagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
     '\n\n' +
     // Due to formatting characters, it won't be exactly the size of the footer, that is okay
     chalk.gray(figures.line.repeat(footer.length)) +
     '\n ' +
     footer +
-    '\n'
+    '\n ' +
+    (collapsedDiagnosticsCount < initialDiagnosticsCount
+      ? `${chalk.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics are not shown in the report as they exceed the limit allowed by Steiger`
+      : '')
   )
 }
 
