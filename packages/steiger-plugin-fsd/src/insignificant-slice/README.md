@@ -1,6 +1,8 @@
 # `insignificant-slice`
 
-It detects slices that have no references to suggest removing them, and also slices that have just one reference, to suggest merging it into the layer above. Note that pages are allowed to only have one reference, as they are the almost like entry points to the application.
+It detects slices that have no references to suggest removing them, and also slices that have just one reference, to suggest merging it into the layer above.
+
+Note that pages are allowed to only have one reference, as they are the almost like entry points to the application. Another exception is when slices are only used on the App layer — this doesn't count as a violation of the rule because the App layer shouldn't contain UI, so there's a valid reason for the code to remain on the lower layers.
 
 Example of a project structure that passes this rule (arrows signify imports):
 
@@ -30,6 +32,26 @@ flowchart BT
   pages/editor/ui/Editor.tsx --> shared/ui/index.ts
   pages/editor/ui/EditorPage.tsx --> shared/ui/index.ts
   pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
+```
+
+```mermaid
+flowchart BT
+  subgraph widgets
+    subgraph widgets/sidebar[sidebar]
+      subgraph widgets/sidebar/ui[ui]
+        widgets/sidebar/ui/Sidebar.tsx[Sidebar.tsx]
+      end
+      widgets/sidebar/index.ts[index.ts]
+    end
+  end
+
+  subgraph app
+    subgraph app/routing[routing]
+      app/routing/routes.ts[routes.ts]
+    end
+  end
+
+  app/routing/routes.ts --> widgets/sidebar/index.ts
 ```
 
 Example of a project structure that fails this rule:

@@ -4,7 +4,8 @@ import noReservedFolderNames from './index.js'
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project without subfolders in segments that use reserved names', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -19,13 +20,16 @@ it('reports no errors on a project without subfolders in segments that use reser
       📂 home
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(noReservedFolderNames.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project with subfolders in segments that use reserved names', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 shared
       📂 ui
         📄 index.ts
@@ -42,19 +46,21 @@ it('reports errors on a project with subfolders in segments that use reserved na
       📂 home
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = noReservedFolderNames.check(root).diagnostics
   expect(diagnostics).toEqual([
     {
       message:
         'Having a folder with the name "lib" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.',
-      location: { path: joinFromRoot('shared', 'ui', 'lib') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', 'lib') },
     },
     {
       message:
         'Having a folder with the name "@x" inside a segment could be confusing because that name is reserved for cross-import public APIs. Consider renaming it.',
-      location: { path: joinFromRoot('shared', 'ui', '@x') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'shared', 'ui', '@x') },
     },
   ])
 })

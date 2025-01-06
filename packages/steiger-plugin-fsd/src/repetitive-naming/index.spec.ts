@@ -4,7 +4,8 @@ import repetitiveNaming from './index.js'
 import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 
 it('reports no errors on a project with no repetitive words in slices', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 pages
       📂 home
         📂 ui
@@ -15,13 +16,16 @@ it('reports no errors on a project with no repetitive words in slices', () => {
       📂 contact
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('reports errors on a project with repetition of "page"', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 pages
       📂 homePage
         📂 ui
@@ -32,16 +36,22 @@ it('reports errors on a project with repetition of "page"', () => {
       📂 contactPage
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
-    { message: 'Repetitive word "page" in slice names.', location: { path: joinFromRoot('pages') } },
+    {
+      message: 'Repetitive word "page" in slice names.',
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'pages') },
+    },
   ])
 })
 
 it('recognizes words in different naming conventions', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 ClientFolder
         📂 ui
@@ -52,16 +62,22 @@ it('recognizes words in different naming conventions', () => {
       📂 service_folder
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
-    { message: 'Repetitive word "folder" in slice names.', location: { path: joinFromRoot('entities') } },
+    {
+      message: 'Repetitive word "folder" in slice names.',
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities') },
+    },
   ])
 })
 
 it('does not complain about layers with just one slice', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 pages
       📂 create-post
         📂 ui
@@ -88,13 +104,16 @@ it('does not complain about layers with just one slice', () => {
         📂 ui
           📄 index.tsx
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('does not treat slice groups as repetitive words', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 features
       📂 session
         📂 login
@@ -109,13 +128,16 @@ it('does not treat slice groups as repetitive words', () => {
           📂 api
           📂 ui
           📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
 it('still recognizes repetitive words inside slice groups', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 pages
       📂 login-word
         📂 api
@@ -139,13 +161,15 @@ it('still recognizes repetitive words inside slice groups', () => {
             📂 api
             📂 ui
             📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(repetitiveNaming.check(root)).toEqual({
     diagnostics: [
       {
         location: {
-          path: joinFromRoot('pages', 'group', 'session'),
+          path: joinFromRoot('users', 'user', 'project', 'src', 'pages', 'group', 'session'),
         },
         message: 'Repetitive word "word" in slice names.',
       },

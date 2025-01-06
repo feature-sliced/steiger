@@ -16,19 +16,19 @@
       "dependsOn": ["transit"]
     },
     "//#check-formatting": {
-      "outputs": ["node_modules/.cache/.prettiercache"]
+      "outputs": ["node_modules/.cache/prettier/.prettier-cache"]
     },
     "check-formatting": {
       "dependsOn": ["transit"],
-      "outputs": ["node_modules/.cache/.prettiercache"]
+      "outputs": ["node_modules/.cache/prettier/.prettier-cache"]
     },
     "//#format": {
-      "outputs": ["node_modules/.cache/.prettiercache"],
+      "outputs": ["node_modules/.cache/prettier/.prettier-cache"],
       "cache": false
     },
     "format": {
       "dependsOn": ["transit"],
-      "outputs": ["node_modules/.cache/.prettiercache"],
+      "outputs": ["node_modules/.cache/prettier/.prettier-cache"],
       "cache": false
     },
     "test": {

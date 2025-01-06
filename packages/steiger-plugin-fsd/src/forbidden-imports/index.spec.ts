@@ -10,7 +10,7 @@ vi.mock('tsconfck', async (importOriginal) => {
       Promise.resolve({
         tsconfig: {
           compilerOptions: {
-            baseUrl: '/src/',
+            baseUrl: '/users/user/project/src/',
             paths: {
               '@/*': ['./*'],
             },
@@ -27,31 +27,34 @@ vi.mock('node:fs', async (importOriginal) => {
 
   return createFsMocks(
     {
-      '/src/shared/ui/styles.ts': '',
-      '/src/shared/ui/Button.tsx': 'import styles from "./styles";',
-      '/src/shared/ui/TextField.tsx': 'import styles from "./styles";',
-      '/src/shared/ui/index.ts': '',
-      '/src/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
-      '/src/entities/user/index.ts': '',
-      '/src/entities/user/@x/product.ts': '',
-      '/src/entities/product/ui/ProductCard.tsx': 'import { UserAvatar } from "@/entities/user"',
-      '/src/entities/product/ui/GoodProductCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
-      '/src/entities/product/index.ts': '',
-      '/src/entities/cart/ui/SmallCart.tsx': 'import { App } from "@/app"',
-      '/src/entities/cart/ui/BadSmallCart.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
-      '/src/entities/cart/lib/count-cart-items.ts': 'import root from "@/app/root.ts"',
-      '/src/entities/cart/lib/index.ts': '',
-      '/src/entities/cart/index.ts': '',
-      '/src/features/comments/ui/CommentCard.tsx': 'import { styles } from "@/pages/editor"',
-      '/src/features/comments/index.ts': '',
-      '/src/pages/editor/ui/styles.ts': '',
-      '/src/pages/editor/ui/EditorPage.tsx': 'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"',
-      '/src/pages/editor/ui/Editor.tsx': 'import { TextField } from "@/shared/ui"',
-      '/src/pages/editor/index.ts': '',
-      '/src/app': '',
-      '/src/app/ui/index.ts': '',
-      '/src/app/index.ts': '',
-      '/src/app/root.ts': '',
+      '/users/user/project/src/shared/ui/styles.ts': '',
+      '/users/user/project/src/shared/ui/Button.tsx': 'import styles from "./styles";',
+      '/users/user/project/src/shared/ui/TextField.tsx': 'import styles from "./styles";',
+      '/users/user/project/src/shared/ui/index.ts': '',
+      '/users/user/project/src/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
+      '/users/user/project/src/entities/user/index.ts': '',
+      '/users/user/project/src/entities/user/@x/product.ts': '',
+      '/users/user/project/src/entities/product/ui/ProductCard.tsx': 'import { UserAvatar } from "@/entities/user"',
+      '/users/user/project/src/entities/product/ui/GoodProductCard.tsx':
+        'import { UserAvatar } from "@/entities/user/@x/product"',
+      '/users/user/project/src/entities/product/index.ts': '',
+      '/users/user/project/src/entities/cart/ui/SmallCart.tsx': 'import { App } from "@/app"',
+      '/users/user/project/src/entities/cart/ui/BadSmallCart.tsx':
+        'import { UserAvatar } from "@/entities/user/@x/product"',
+      '/users/user/project/src/entities/cart/lib/count-cart-items.ts': 'import root from "@/app/root.ts"',
+      '/users/user/project/src/entities/cart/lib/index.ts': '',
+      '/users/user/project/src/entities/cart/index.ts': '',
+      '/users/user/project/src/features/comments/ui/CommentCard.tsx': 'import { styles } from "@/pages/editor"',
+      '/users/user/project/src/features/comments/index.ts': '',
+      '/users/user/project/src/pages/editor/ui/styles.ts': '',
+      '/users/user/project/src/pages/editor/ui/EditorPage.tsx':
+        'import { Button } from "@/shared/ui"; import { Editor } from "./Editor"',
+      '/users/user/project/src/pages/editor/ui/Editor.tsx': 'import { TextField } from "@/shared/ui"',
+      '/users/user/project/src/pages/editor/index.ts': '',
+      '/users/user/project/src/app': '',
+      '/users/user/project/src/app/ui/index.ts': '',
+      '/users/user/project/src/app/index.ts': '',
+      '/users/user/project/src/app/root.ts': '',
     },
     originalFs,
   )
@@ -73,7 +76,7 @@ it('reports no errors on a project with only correct imports', async () => {
             📄 Editor.tsx
           📄 index.ts
     `,
-    joinFromRoot('src'),
+    joinFromRoot('users', 'user', 'project', 'src'),
   )
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
@@ -104,13 +107,15 @@ it('reports errors on a project with cross-imports in entities', async () => {
             📄 Editor.tsx
           📄 index.ts
     `,
-    joinFromRoot('src'),
+    joinFromRoot('users', 'user', 'project', 'src'),
   )
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx') },
+      location: {
+        path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'product', 'ui', 'ProductCard.tsx'),
+      },
     },
   ])
 })
@@ -137,13 +142,15 @@ it('reports errors on a project where a feature imports from a page', async () =
             📄 Editor.tsx
           📄 index.ts
     `,
-    joinFromRoot('src'),
+    joinFromRoot('users', 'user', 'project', 'src'),
   )
 
   expect((await forbiddenImports.check(root)).diagnostics.sort()).toEqual([
     {
       message: `Forbidden import from higher layer "pages".`,
-      location: { path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx') },
+      location: {
+        path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'comments', 'ui', 'CommentCard.tsx'),
+      },
     },
   ])
 })
@@ -178,18 +185,20 @@ it('reports errors on a project where a lower level imports from files that are 
         📄 index.ts
         📄 root.ts
     `,
-    joinFromRoot('src'),
+    joinFromRoot('users', 'user', 'project', 'src'),
   )
 
   const diagnostics = (await forbiddenImports.check(root)).diagnostics
   expect(diagnostics).toEqual([
     {
       message: `Forbidden import from higher layer "app".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'lib', 'count-cart-items.ts') },
+      location: {
+        path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'cart', 'lib', 'count-cart-items.ts'),
+      },
     },
     {
       message: `Forbidden import from higher layer "app".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'SmallCart.tsx') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'cart', 'ui', 'SmallCart.tsx') },
     },
   ])
 })
@@ -221,7 +230,7 @@ it('reports no errors on a project with cross-imports through @x', async () => {
             📄 Editor.tsx
           📄 index.ts
     `,
-    joinFromRoot('src'),
+    joinFromRoot('users', 'user', 'project', 'src'),
   )
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
@@ -258,13 +267,13 @@ it('reports errors on a project with incorrect cross-imports through @x', async 
             📄 Editor.tsx
           📄 index.ts
     `,
-    joinFromRoot('src'),
+    joinFromRoot('users', 'user', 'project', 'src'),
   )
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx') },
     },
   ])
 })

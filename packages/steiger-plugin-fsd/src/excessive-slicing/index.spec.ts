@@ -4,7 +4,8 @@ import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/tool
 import excessiveSlicing from './index.js'
 
 it('reports no errors on projects with moderate slicing', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -16,7 +17,9 @@ it('reports no errors on projects with moderate slicing', () => {
       📂 ui
         📄 index.ts
         📄 Button.tsx
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const { diagnostics } = excessiveSlicing.check(root)
 
@@ -24,7 +27,8 @@ it('reports no errors on projects with moderate slicing', () => {
 })
 
 it('reports errors on a project with an excessive amount of features', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -106,13 +110,15 @@ it('reports errors on a project with an excessive amount of features', () => {
       📂 bitcoin
         📂 ui
         📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const { diagnostics } = excessiveSlicing.check(root)
 
   expect(diagnostics).toEqual([
     {
-      location: { path: joinFromRoot('features') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'features') },
       message:
         'Layer "features" has 23 ungrouped slices, which is above the recommended threshold of 20. Consider grouping them or moving the code inside to the layer where it\'s used.',
     },
@@ -120,7 +126,8 @@ it('reports errors on a project with an excessive amount of features', () => {
 })
 
 it('works with slice groups', () => {
-  const root = parseIntoFsdRoot(`
+  const root = parseIntoFsdRoot(
+    `
     📂 entities
       📂 users
         📂 ui
@@ -206,13 +213,15 @@ it('works with slice groups', () => {
         📂 bitcoin
           📂 ui
           📄 index.ts
-  `)
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   const { diagnostics } = excessiveSlicing.check(root)
 
   expect(diagnostics).toEqual([
     {
-      location: { path: joinFromRoot('features', 'junk') },
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'features', 'junk') },
       message:
         'Slice group "junk" has 23 slices, which is above the recommended threshold of 20. Consider grouping them or moving the code inside to the layer where it\'s used.',
     },

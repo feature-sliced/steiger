@@ -1,3 +1,4 @@
+import { access, stat } from 'node:fs/promises'
 import { File, Folder } from '@steiger/types'
 
 export function isPathInTree(vfs: Folder, paths: string | Array<string>) {
@@ -28,4 +29,14 @@ export function isPathInTree(vfs: Folder, paths: string | Array<string>) {
   }
 
   return typeof paths === 'string' ? results[0] : results
+}
+
+/** Check if a given path exists and is a folder. */
+export async function existsAndIsFolder(path: string) {
+  try {
+    await access(path)
+    return (await stat(path)).isDirectory()
+  } catch {
+    return false
+  }
 }

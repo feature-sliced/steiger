@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import pc from 'picocolors'
 import figures from 'figures'
 import type { Diagnostic } from '@steiger/types'
 
@@ -9,7 +9,7 @@ import { s } from './pluralization.js'
 
 export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   if (diagnostics.length === 0) {
-    return chalk.green(`${figures.tick} No problems found!`)
+    return pc.green(`${figures.tick} No problems found!`)
   }
 
   const collapsedDiagnostics = collapseDiagnostics(groupDiagnosticsByRule(diagnostics)).flat()
@@ -22,17 +22,17 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   let footer =
     'Found ' +
     [
-      errors.length > 0 && chalk.red.bold(`${errors.length} error${s(errors.length)}`),
-      warnings.length > 0 && chalk.yellow.bold(`${warnings.length} warning${s(warnings.length)}`),
+      errors.length > 0 && pc.bold(pc.red(`${errors.length} error${s(errors.length)}`)),
+      warnings.length > 0 && pc.bold(pc.yellow(`${warnings.length} warning${s(warnings.length)}`)),
     ]
       .filter(Boolean)
       .join(' and ')
 
   const autofixable = collapsedDiagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
   if (autofixable.length === collapsedDiagnostics.length) {
-    footer += ` (all can be fixed automatically with ${chalk.green.bold('--fix')})`
+    footer += ` (all can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
   } else if (autofixable.length > 0) {
-    footer += ` (${autofixable.length} can be fixed automatically with ${chalk.green.bold('--fix')})`
+    footer += ` (${autofixable.length} can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
   } else {
     footer += ' (none can be fixed automatically)'
   }
@@ -42,12 +42,12 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
     collapsedDiagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
     '\n\n' +
     // Due to formatting characters, it won't be exactly the size of the footer, that is okay
-    chalk.gray(figures.line.repeat(footer.length)) +
+    pc.gray(figures.line.repeat(footer.length)) +
     '\n ' +
     footer +
     '\n ' +
     (collapsedDiagnosticsCount < initialDiagnosticsCount
-      ? `${chalk.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics are not shown in the report as they exceed the limit allowed by Steiger`
+      ? `${pc.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics are not shown in the report as they exceed the limit allowed by Steiger`
       : '')
   )
 }
