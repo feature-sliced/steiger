@@ -1,4 +1,5 @@
-import { wordPattern } from '../inconsistent-naming-scheme/detect-naming-scheme.js'
+/** Extracts individual words in every naming scheme. */
+export const wordPattern = /([A-Z0-9]{2,}(?![A-Z][a-z])|[A-Z]?[a-z0-9]+)/g
 
 /**
  * Extract the main subject in a multi-word subject name.
