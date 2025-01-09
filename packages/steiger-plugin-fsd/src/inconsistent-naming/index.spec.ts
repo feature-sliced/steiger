@@ -1,10 +1,10 @@
 import { expect, it } from 'vitest'
 
-import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
 import inconsistentNaming from './index.js'
 
-it('reports no errors on slice names that are pluralized consistently', () => {
-  const root = parseIntoFsdRoot(
+it('reports no errors on entity names that are pluralized consistently', () => {
+  const root1 = parseIntoFsdRoot(
     `
     📂 entities
       📂 users
@@ -16,11 +16,41 @@ it('reports no errors on slice names that are pluralized consistently', () => {
   `,
     joinFromRoot('users', 'user', 'project', 'src'),
   )
+  const root2 = parseIntoFsdRoot(
+    `
+    📂 entities
+      📂 user
+        📂 ui
+        📄 index.ts
+      📂 post
+        📂 ui
+        📄 index.ts
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
+
+  expect(inconsistentNaming.check(root1)).toEqual({ diagnostics: [] })
+  expect(inconsistentNaming.check(root2)).toEqual({ diagnostics: [] })
+})
+
+it('reports no errors on multi-word entity names that are pluralized consistently', () => {
+  const root = parseIntoFsdRoot(
+    `
+    📂 entities
+      📂 admin-users
+        📂 ui
+        📄 index.ts
+      📂 employers-of-record
+        📂 ui
+        📄 index.ts
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
 
   expect(inconsistentNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
-it('reports an error on slice names that are not pluralized consistently', () => {
+it('reports an error on entity names that are not pluralized consistently', () => {
   const root = parseIntoFsdRoot(
     `
     📂 entities
@@ -34,10 +64,10 @@ it('reports an error on slice names that are not pluralized consistently', () =>
     joinFromRoot('users', 'user', 'project', 'src'),
   )
 
-  const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
+  const diagnostics = inconsistentNaming.check(root).diagnostics
   expect(diagnostics).toEqual([
     {
-      message: 'Inconsistent pluralization of slice names. Prefer all plural names',
+      message: 'Inconsistent pluralization of entity names. Prefer all plural names.',
       fixes: [
         {
           type: 'rename',
@@ -54,10 +84,10 @@ it('prefers the singular form when there are more singular slices', () => {
   const root = parseIntoFsdRoot(
     `
     📂 entities
-      📂 user
+      📂 admin-user
         📂 ui
         📄 index.ts
-      📂 post
+      📂 news-post
         📂 ui
         📄 index.ts
       📂 comments
@@ -67,10 +97,10 @@ it('prefers the singular form when there are more singular slices', () => {
     joinFromRoot('users', 'user', 'project', 'src'),
   )
 
-  const diagnostics = inconsistentNaming.check(root).diagnostics.sort(compareMessages)
+  const diagnostics = inconsistentNaming.check(root).diagnostics
   expect(diagnostics).toEqual([
     {
-      message: 'Inconsistent pluralization of slice names. Prefer all singular names',
+      message: 'Inconsistent pluralization of entity names. Prefer all singular names.',
       fixes: [
         {
           type: 'rename',
@@ -81,4 +111,49 @@ it('prefers the singular form when there are more singular slices', () => {
       location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities') },
     },
   ])
+})
+
+it('recognizes the special case when there are two pluralizations of the same name', () => {
+  const root = parseIntoFsdRoot(
+    `
+    📂 entities
+      📂 admin-user
+        📂 ui
+        📄 index.ts
+      📂 admin-users
+        📂 ui
+        📄 index.ts
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
+
+  const diagnostics = inconsistentNaming.check(root).diagnostics
+  expect(diagnostics).toEqual([
+    {
+      message: 'Avoid having both "admin-user" and "admin-users" entities.',
+      location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'admin-user') },
+    },
+  ])
+})
+
+it('allows inconsistency between different slice groups', () => {
+  const root = parseIntoFsdRoot(
+    `
+    📂 entities
+      📂 admin-user
+        📂 ui
+        📄 index.ts
+      📂 group
+        📄 index.ts
+      📂 post-parts
+        📂 posts
+          📄 index.ts
+        📂 authors
+          📄 index.ts
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
+
+  const diagnostics = inconsistentNaming.check(root).diagnostics
+  expect(diagnostics).toEqual([])
 })
