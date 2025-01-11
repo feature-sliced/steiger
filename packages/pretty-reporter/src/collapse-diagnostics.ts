@@ -14,7 +14,7 @@ function distributeQuota(buckets: Array<number>, quota: number) {
 
     // If it went beyond the last bucket, start from the first one
     if (numOfItemsInBucket === undefined) {
-      i = -1
+      i = 0
       continue
     }
 
@@ -23,6 +23,8 @@ function distributeQuota(buckets: Array<number>, quota: number) {
       quotaPerBucket[i] += 1
       remainingQuota -= 1
     }
+
+    i += 1
   }
 
   return quotaPerBucket
