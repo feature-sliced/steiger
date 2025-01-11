@@ -6,8 +6,9 @@ function distributeQuota(buckets: Array<number>, quota: number) {
   const allItemsCount = buckets.reduce((acc, bucket) => acc + bucket, 0)
   const quotaPerBucket = buckets.slice(0).fill(0)
   let remainingQuota = Math.min(quota, allItemsCount)
+  let i = 0
 
-  for (let i = 0; remainingQuota > 0; i += 1) {
+  while (remainingQuota > 0) {
     const numOfItemsInBucket = buckets[i]
     const assignedQuotaForBucket = quotaPerBucket[i]
 
