@@ -116,7 +116,7 @@ describe('trimDiagnosticsToMeetQuota', () => {
 
     const result = trimDiagnosticsToMeetQuota(diagnosticPerRule, 3)
 
-    expect(result).toEqual([[rule1Message1], [rule2Message1], [rule3Message1]])
+    expect(result).toEqual([[rule1Message1], [rule2Message1], [rule3Message1], []])
   })
 
   it('should not distribute the quota to non-existent items', () => {

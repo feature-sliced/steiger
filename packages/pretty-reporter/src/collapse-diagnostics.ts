@@ -3,9 +3,9 @@ import { Diagnostic } from '@steiger/types'
 const DIAGNOSTIC_QUOTA = 20
 
 function distributeQuota(buckets: Array<number>, quota: number) {
-  const allItems = buckets.reduce((acc, bucket) => acc + bucket, 0)
+  const allItemsCount = buckets.reduce((acc, bucket) => acc + bucket, 0)
   const quotaPerBucket = buckets.slice(0).fill(0)
-  let remainingQuota = quota
+  let remainingQuota = Math.min(quota, allItemsCount)
 
   for (let i = 0; remainingQuota > 0; i += 1) {
     const numOfItemsInBucket = buckets[i]
@@ -21,11 +21,6 @@ function distributeQuota(buckets: Array<number>, quota: number) {
     if (assignedQuotaForBucket < numOfItemsInBucket && numOfItemsInBucket !== 0) {
       quotaPerBucket[i] += 1
       remainingQuota -= 1
-    }
-
-    // If it ran out of the items earlier than the quota, break
-    if (allItems === quota - remainingQuota) {
-      break
     }
   }
 
