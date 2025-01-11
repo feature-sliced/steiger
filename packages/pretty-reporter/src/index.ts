@@ -28,8 +28,8 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
       .filter(Boolean)
       .join(' and ')
 
-  const autofixable = collapsedDiagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
-  if (autofixable.length === collapsedDiagnostics.length) {
+  const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
+  if (autofixable.length === initialDiagnosticsCount) {
     footer += ` (all can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
   } else if (autofixable.length > 0) {
     footer += ` (${autofixable.length} can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
