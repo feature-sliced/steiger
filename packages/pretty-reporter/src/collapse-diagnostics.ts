@@ -33,14 +33,10 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
   return diagnostics.slice(0).sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity])
 }
 
-// Export for testing purposes to be able to pass a custom quota
-export function trimDiagnosticsToMeetQuota(diagnosticsPerRule: Array<Array<Diagnostic>>, quota: number) {
+export function collapseDiagnostics(diagnosticsPerRule: Array<Array<Diagnostic>>) {
   const diagnosticCountPerRule = diagnosticsPerRule.map((diagnostics) => diagnostics.length)
-  const quotaPerRule = distributeQuota(diagnosticCountPerRule, quota)
+  const quotaPerRule = distributeQuota(diagnosticCountPerRule, DIAGNOSTIC_QUOTA)
   const sortedDiagnosticsPerRule = diagnosticsPerRule.map((diagnostics) => sortDiagnostics(diagnostics))
 
   return sortedDiagnosticsPerRule.map((diagnostics, i) => diagnostics.slice(0, quotaPerRule[i]))
 }
-
-export const collapseDiagnostics = (diagnosticPerRule: Array<Array<Diagnostic>>) =>
-  trimDiagnosticsToMeetQuota(diagnosticPerRule, DIAGNOSTIC_QUOTA)
