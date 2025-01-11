@@ -47,7 +47,7 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
     footer +
     '\n ' +
     (collapsedDiagnosticsCount < initialDiagnosticsCount
-      ? `${pc.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics are not shown in the report as they exceed the limit allowed by Steiger`
+      ? `${pc.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics are not shown, use ${pc.bold(pc.green('--reporter json'))} to see them.`
       : '')
   )
 }
