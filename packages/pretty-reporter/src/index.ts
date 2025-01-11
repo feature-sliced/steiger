@@ -15,6 +15,7 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   const collapsedDiagnostics = collapseDiagnostics(groupDiagnosticsByRule(diagnostics)).flat()
   const collapsedDiagnosticsCount = collapsedDiagnostics.length
   const initialDiagnosticsCount = diagnostics.length
+  const diffCount = initialDiagnosticsCount - collapsedDiagnosticsCount
 
   const errors = diagnostics.filter((d) => d.severity === 'error')
   const warnings = diagnostics.filter((d) => d.severity === 'warn')
@@ -47,7 +48,7 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
     footer +
     '\n ' +
     (collapsedDiagnosticsCount < initialDiagnosticsCount
-      ? `${pc.reset(initialDiagnosticsCount - collapsedDiagnosticsCount)} diagnostics are not shown, use ${pc.bold(pc.green('--reporter json'))} to see them.`
+      ? `${pc.reset(diffCount)} diagnostic${s(diffCount)} are not shown, use ${pc.bold(pc.green('--reporter json'))} to see them.`
       : '')
   )
 }
