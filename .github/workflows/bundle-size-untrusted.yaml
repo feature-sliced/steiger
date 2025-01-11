@@ -29,7 +29,7 @@ jobs:
 
       - name: Sanitize branch name
         id: sanitize_branch
-        run: echo "stanitized=$(echo ${{ matrix.branch }} | sed 's/[^0-9a-zA-Z\._\-]/_/g')"
+        run: echo "sanitized=$(echo ${{ matrix.branch }} | sed 's/[^0-9a-zA-Z\._\-]/_/g')"
 
       - name: Setup
         uses: ./.github/actions/setup
