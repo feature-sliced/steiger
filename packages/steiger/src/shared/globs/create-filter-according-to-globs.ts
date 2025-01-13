@@ -1,5 +1,5 @@
 import { isNegatedGlob } from './utilities'
-import { minimatch } from 'minimatch'
+import micromatch from 'micromatch'
 
 // ! Don't use platform specific path separators in the glob patterns for globby/minimatch
 // as it only works with forward slashes!
@@ -15,7 +15,8 @@ export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGl
   const inclusionsEmpty = thereAreInclusions && inclusions.length === 0
 
   function filterAccordingToGlobs(path: string) {
-    const matchesInclusionPatterns = !thereAreInclusions || inclusions.some((pattern) => minimatch(path, pattern))
+    const matchesInclusionPatterns =
+      !thereAreInclusions || inclusions.some((pattern) => micromatch.isMatch(path, pattern))
     let isIgnored = false
 
     if (inclusionsEmpty) {
@@ -23,12 +24,14 @@ export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGl
     }
 
     if (matchesInclusionPatterns && thereAreExclusions) {
-      isIgnored = exclusions.filter((pattern) => !isNegatedGlob(pattern)).some((pattern) => minimatch(path, pattern))
+      isIgnored = exclusions
+        .filter((pattern) => !isNegatedGlob(pattern))
+        .some((pattern) => micromatch.isMatch(path, pattern))
 
       // If the path is ignored, check for any negated patterns that would include it back
       if (isIgnored) {
         const isNegated = exclusions.some(
-          (ignorePattern) => isNegatedGlob(ignorePattern) && minimatch(path, ignorePattern.slice(1)),
+          (ignorePattern) => isNegatedGlob(ignorePattern) && micromatch.isMatch(path, ignorePattern.slice(1)),
         )
 
         isIgnored = !isNegated
