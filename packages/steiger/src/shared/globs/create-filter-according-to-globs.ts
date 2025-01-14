@@ -1,7 +1,7 @@
 import { isNegatedGlob } from './utilities'
 import micromatch from 'micromatch'
 
-// ! Don't use platform specific path separators in the glob patterns for globby/minimatch
+// ! Don't use platform specific path separators in the glob patterns for globby/micromatch
 // as it only works with forward slashes!
 
 interface ApplyGlobsOptions {
