@@ -1,7 +1,7 @@
 {
   "name": "steiger",
   "description": "Universal file structure and project architecture linter",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "license": "MIT",
   "authors": [
     {
