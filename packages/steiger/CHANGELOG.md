@@ -1,5 +1,11 @@
 # steiger
 
+## 0.5.5
+
+### Patch Changes
+
+- 065ea85: Switch from `minimatch` to `micromatch` to restore support for Node 18
+
 ## 0.5.4
 
 ### Patch Changes
