@@ -25,6 +25,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
+      - name: Sanitize branch name
+        id: sanitize_branch
+        run: echo "sanitized=$(echo ${{ matrix.branch }} | sed 's/[^0-9a-zA-Z\._\-]/_/g')" >> $GITHUB_OUTPUT
+
       - name: Create the report
         id: create-report
         uses: actions/github-script@v7
