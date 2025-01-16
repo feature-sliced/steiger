@@ -47,8 +47,8 @@ jobs:
               }
             }
             const fs = require('fs');
-            const sizes = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.base_ref) }}}.txt`, 'utf8'));
-            const sizesPR = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.head_ref) }}}.txt`, 'utf8'));
+            const sizes = parseDuOutput(fs.readFileSync('sizes-master.txt', 'utf8'));
+            const sizesPR = parseDuOutput(fs.readFileSync(`sizes-${${{ toJson(github.event.workflow_run.head_branch) }}}.txt`, 'utf8'));
             core.summary.addHeading('📊 Package size report', '3');
             core.summary.addTable([
               ['Package', 'Before', 'After'].map((data) => ({ data, header: true })),
