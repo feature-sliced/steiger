@@ -18,8 +18,7 @@ function distributeQuota(buckets: Array<number>, quota: number) {
       continue
     }
 
-    // If the bucket already has the quota distributed for it or does not contain any items, skip it
-    if (assignedQuotaForBucket < numOfItemsInBucket && numOfItemsInBucket !== 0) {
+    if (assignedQuotaForBucket < numOfItemsInBucket) {
       quotaPerBucket[i] += 1
       remainingQuota -= 1
     }
