@@ -117,7 +117,7 @@ if (inputPaths.length > 0) {
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
   if (consoleArgs.reporter === 'json') {
-    console.log(JSON.stringify(diagnostics, null, 2))
+    console.error(JSON.stringify(diagnostics, null, 2))
   } else {
     reportPretty(diagnostics, process.cwd())
   }
