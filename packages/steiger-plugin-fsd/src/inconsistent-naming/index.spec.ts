@@ -113,7 +113,7 @@ it('prefers the singular form when there are more singular slices', () => {
   ])
 })
 
-it('recognizes the special case when there are two pluralizations of the same name', () => {
+it('recognizes the special case when there is a plural and singular form of the same name', () => {
   const root = parseIntoFsdRoot(
     `
     📂 entities
