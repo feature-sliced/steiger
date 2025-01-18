@@ -67,12 +67,12 @@ it('reports an error on entity names that are not pluralized consistently', () =
   const diagnostics = inconsistentNaming.check(root).diagnostics
   expect(diagnostics).toEqual([
     {
-      message: 'Inconsistent pluralization of entity names. Prefer all plural names.',
+      message: 'Inconsistent pluralization of entity names. Prefer all singular names.',
       fixes: [
         {
           type: 'rename',
-          path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'user'),
-          newName: 'users',
+          path: joinFromRoot('users', 'user', 'project', 'src', 'entities', 'posts'),
+          newName: 'post',
         },
       ],
       location: { path: joinFromRoot('users', 'user', 'project', 'src', 'entities') },

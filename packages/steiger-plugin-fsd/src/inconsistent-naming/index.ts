@@ -50,7 +50,7 @@ const inconsistentNaming = {
 
         const message = 'Inconsistent pluralization of entity names'
         if (
-          pluralNames.length >= singularNames.length &&
+          pluralNames.length > singularNames.length &&
           singularNames.some(([name]) => !duplicates.singular.includes(name))
         ) {
           diagnostics.push({
