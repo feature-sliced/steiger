@@ -49,10 +49,7 @@ const inconsistentNaming = {
         }
 
         const message = 'Inconsistent pluralization of entity names'
-        if (
-          pluralNames.length > singularNames.length &&
-          singularNames.some(([name]) => !duplicates.singular.includes(name))
-        ) {
+        if (pluralNames.length > singularNames.length && singularNames.length > duplicates.singular.length) {
           diagnostics.push({
             message: `${message}. Prefer all plural names.`,
             fixes: singularNames
@@ -64,7 +61,7 @@ const inconsistentNaming = {
               })),
             location: { path: join(entities.path, groupPrefix) },
           })
-        } else if (pluralNames.some(([name]) => !duplicates.plural.includes(name))) {
+        } else if (pluralNames.length > duplicates.plural.length) {
           diagnostics.push({
             message: `${message}. Prefer all singular names.`,
             fixes: pluralNames
