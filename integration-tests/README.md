@@ -8,3 +8,12 @@
 Create a new file with the `.test.ts` extension in the `tests/` folder. Use `tests/smoke.test.ts` as a reference on how to set up a temporary folder for the project and execute Steiger.
 
 Store your output snapshots in `__snapshots__` with the `-posix.txt` extension. After you wrote your test, run `pnpm update-windows-snapshots` to copy over the changes in snapshots.
+
+## Updating both snapshots
+
+To update snapshots on POSIX and Windows, run the following commands:
+
+```
+pnpm run test --update
+pnpm update-windows-snapshots
+```
