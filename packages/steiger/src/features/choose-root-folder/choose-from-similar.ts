@@ -7,7 +7,7 @@ import * as find from 'empathic/find'
 import { distance } from 'fastest-levenshtein'
 import { isCancel, outro, select, confirm } from '@clack/prompts'
 import { formatCommand } from './format-command'
-import { ExitException } from './exit-exception'
+import { ExitException } from '../../shared/exit-exception'
 
 /** The maximum Levenshtein distance between the input and the reference for the input to be considered a typo. */
 const typoThreshold = 5

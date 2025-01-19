@@ -1,9 +1,9 @@
 import { sep } from 'node:path'
 import { confirm, isCancel, outro, select } from '@clack/prompts'
 
-import { ExitException } from './exit-exception'
 import { formatCommand } from './format-command'
 import { existsAndIsFolder } from '../../shared/file-system'
+import { ExitException } from '../../shared/exit-exception'
 
 const commonRootFolders = ['src', 'app'].map((folder) => `.${sep}${folder}`)
 

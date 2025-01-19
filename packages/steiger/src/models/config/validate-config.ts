@@ -1,9 +1,13 @@
 import z from 'zod'
+import type { Schema } from 'zod'
 
 import { BaseRuleOptions, Config, Plugin, Rule } from '@steiger/types'
 
-import { getOptions, isConfigObject, isPlugin } from './raw-config'
 import { isEqual } from '../../shared/objects'
+import { getOptions, isConfigObject, isPlugin } from './raw-config'
+import { globalIgnoreSchema } from './schemas/global-ignore'
+import { pluginSchema } from './schemas/plugin'
+import { configObjectSchema } from './schemas/config-object'
 
 const OLD_CONFIG_ERROR_MESSAGE =
   'Old configuration format detected. We are evolving!\nPlease follow this short guide to migrate to the new one:\nhttps://github.com/feature-sliced/steiger/blob/master/MIGRATION_GUIDE.md'
@@ -15,17 +19,6 @@ const NO_CONFIG_OBJECTS_ERROR_MESSAGE = 'At least one config object must be prov
 function getAllRuleNames(plugins: Array<Plugin>) {
   const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
   return allRules.map((rule) => rule.name)
-}
-
-function validateConfigObjectsNumber(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
-  const configObjects = value.filter(isConfigObject)
-
-  if (configObjects.length === 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: NO_CONFIG_OBJECTS_ERROR_MESSAGE,
-    })
-  }
 }
 
 function validateRuleUniqueness(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
@@ -75,7 +68,7 @@ function validateRuleOptions(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
 /**
  * Dynamically build a validation scheme based on the rules provided by plugins.
  * */
-export function buildValidationScheme(rawConfig: Config<Array<Rule>>) {
+export function buildValidationScheme(rawConfig: Config<Array<Rule>>): Schema<Config<Array<Rule>>> {
   const allRuleNames = getAllRuleNames(rawConfig.filter(isPlugin))
 
   // Make sure there's at least one rule registered by plugins
@@ -84,50 +77,9 @@ export function buildValidationScheme(rawConfig: Config<Array<Rule>>) {
     throw new Error(NO_RULES_ERROR_MESSAGE)
   }
 
-  // Marked as "any" because return type is not useful for this validation
-  const ruleResultScheme = z.object({
-    diagnostics: z.array(z.any()),
-  })
-
   return z
-    .array(
-      z.union([
-        z
-          .object({
-            ignores: z.array(z.string()),
-          })
-          .passthrough(),
-        z.object({
-          files: z.optional(z.array(z.string())),
-          ignores: z.optional(z.array(z.string())),
-          // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-          rules: z.record(
-            z.enum(allRuleNames as [string, ...string[]]),
-            z.union([
-              z.enum(['off', 'error', 'warn']),
-              z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()]),
-            ]),
-          ),
-        }),
-        z.object({
-          meta: z.object({
-            name: z.string(),
-            version: z.string(),
-          }),
-          getRuleDescriptionUrl: z.optional(z.function().args(z.string()).returns(z.any())),
-          ruleDefinitions: z.array(
-            z.object({
-              name: z.string(),
-              check: z
-                .function()
-                .args()
-                .returns(z.union([z.promise(ruleResultScheme), ruleResultScheme])),
-            }),
-          ),
-        }),
-      ]),
-    )
-    .superRefine(validateConfigObjectsNumber)
+    .array(z.union([globalIgnoreSchema, configObjectSchema(allRuleNames as [string, ...string[]]), pluginSchema]))
+    .refine((configArray) => configArray.some(isConfigObject), { message: NO_CONFIG_OBJECTS_ERROR_MESSAGE })
     .superRefine(validateRuleOptions)
     .superRefine(validateRuleUniqueness)
 }
