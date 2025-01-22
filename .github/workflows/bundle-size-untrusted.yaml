@@ -27,6 +27,10 @@ jobs:
         with:
           ref: ${{ matrix.branch }}
 
+      - name: Sanitize branch name
+        id: sanitize_branch
+        run: echo "sanitized=$(echo ${{ matrix.branch }} | sed 's/[^0-9a-zA-Z\._\-]/_/g')" >> $GITHUB_OUTPUT
+
       - name: Setup
         uses: ./.github/actions/setup
 
@@ -35,10 +39,10 @@ jobs:
 
       - name: Collect sizes in bytes
         id: sizes
-        run: du -sb packages/*/dist > sizes-${{ matrix.branch }}.txt
+        run: du -sb packages/*/dist > sizes-${{ steps.sanitize_branch.outputs.sanitized }}.txt
 
       - name: Upload the sizes
         uses: actions/upload-artifact@v4
         with:
-          name: sizes-${{ matrix.branch }}
-          path: sizes-${{ matrix.branch }}.txt
+          name: sizes-${{ steps.sanitize_branch.outputs.sanitized }}
+          path: sizes-${{ steps.sanitize_branch.outputs.sanitized }}.txt
