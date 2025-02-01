@@ -1,0 +1,45 @@
+
+┌ src/entities/user/api/getUser.ts
+✘ Forbidden import from higher layer "app".
+│
+└ fsd/forbidden-imports: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/forbidden-imports
+
+┌ src/entities
+✘ Inconsistent pluralization of slice names. Prefer all plural names
+✔ Auto-fixable
+│
+└ fsd/inconsistent-naming: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/inconsistent-naming
+
+┌ src/entities/user
+✘ This slice has no references. Consider removing it.
+│
+└ fsd/insignificant-slice: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/insignificant-slice
+
+┌ src/entities/users
+✘ This slice has no references. Consider removing it.
+│
+└ fsd/insignificant-slice: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/insignificant-slice
+
+┌ src/entities/user/api/getUser.ts
+✘ Forbidden sidestep of public API when importing from "@/app/ui/App".
+│
+└ fsd/no-public-api-sidestep: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-public-api-sidestep
+
+┌ src/entities/user/ui/api
+✘ Having a folder with the name "api" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.
+│
+└ fsd/no-reserved-folder-names: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-reserved-folder-names
+
+┌ src/app/ui
+✘ Layer "app" should not have "ui" segment.
+│
+└ fsd/no-ui-in-app: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-ui-in-app
+
+┌ src/processes
+✘ Layer "processes" is deprecated, avoid using it
+│
+└ fsd/no-processes: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-processes
+
+────────────────────────────────────────────────────────
+ Found 8 errors (1 can be fixed automatically with --fix)
+
