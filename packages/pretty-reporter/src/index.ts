@@ -3,12 +3,19 @@ import figures from 'figures'
 import type { Diagnostic } from '@steiger/types'
 
 import { formatSingleDiagnostic } from './format-single-diagnostic.js'
+import { collapseDiagnostics } from './collapse-diagnostics.js'
+import { groupDiagnosticsByRule } from './group-diagnostics-by-rule.js'
 import { s } from './pluralization.js'
 
 export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   if (diagnostics.length === 0) {
     return pc.green(`${figures.tick} No problems found!`)
   }
+
+  const collapsedDiagnostics = collapseDiagnostics(groupDiagnosticsByRule(diagnostics)).flat()
+  const collapsedDiagnosticsCount = collapsedDiagnostics.length
+  const initialDiagnosticsCount = diagnostics.length
+  const diffCount = initialDiagnosticsCount - collapsedDiagnosticsCount
 
   const errors = diagnostics.filter((d) => d.severity === 'error')
   const warnings = diagnostics.filter((d) => d.severity === 'warn')
@@ -23,7 +30,7 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
       .join(' and ')
 
   const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
-  if (autofixable.length === diagnostics.length) {
+  if (autofixable.length === initialDiagnosticsCount) {
     footer += ` (all can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
   } else if (autofixable.length > 0) {
     footer += ` (${autofixable.length} can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
@@ -33,13 +40,16 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
 
   return (
     '\n' +
-    diagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
+    collapsedDiagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
     '\n\n' +
     // Due to formatting characters, it won't be exactly the size of the footer, that is okay
     pc.gray(figures.line.repeat(footer.length)) +
     '\n ' +
     footer +
-    '\n'
+    '\n ' +
+    (collapsedDiagnosticsCount < initialDiagnosticsCount
+      ? `${pc.reset(diffCount)} diagnostic${s(diffCount)} are not shown, use ${pc.bold(pc.green('--reporter json'))} to see them.`
+      : '')
   )
 }
 

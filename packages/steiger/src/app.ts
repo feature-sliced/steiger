@@ -13,12 +13,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
 
   const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
-  return ruleResults.flatMap((r, ruleResultsIndex) => {
-    const { diagnostics } = r
-    if (diagnostics.length === 0) {
-      return []
-    }
-
+  return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
     const ruleName = rules[ruleResultsIndex].name
     const ruleSourcePlugin = getPluginByRuleName(ruleName)
     const severities = calculateFinalSeverities(
@@ -27,22 +22,24 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
       diagnostics.map((d) => d.location.path),
     )
 
-    return diagnostics.map((d, index) => {
-      const finalDiagnostic = {
-        ...d,
-        ruleName,
-        severity: severities[index],
-      }
-
-      if (ruleSourcePlugin.getRuleDescriptionUrl) {
-        return {
-          ...finalDiagnostic,
-          getRuleDescriptionUrl: ruleSourcePlugin.getRuleDescriptionUrl,
+    return diagnostics
+      .sort((a, b) => a.location.path.localeCompare(b.location.path))
+      .map((d, index) => {
+        const finalDiagnostic = {
+          ...d,
+          ruleName,
+          severity: severities[index],
         }
-      }
 
-      return finalDiagnostic
-    })
+        if (ruleSourcePlugin.getRuleDescriptionUrl) {
+          return {
+            ...finalDiagnostic,
+            getRuleDescriptionUrl: ruleSourcePlugin.getRuleDescriptionUrl,
+          }
+        }
+
+        return finalDiagnostic
+      })
   })
 }
 
