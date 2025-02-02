@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import noReservedFolderNames from './index.js'
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
 it('reports no errors on a project without subfolders in segments that use reserved names', () => {
   const root = parseIntoFsdRoot(`

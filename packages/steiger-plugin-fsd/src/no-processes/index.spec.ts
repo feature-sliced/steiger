@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import noProcesses from './index.js'
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
 it('reports no errors on a project without the Processes layer', () => {
   const root = parseIntoFsdRoot(`

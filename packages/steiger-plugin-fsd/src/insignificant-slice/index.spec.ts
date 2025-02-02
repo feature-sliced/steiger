@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 import { join } from 'node:path'
 
-import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 import insignificantSlice from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
@@ -13,7 +13,7 @@ vi.mock('tsconfck', async (importOriginal) => {
 
 vi.mock('node:fs', async (importOriginal) => {
   const originalFs = await importOriginal<typeof import('fs')>()
-  const { createFsMocks } = await import('@steiger/toolkit')
+  const { createFsMocks } = await import('@steiger/toolkit/test')
 
   return createFsMocks(
     {
