@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 import inconsistentNaming from './index.js'
 
 it('reports no errors on entity names that are pluralized consistently', () => {
