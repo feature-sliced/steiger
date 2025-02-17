@@ -33,6 +33,15 @@ importers:
         specifier: ^2.3.3
         version: 2.3.3
 
+  examples/kitchen-sink-of-fsd-issues:
+    devDependencies:
+      '@feature-sliced/steiger-plugin':
+        specifier: workspace:*
+        version: link:../../packages/steiger-plugin-fsd
+      steiger:
+        specifier: workspace:*
+        version: link:../../packages/steiger
+
   integration-tests:
     dependencies:
       steiger:
@@ -112,6 +121,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
+      vitest:
+        specifier: ^3.0.2
+        version: 3.0.4(@types/node@18.19.74)
 
   packages/steiger:
     dependencies:

@@ -1,6 +1,7 @@
 {
+  "private": true,
   "devDependencies": {
-    "steiger": "file:../../packages/steiger/dist",
-    "@feature-sliced/steiger-plugin": "file:../../packages/steiger-plugin-fsd/dist"
+    "steiger": "workspace:*",
+    "@feature-sliced/steiger-plugin": "workspace:*"
   }
 }
