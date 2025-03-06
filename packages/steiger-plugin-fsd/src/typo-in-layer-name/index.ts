@@ -4,7 +4,7 @@ import { LayerName, layerSequence } from '@feature-sliced/filesystem'
 import { distance } from 'fastest-levenshtein'
 import { basename, join } from 'node:path'
 
-const LEVENSHTEIN_DISTANCE_UPPER_BOUND = 3
+const LEVENSHTEIN_DISTANCE_UPPER_BOUND = 2
 
 const typoInLayerName = {
   name: `${NAMESPACE}/typo-in-layer-name` as const,
