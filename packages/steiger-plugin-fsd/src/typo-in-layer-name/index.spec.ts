@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
 import typoInLayerName from './index.js'
 

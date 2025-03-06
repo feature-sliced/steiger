@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { expect, it } from 'vitest'
 
 import ambiguousSliceNames from './index.js'
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
 it('reports no errors on a project without slice names that match some segment name in Shared', () => {
   const root = parseIntoFsdRoot(`

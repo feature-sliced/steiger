@@ -58,7 +58,7 @@ async function findRootFolderCandidates(): Promise<Array<string>> {
 if (import.meta.vitest) {
   const { describe, test, expect, vi, beforeEach } = import.meta.vitest
   const { vol } = await import('memfs')
-  const { joinFromRoot } = await import('@steiger/toolkit')
+  const { joinFromRoot } = await import('@steiger/toolkit/test')
 
   vi.mock('node:fs/promises', () => import('memfs').then((memfs) => memfs.fs.promises))
 
