@@ -20,6 +20,9 @@ Universal file structure and project architecture linter.
 
 ```bash
 npm i -D steiger
+
+# If you want to check compliance to Feature-Sliced Design, also install this:
+npm i -D @feature-sliced/steiger-plugin
 ```
 
 ## Usage
