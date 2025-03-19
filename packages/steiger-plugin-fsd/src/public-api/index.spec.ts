@@ -147,3 +147,15 @@ it('reports errors on top-level folders in shared/lib and shared/ui that are mis
     },
   ])
 })
+
+it('reports no errors on a SSR project with server-side public APIs', () => {
+  const root = parseIntoFsdRoot(`
+    📂 pages
+      📂 pageA
+        📄 index.server.js
+      📂 pageB
+        📄 index.server.js
+  `)
+
+  expect(publicApi.check(root)).toEqual({ diagnostics: [] })
+})
