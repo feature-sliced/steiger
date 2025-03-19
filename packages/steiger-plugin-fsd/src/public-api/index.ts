@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { getLayers, getSegments, isSliced, getIndex, getSlices } from '@feature-sliced/filesystem'
+import { getLayers, getSegments, isSliced, getIndexes, getSlices } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
@@ -16,7 +16,7 @@ const publicApi = {
           continue
         }
         for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
-          if (getIndex(segment) === undefined) {
+          if (getIndexes(segment).length === 0) {
             if (!['ui', 'lib'].includes(segmentName)) {
               diagnostics.push({
                 message: 'This segment is missing a public API.',
@@ -32,7 +32,7 @@ const publicApi = {
               })
             } else if (segment.type === 'folder') {
               for (const child of segment.children) {
-                if (child.type === 'folder' && getIndex(child) === undefined) {
+                if (child.type === 'folder' && getIndexes(child).length === 0) {
                   diagnostics.push({
                     message: `This top-level folder in shared/${segmentName} is missing a public API.`,
                     fixes: [
@@ -51,7 +51,7 @@ const publicApi = {
         }
       } else {
         for (const slice of Object.values(getSlices(layer))) {
-          if (getIndex(slice) === undefined) {
+          if (getIndexes(slice).length === 0) {
             diagnostics.push({
               message: 'This slice is missing a public API.',
               fixes: [

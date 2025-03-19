@@ -1,4 +1,4 @@
-import { getIndex, getLayers, getSegments, getSlices, isSliced, type LayerName } from '@feature-sliced/filesystem'
+import { getIndexes, getLayers, getSegments, getSlices, isSliced, type LayerName } from '@feature-sliced/filesystem'
 import type { File, Folder } from '@steiger/toolkit'
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
@@ -43,8 +43,9 @@ export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
         for (const [segmentName, segment] of Object.entries(getSegments(slice))) {
           walk(segment, { layerName: layerName as LayerName, sliceName, segmentName })
         }
-        const index = getIndex(slice)
-        if (index !== undefined) {
+        const indexes = getIndexes(slice)
+
+        for (const index of indexes) {
           walk(index, { layerName: layerName as LayerName, sliceName, segmentName: null })
         }
       }

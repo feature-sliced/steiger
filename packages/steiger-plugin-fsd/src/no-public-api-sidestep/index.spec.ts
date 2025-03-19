@@ -22,6 +22,8 @@ vi.mock('node:fs', async (importOriginal) => {
       '/shared/ui/Button.tsx': 'import styles from "./styles";',
       '/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/shared/ui/index.ts': '',
+      '/shared/ui/index.server.js': 'export const serverUtil = () => {};',
+      '/shared/ui/index.client.js': 'export const clientUtil = () => {};',
       '/shared/lib/index.ts': '',
       '/shared/lib/dates.ts': '',
       '/shared/lib/i18n/index.ts': '',
@@ -45,6 +47,13 @@ vi.mock('node:fs', async (importOriginal) => {
       '/pages/settings/ui/SettingsPage.tsx':
         'import { Button } from "@/shared/ui"; import { dates } from "@/shared/lib/dates"; import { translator } from "@/shared/lib/i18n"',
       '/pages/settings/ui/Password.tsx': 'import { translator } from "@/shared/lib/i18n/translator";',
+      '/pages/home/ui/HomePage.tsx': `
+        import { serverUtil } from "@/shared/ui/index.server.js";
+        import { clientUtil } from "@/shared/ui/index.client.js";
+        serverUtil();
+        clientUtil();
+      `,
+      '/pages/home/index.ts': '',
     },
     originalFs,
   )
@@ -133,6 +142,22 @@ it('reports errors on a project with a public API sidestep on shared', async () 
       location: { path: joinFromRoot('pages', 'editor', 'ui', 'SubmitButton.tsx') },
     },
   ])
+})
+
+it('reports no errors when importing from multiple public APIs', async () => {
+  const root = parseIntoFsdRoot(`
+    📂 shared
+      📂 ui
+        📄 index.server.js
+        📄 index.client.js
+    📂 pages
+      📂 home
+        📂 ui
+          📄 HomePage.tsx
+        📄 index.ts
+  `)
+
+  expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([])
 })
 
 describe('specifics of shared/lib and shared/ui', () => {
