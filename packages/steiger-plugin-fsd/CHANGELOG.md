@@ -1,5 +1,11 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.5
+
+### Patch Changes
+
+- b8d083c: Add support for multiple public APIs like `index.client.js` and `index.server.js`
+
 ## 0.5.4
 
 ### Patch Changes
