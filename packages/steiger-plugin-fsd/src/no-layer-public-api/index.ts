@@ -1,4 +1,4 @@
-import { getIndex, getLayers } from '@feature-sliced/filesystem'
+import { getIndexes, getLayers } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
 
@@ -12,14 +12,16 @@ const noLayerPublicApi = {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
-      const index = getIndex(layer)
+      const indexes = getIndexes(layer)
       const notAmongExceptions = !exceptionLayers.includes(layerName)
 
-      if (notAmongExceptions && index !== undefined) {
-        diagnostics.push({
-          message: `Layer "${layerName}" should not have an index file`,
-          location: { path: index.path },
-        })
+      if (notAmongExceptions) {
+        for (const index of indexes) {
+          diagnostics.push({
+            message: `Layer "${layerName}" should not have an index file`,
+            location: { path: index.path },
+          })
+        }
       }
     }
 
