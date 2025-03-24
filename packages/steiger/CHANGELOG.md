@@ -1,5 +1,11 @@
 # steiger
 
+## 0.5.6
+
+### Patch Changes
+
+- 72f1981: The diagnostics from a single rule are now sorted by path in alphabetical order
+
 ## 0.5.5
 
 ### Patch Changes

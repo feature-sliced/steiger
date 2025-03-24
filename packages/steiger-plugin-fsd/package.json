@@ -1,7 +1,7 @@
 {
   "name": "@feature-sliced/steiger-plugin",
   "description": "A set of rules to verify correct usage of Feature-Sliced Design",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write . --cache",
