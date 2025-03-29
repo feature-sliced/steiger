@@ -39,9 +39,9 @@ const enabledRules = [
   typoInLayerName,
   noProcesses,
 ]
-const disabeldRules = [noCrossImports, noHigherLevelImports]
+const disabledRules = [noCrossImports, noHigherLevelImports]
 
-const rules = [...enabledRules, ...disabeldRules]
+const rules = [...enabledRules, ...disabledRules]
 
 const plugin = createPlugin({
   meta: {
