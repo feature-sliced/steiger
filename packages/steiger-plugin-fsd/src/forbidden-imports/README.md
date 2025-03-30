@@ -6,6 +6,36 @@ This rule forbids imports from higher layers and cross-imports between slices on
 >
 > https://feature-sliced.design/docs/reference/layers#import-rule-on-layers
 
+> [!NOTE]
+> If you need more granular control, this rule's functionality is split into two separate rules that you can use independently:
+>
+> - `no-higher-level-imports`: Only checks for imports from higher layers (e.g., features importing from pages)
+> - `no-cross-imports`: Only checks for cross-imports between slices on the same layer (e.g., one entity importing from another entity)
+>
+> ```javascript
+> // steiger.config.js
+> import { defineConfig } from 'steiger'
+> import fsd from '@feature-sliced/steiger-plugin'
+>
+> export default defineConfig([
+>   ...fsd.configs.recommended,
+>   {
+>     rules: {
+>       'fsd/forbidden-imports': 'off',
+>       'fsd/no-cross-imports': 'error',
+>       'fsd/no-higher-level-imports': 'error',
+>     },
+>   },
+>   {
+>     // Allow cross-imports between widgets, for example
+>     files: ['src/widgets/**'],
+>     rules: {
+>       'fsd/no-cross-imports': 'off',
+>     },
+>   },
+> ])
+> ```
+
 Example of a project structure that passes this rule (arrows signify imports):
 
 ```mermaid
@@ -172,8 +202,6 @@ flowchart BT
 ## Rationale
 
 This is one of the main rules of Feature-Sliced Design, it ensures low coupling and predictability in refactoring.
-
-## Related Rules
 
 If you need more granular control, this rule's functionality is split into two separate rules that you can use independently:
 

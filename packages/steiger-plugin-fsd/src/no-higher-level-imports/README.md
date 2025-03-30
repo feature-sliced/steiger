@@ -1,6 +1,6 @@
 # `no-higher-level-imports`
 
-This rule forbids imports from higher layers in the Feature-Sliced Design architecture. This is in accordance to the import rule on layers:
+This rule forbids imports from higher layers. This is in accordance to the import rule on layers:
 
 > A module in a slice can only import other slices when they are located on layers strictly below.
 >

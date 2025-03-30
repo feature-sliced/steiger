@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
-import forbiddenImports from './index.js'
+import noCrossImports from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
   return {
@@ -76,7 +76,7 @@ it('reports no errors on a project with only correct imports', async () => {
     joinFromRoot('src'),
   )
 
-  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+  expect((await noCrossImports.check(root)).diagnostics).toEqual([])
 })
 
 it('reports errors on a project with cross-imports in entities', async () => {
@@ -107,7 +107,7 @@ it('reports errors on a project with cross-imports in entities', async () => {
     joinFromRoot('src'),
   )
 
-  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
+  expect((await noCrossImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
       location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx') },
@@ -145,7 +145,7 @@ it('reports no errors on a project with cross-imports through @x', async () => {
     joinFromRoot('src'),
   )
 
-  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+  expect((await noCrossImports.check(root)).diagnostics).toEqual([])
 })
 
 it('reports errors on a project with incorrect cross-imports through @x', async () => {
@@ -182,7 +182,7 @@ it('reports errors on a project with incorrect cross-imports through @x', async 
     joinFromRoot('src'),
   )
 
-  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
+  expect((await noCrossImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
       location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx') },

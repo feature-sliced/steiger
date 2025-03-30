@@ -1,6 +1,6 @@
 # `no-cross-imports`
 
-This rule forbids cross-imports between slices on the same layer. This is in accordance to the slice isolation principle in Feature-Sliced Design:
+This rule forbids cross-imports between slices on the same layer. This is in accordance to the import rule on layers:
 
 > A module in a slice can only import other slices when they are located on layers strictly below.
 >
@@ -39,8 +39,8 @@ flowchart BT
 flowchart BT
   subgraph entities
     subgraph entities/user[user]
-      subgraph entities/user/@x[@x]
-        entities/user/@x/product.ts[product.ts]
+      subgraph entities/user/at-x[@x]
+        entities/user/at-x/product.ts[product.ts]
       end
       subgraph entities/user/ui[ui]
         entities/user/ui/UserAvatar.tsx[UserAvatar.tsx]
@@ -56,7 +56,7 @@ flowchart BT
   end
 
   entities/user/ui/UserAvatar.tsx --> shared/ui/index.ts
-  entities/product/ui/ProductCard.tsx --> entities/user/@x/product.ts
+  entities/product/ui/ProductCard.tsx --> entities/user/at-x/product.ts
 ```
 
 Examples of project structures that fail this rule:

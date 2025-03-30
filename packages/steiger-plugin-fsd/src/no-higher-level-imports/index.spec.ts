@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
-import forbiddenImports from './index.js'
+import noHigherLevelImports from './index.js'
 
 vi.mock('tsconfck', async (importOriginal) => {
   return {
@@ -76,7 +76,7 @@ it('reports no errors on a project with only correct imports', async () => {
     joinFromRoot('src'),
   )
 
-  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+  expect((await noHigherLevelImports.check(root)).diagnostics).toEqual([])
 })
 
 it('reports errors on a project where a feature imports from a page', async () => {
@@ -104,7 +104,7 @@ it('reports errors on a project where a feature imports from a page', async () =
     joinFromRoot('src'),
   )
 
-  expect((await forbiddenImports.check(root)).diagnostics.sort()).toEqual([
+  expect((await noHigherLevelImports.check(root)).diagnostics.sort()).toEqual([
     {
       message: `Forbidden import from higher layer "pages".`,
       location: { path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx') },
@@ -145,7 +145,7 @@ it('reports errors on a project where a lower level imports from files that are 
     joinFromRoot('src'),
   )
 
-  const diagnostics = (await forbiddenImports.check(root)).diagnostics
+  const diagnostics = (await noHigherLevelImports.check(root)).diagnostics
   expect(diagnostics).toEqual([
     {
       message: `Forbidden import from higher layer "app".`,
