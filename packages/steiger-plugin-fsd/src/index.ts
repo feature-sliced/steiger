@@ -1,5 +1,4 @@
-import { enableAllRules, type ConfigObjectOf, createPlugin, createConfigs } from '@steiger/toolkit'
-
+import { enableSpecificRules, type ConfigObjectOf, createPlugin, createConfigs } from '@steiger/toolkit'
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
 import forbiddenImports from './forbidden-imports/index.js'
@@ -18,8 +17,10 @@ import sharedLibGrouping from './shared-lib-grouping/index.js'
 import typoInLayerName from './typo-in-layer-name/index.js'
 import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json' with { type: 'json' }
+import noCrossImports from './no-cross-imports/index.js'
+import noHigherLevelImports from './no-higher-level-imports/index.js'
 
-const rules = [
+const enabledRules = [
   ambiguousSliceNames,
   excessiveSlicing,
   forbiddenImports,
@@ -38,6 +39,9 @@ const rules = [
   typoInLayerName,
   noProcesses,
 ]
+const disabledRules = [noCrossImports, noHigherLevelImports]
+
+const rules = [...enabledRules, ...disabledRules]
 
 const plugin = createPlugin({
   meta: {
@@ -48,7 +52,7 @@ const plugin = createPlugin({
 })
 
 const configs = createConfigs({
-  recommended: enableAllRules(plugin),
+  recommended: enableSpecificRules(plugin, enabledRules),
 })
 
 export default {
