@@ -19,12 +19,14 @@ export function enableSpecificRules<Context, Rules extends Array<Rule>>(
   rulesToEnable: Rules,
   options?: { severity: Exclude<Severity, 'off'> },
 ): [Plugin<Context, Rules>, ConfigObject<Rules>] {
+  const namesOfRulesToEnable = rulesToEnable.map((ruleToEnable) => ruleToEnable.name)
+
   return [
     plugin,
     {
       rules: Object.fromEntries(
         plugin.ruleDefinitions
-          .filter((rule) => rulesToEnable.map((ruleToEnable) => ruleToEnable.name).includes(rule.name))
+          .filter((rule) => namesOfRulesToEnable.includes(rule.name))
           .map((rule) => [rule.name, options?.severity ?? 'error']),
       ) as {
         [key in RuleNames<Rules>]?: Severity | [Severity, OptionsForRule<Rules, key>]
