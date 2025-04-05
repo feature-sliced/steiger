@@ -198,14 +198,3 @@ flowchart BT
   pages/editor/ui/EditorPage.tsx --> shared/ui/index.ts
   pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
 ```
-
-## Rationale
-
-This is one of the main rules of Feature-Sliced Design, it ensures low coupling and predictability in refactoring.
-
-If you need more granular control, this rule's functionality is split into two separate rules that you can use independently:
-
-- `no-higher-level-imports`: Only checks for imports from higher layers (e.g., features importing from pages)
-- `no-cross-imports`: Only checks for cross-imports between slices on the same layer (e.g., one entity importing from another entity)
-
-Using these separate rules allows you to enforce only specific aspects of the import restrictions or configure them differently.
