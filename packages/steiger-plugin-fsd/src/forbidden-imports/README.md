@@ -198,3 +198,7 @@ flowchart BT
   pages/editor/ui/EditorPage.tsx --> shared/ui/index.ts
   pages/editor/ui/EditorPage.tsx --> pages/editor/ui/Editor.tsx
 ```
+
+## Rationale
+
+This is one of the main rules of Feature-Sliced Design, it ensures low coupling and predictability in refactoring.
