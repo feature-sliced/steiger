@@ -29,9 +29,11 @@ jobs:
           if [[ "${{ matrix.branch }}" == "base" ]]; then
             echo "ref=${{ github.base_ref }}" >> $GITHUB_OUTPUT
             echo "repo=${{ github.repository }}" >> $GITHUB_OUTPUT
+            echo "branch_name=${{ github.base_ref }}" >> $GITHUB_OUTPUT
           else
             echo "ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
             echo "repo=${{ github.event.pull_request.head.repo.full_name }}" >> $GITHUB_OUTPUT
+            echo "branch_name=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout ${{ matrix.branch }} branch
@@ -49,10 +51,10 @@ jobs:
 
       - name: Collect sizes in bytes
         id: sizes
-        run: du -sb packages/*/dist > sizes-${{ matrix.branch }}.txt
+        run: du -sb packages/*/dist > sizes-${{ steps.vars.outputs.branch_name }}.txt
 
       - name: Upload the sizes
         uses: actions/upload-artifact@v4
         with:
-          name: sizes-${{ matrix.branch }}
-          path: sizes-${{ matrix.branch }}.txt
+          name: sizes-${{ steps.vars.outputs.branch_name }}
+          path: sizes-${{ steps.vars.outputs.branch_name }}.txt
