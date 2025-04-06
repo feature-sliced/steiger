@@ -66,5 +66,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
         with:
           message: ${{ steps.create-report.outputs.result }}
-          pr-number: ${{ github.event.workflow_run.pull_requests.number }}
+          pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
           comment-tag: bundle-size
