@@ -41,7 +41,6 @@ jobs:
         with:
           ref: ${{ steps.vars.outputs.ref }}
           repository: ${{ steps.vars.outputs.repo }}
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup
         uses: ./.github/actions/setup
