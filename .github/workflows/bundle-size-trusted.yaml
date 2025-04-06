@@ -62,9 +62,23 @@ jobs:
             core.summary.write();
             return report;
 
+      - name: Extract PR number
+        id: extract-pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prList = context.payload.workflow_run.pull_requests;
+            if (prList && prList.length > 0) {
+              return prList[0].number;
+            }
+            core.setFailed('No PR found associated with this workflow run');
+            return '';
+          result-encoding: string
+
       - name: Post the report to the PR
+        if: steps.extract-pr.outputs.result != ''
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
         with:
           message: ${{ steps.create-report.outputs.result }}
-          pr-number: ${{ github.event.workflow_run.pull_requests.number }}
+          pr-number: ${{ steps.extract-pr.outputs.result }}
           comment-tag: bundle-size
