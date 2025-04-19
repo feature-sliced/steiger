@@ -37,8 +37,12 @@ vi.mock('node:fs', async (importOriginal) => {
       '/src/entities/product/ui/ProductCard.tsx': 'import { UserAvatar } from "@/entities/user"',
       '/src/entities/product/ui/GoodProductCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/src/entities/product/index.ts': '',
+      '/src/entities/order/ui/OrderBadge.tsx': '',
+      '/src/entities/order/@x/cart/index.ts': '',
+      '/src/entities/order/index.ts': '',
       '/src/entities/cart/ui/SmallCart.tsx': 'import { App } from "@/app"',
       '/src/entities/cart/ui/BadSmallCart.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
+      '/src/entities/cart/ui/CartItem.tsx': 'import { OrderBadge } from "@/entities/order/@x/cart"',
       '/src/entities/cart/lib/count-cart-items.ts': 'import root from "@/app/root.ts"',
       '/src/entities/cart/lib/index.ts': '',
       '/src/entities/cart/index.ts': '',
@@ -213,6 +217,40 @@ it('reports no errors on a project with cross-imports through @x', async () => {
         📂 product
           📂 ui
             📄 GoodProductCard.tsx
+          📄 index.ts
+      📂 pages
+        📂 editor
+          📂 ui
+            📄 EditorPage.tsx
+            📄 Editor.tsx
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+})
+
+it('reports no errors on a project with cross-imports through @x index files', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 shared
+        📂 ui
+          📄 styles.ts
+          📄 Button.tsx
+          📄 TextField.tsx
+          📄 index.ts
+      📂 entities
+        📂 order
+          📂 @x
+            📂 cart
+              📄 index.ts
+          📂 ui
+            📄 OrderBadge.tsx
+          📄 index.ts
+        📂 cart
+          📂 ui
+            📄 CartItem.tsx
           📄 index.ts
       📂 pages
         📂 editor
