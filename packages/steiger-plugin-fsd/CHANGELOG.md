@@ -1,5 +1,13 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.6
+
+### Patch Changes
+
+- 4e331fb: Split `forbidden-imports` rule into granular `no-higher-level-imports` and `no-cross-imports` rules for better flexibility
+  The `forbidden-imports` rule still remains for backward compatibility. If you want to use the new rules, enable them explicitly in the config and disable the `forbidden-imports` rule.
+- 1281d60: Support `sliceA/@x/sliceB/index.ts` as cross-import public APIs
+
 ## 0.5.5
 
 ### Patch Changes

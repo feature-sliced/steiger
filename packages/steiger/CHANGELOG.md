@@ -1,5 +1,12 @@
 # steiger
 
+## 0.5.7
+
+### Patch Changes
+
+- Updated dependencies
+  - @feature-sliced/steiger-plugin@0.5.6
+
 ## 0.5.6
 
 ### Patch Changes

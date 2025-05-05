@@ -1,7 +1,7 @@
 {
   "name": "@steiger/toolkit",
   "description": "Toolkit for writing rules for Steiger",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write . --cache",
