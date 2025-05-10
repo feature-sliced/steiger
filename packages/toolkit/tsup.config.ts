@@ -9,7 +9,4 @@ export default defineConfig({
   },
   treeshake: true,
   clean: true,
-  esbuildOptions(options) {
-    options.define = { 'import.meta.vitest': 'undefined' }
-  },
 })
