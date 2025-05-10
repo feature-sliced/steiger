@@ -6,30 +6,49 @@ import { expect, test } from 'vitest'
 import { createViteProject } from '../utils/create-vite-project.js'
 import { exec } from 'tinyexec'
 import { getSteigerBinPath } from '../utils/get-bin-path.js'
-import { getSnapshotPath } from '../utils/get-snapshot-path.js'
+import { getRepoRootPath } from '../utils/get-repo-root-path.js'
 
 const temporaryDirectory = await fs.realpath(os.tmpdir())
+const repoRoot = getRepoRootPath()
 const steiger = await getSteigerBinPath()
 
-test(
-  'auto plugin discovery works',
-  async () => {
-    const project = join(temporaryDirectory, 'auto-discovery')
-    await createViteProject(project)
+test('auto plugin discovery works', { timeout: 15_000 }, async () => {
+  const project = join(temporaryDirectory, 'auto-discovery')
+  await createViteProject(project)
 
-    const plugin = join(temporaryDirectory, 'custom-steiger-plugin')
-    await createDummySteigerPlugin(plugin)
+  const plugin = join(temporaryDirectory, 'custom-steiger-plugin')
+  await createDummySteigerPlugin(plugin)
 
-    await exec('npm', ['install'], { nodeOptions: { cwd: plugin } })
-    await exec('npm', ['add', `steiger-plugin-dummy@file:${plugin}`], { nodeOptions: { cwd: project } })
+  await exec('npm', ['install'], { nodeOptions: { cwd: plugin } })
+  await exec('npm', ['add', `steiger-plugin-dummy@file:${plugin}`], { nodeOptions: { cwd: project } })
 
-    const { stderr } = await exec(steiger, ['-v'], { nodeOptions: { cwd: project, env: { NO_COLOR: '1' } } })
-    await expect(stderr).toMatchFileSnapshot(getSnapshotPath('auto-discovery-stderr'))
-  },
-  { timeout: 15_000 },
-)
+  function getDetectedPlugins(versionOutput: string) {
+    const [_steigerVersion, plugins] = versionOutput.trim().split('\n\n', 2)
+    return plugins.split('\n').map((line) => ({ name: line.split('\t')[0], version: line.split('\t')[1] }))
+  }
+
+  const resultWithOnlyDummy = await exec(steiger, ['-v'], { nodeOptions: { cwd: project, env: { NO_COLOR: '1' } } })
+  expect(resultWithOnlyDummy.stderr).toEqual('')
+  expect(getDetectedPlugins(resultWithOnlyDummy.stdout)).toEqual([
+    { name: 'steiger-plugin-dummy', version: '1.0.0-alpha.0' },
+  ])
+
+  await exec(
+    'npm',
+    ['add', `@feature-sliced/steiger-plugin@file:${join(repoRoot, 'packages', 'steiger-plugin-fsd')}`],
+    { nodeOptions: { cwd: project } },
+  )
+
+  const resultWithDummyAndFsd = await exec(steiger, ['-v'], { nodeOptions: { cwd: project, env: { NO_COLOR: '1' } } })
+  expect(resultWithDummyAndFsd.stderr).toEqual('')
+  expect(getDetectedPlugins(resultWithDummyAndFsd.stdout)).toEqual([
+    { name: '@feature-sliced/steiger-plugin', version: expect.any(String) },
+    { name: 'steiger-plugin-dummy', version: '1.0.0-alpha.0' },
+  ])
+})
 
 async function createDummySteigerPlugin(location: string) {
+  console.log('Creating dummy plugin at', location)
   await fs.rm(location, { recursive: true, force: true })
   await fs.mkdir(location, { recursive: true })
   const packageJsonContents = JSON.stringify(
@@ -41,7 +60,7 @@ async function createDummySteigerPlugin(location: string) {
         import: './index.mjs',
       },
       dependencies: {
-        '@steiger/toolkit': '*',
+        '@steiger/toolkit': `file:${join(repoRoot, 'packages', 'toolkit')}`,
       },
     },
     null,
