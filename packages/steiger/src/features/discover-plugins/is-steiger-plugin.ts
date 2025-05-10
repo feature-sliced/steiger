@@ -22,3 +22,15 @@ export function isSteigerPlugin(packageName: string) {
     return packageName.startsWith(`${pluginNamePrefix}-`)
   }
 }
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest
+
+  test('isSteigerPlugin', () => {
+    expect(isSteigerPlugin('@someone/steiger-plugin-foo')).toBe(true)
+    expect(isSteigerPlugin('steiger-plugin-bar')).toBe(true)
+    expect(isSteigerPlugin('@someone-else/steiger-plugin')).toBe(true)
+    expect(isSteigerPlugin('plugin-foo')).toBe(false)
+    expect(isSteigerPlugin('steiger-foo')).toBe(false)
+  })
+}
