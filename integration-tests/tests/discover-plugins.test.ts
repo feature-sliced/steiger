@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises'
 import os from 'node:os'
 import { join } from 'node:path'
+import type { ChildProcess } from 'node:child_process'
 
 import { expect, test } from 'vitest'
 import { createViteProject } from '../utils/create-vite-project.js'
@@ -12,7 +13,7 @@ const temporaryDirectory = await fs.realpath(os.tmpdir())
 const repoRoot = getRepoRootPath()
 const steiger = await getSteigerBinPath()
 
-test('auto plugin discovery works', { timeout: 15_000 }, async () => {
+test('auto plugin discovery', { timeout: 15_000 }, async () => {
   const project = join(temporaryDirectory, 'auto-discovery')
   await createViteProject(project)
 
@@ -47,8 +48,39 @@ test('auto plugin discovery works', { timeout: 15_000 }, async () => {
   ])
 })
 
+test('suggestion to install the FSD plugin', { timeout: 30_000 }, async () => {
+  const project = join(temporaryDirectory, 'suggest-fsd-plugin')
+  await createViteProject(project)
+
+  const execResult = exec(steiger, ['./src'], {
+    nodeOptions: { stdio: 'pipe', cwd: project, env: { NO_COLOR: '1', npm_config_user_agent: undefined } },
+  })
+  const steigerProcess = execResult.process!
+
+  await expect(getNewProcessOutput(steigerProcess, { until: '○ No' })).resolves.toContain(
+    "Couldn't find any plugins in package.json. Are you trying to check this project's compliance to Feature-Sliced Design (https://feature-sliced.design)?",
+  )
+  steigerProcess.stdin?.write('y')
+
+  await expect(getNewProcessOutput(steigerProcess, { until: '○ No' })).resolves.toContain(
+    'Okay! Would you like to run `npm add -D @feature-sliced/steiger-plugin` in suggest-fsd-plugin (path: .) to install the FSD plugin?',
+  )
+  steigerProcess.stdin?.write('y')
+
+  await expect(getNewProcessOutput(steigerProcess, { until: 'All done!' })).resolves.toContain(
+    "All done! Now let's run the FSD checks.",
+  )
+
+  const packageJson = (await fs
+    .readFile(join(project, 'package.json'), { encoding: 'utf-8' })
+    .then(JSON.parse)) as Record<string, Record<string, string>>
+  expect(packageJson.devDependencies['@feature-sliced/steiger-plugin']).not.toBeUndefined()
+  await expect(getNewProcessOutput(execResult.process!, { stream: 'stderr' })).resolves.toContain('No problems found!')
+  await execResult
+  expect(execResult.exitCode).toEqual(0)
+})
+
 async function createDummySteigerPlugin(location: string) {
-  console.log('Creating dummy plugin at', location)
   await fs.rm(location, { recursive: true, force: true })
   await fs.mkdir(location, { recursive: true })
   const packageJsonContents = JSON.stringify(
@@ -96,4 +128,26 @@ async function createDummySteigerPlugin(location: string) {
     };
   `
   await fs.writeFile(join(location, 'index.mjs'), indexMjsContents)
+}
+
+/**
+ * Read the stdout/stderr stream of the process until the specified string is found.
+ *
+ * If no string is specified, it will return the first chunk of output.
+ */
+function getNewProcessOutput(
+  process: ChildProcess,
+  { until, stream = 'stdout' }: { until?: string; stream?: 'stdout' | 'stderr' } = {},
+): Promise<string> {
+  return new Promise((resolve) => {
+    let output = ''
+    function onData(data: string) {
+      output += data
+      if (until === undefined || output.includes(until)) {
+        process[stream]?.off('data', onData)
+        resolve(output)
+      }
+    }
+    process[stream]?.on('data', onData)
+  })
 }

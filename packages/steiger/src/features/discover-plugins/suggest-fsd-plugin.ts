@@ -11,7 +11,9 @@ import { ExitException } from '../../shared/exit-exception'
 import { pluginNamePrefix } from './is-steiger-plugin'
 
 const fsdPlugin = '@feature-sliced/steiger-plugin'
-const fsdWebsiteLink = terminalLink('Feature-Sliced Design', 'https://feature-sliced.design')
+const fsdWebsiteLink = terminalLink('Feature-Sliced Design', 'https://feature-sliced.design', {
+  fallback: (text, url) => `${pc.reset(text)} (${pc.blue(url)})`,
+})
 
 /**
  * Ask if the user wants to run FSD checks and offer to install the FSD plugin.
@@ -21,7 +23,7 @@ const fsdWebsiteLink = terminalLink('Feature-Sliced Design', 'https://feature-sl
 export async function suggestInstallingFsdPlugin() {
   const pm = whichPackageManagerRuns()?.name ?? whichLockfileExists() ?? 'npm'
   const packageJsonPath = pkg.up()
-  const addCommand = [pm, 'add', fsdPlugin]
+  const addCommand = [pm, 'add', '-D', fsdPlugin]
 
   const theyWantFsdChecks = await confirm({
     message:
