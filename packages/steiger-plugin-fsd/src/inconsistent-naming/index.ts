@@ -24,7 +24,9 @@ const inconsistentNaming = {
     const sliceNames = groupSlices(Object.keys(slices))
     for (const [groupPrefix, group] of Object.entries(sliceNames)) {
       const [pluralNames, singularNames] = partition(
-        group.map((name) => [name, getMainSubject(name)] as const),
+        group
+          .map((name) => [name, getMainSubject(name)] as const)
+          .filter(([, mainSubject]) => !isUncountable(mainSubject)),
         ([, mainSubject]) => isPlural(mainSubject),
       )
 
@@ -80,5 +82,9 @@ const inconsistentNaming = {
     return { diagnostics }
   },
 } satisfies Rule
+
+function isUncountable(word: string) {
+  return singular(word) === plural(word)
+}
 
 export default inconsistentNaming

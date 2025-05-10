@@ -4,9 +4,8 @@
 │
 └ fsd/forbidden-imports: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/forbidden-imports
 
-┌ src\entities
-× Inconsistent pluralization of slice names. Prefer all plural names
-√ Auto-fixable
+┌ src\entities\user
+× Avoid having both "user" and "users" entities.
 │
 └ fsd/inconsistent-naming: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/inconsistent-naming
 
@@ -40,6 +39,6 @@
 │
 └ fsd/no-processes: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-processes
 
-────────────────────────────────────────────────────────
- Found 8 errors (1 can be fixed automatically with --fix)
-
+────────────────────────────────────────────────
+ Found 8 errors (none can be fixed automatically)
+ 
