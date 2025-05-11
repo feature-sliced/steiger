@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import process from 'node:process'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import * as pkg from 'empathic/package'
 import { ResolverFactory } from 'oxc-resolver'
 import type { Plugin, Config, Rule } from '@steiger/types'
@@ -64,7 +65,7 @@ async function loadSteigerPlugin(pluginName: string): Promise<{ plugin: Plugin; 
   if (pluginIndex.path === undefined) {
     throw new Error(`Could not resolve plugin ${pluginName}`)
   }
-  const pluginExports = await import(pluginIndex.path)
+  const pluginExports = await import(pathToFileURL(pluginIndex.path).toString())
   return parsePluginDefaultExport(pluginExports.default)
 }
 
