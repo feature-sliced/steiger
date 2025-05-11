@@ -153,7 +153,7 @@ const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
 }
 
 if (consoleArgs.watch) {
-  const [diagnosticsChanged, stopWatching] = await linter.watch(targetPath)
+  const [diagnosticsChanged, stopWatching] = await linter.watch(targetPath!)
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
     printDiagnostics(state)
@@ -166,7 +166,7 @@ if (consoleArgs.watch) {
     unsubscribe()
   })
 } else {
-  const diagnostics = await linter.run(targetPath)
+  const diagnostics = await linter.run(targetPath!)
   let stillRelevantDiagnostics = diagnostics
 
   printDiagnostics(diagnostics)
