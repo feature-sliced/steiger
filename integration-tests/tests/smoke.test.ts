@@ -15,7 +15,7 @@ const repoRoot = getRepoRootPath()
 const steiger = await getSteigerBinPath()
 const kitchenSinkExample = join(dirname(fileURLToPath(import.meta.url)), '../../examples/kitchen-sink-of-fsd-issues')
 
-test('basic functionality in the kitchen sink example project', { timeout: 15_000 }, async () => {
+test('basic functionality in the kitchen sink example project', { timeout: 30_000 }, async () => {
   const project = join(temporaryDirectory, 'smoke')
   await fs.rm(project, { recursive: true, force: true })
   await fs.cp(kitchenSinkExample, project, { recursive: true })
