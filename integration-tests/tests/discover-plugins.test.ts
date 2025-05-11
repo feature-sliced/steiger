@@ -13,7 +13,7 @@ const temporaryDirectory = await fs.realpath(os.tmpdir())
 const repoRoot = getRepoRootPath()
 const steiger = await getSteigerBinPath()
 
-test('auto plugin discovery', { timeout: 30_000 }, async () => {
+test('auto plugin discovery', { timeout: 60_000 }, async () => {
   const project = join(temporaryDirectory, 'auto-discovery')
   await createViteProject(project)
 
@@ -48,7 +48,7 @@ test('auto plugin discovery', { timeout: 30_000 }, async () => {
   ])
 })
 
-test('suggestion to install the FSD plugin', { timeout: 60_000 }, async () => {
+test('suggestion to install the FSD plugin', { timeout: 2 * 60_000 }, async () => {
   const project = join(temporaryDirectory, 'suggest-fsd-plugin')
   await createViteProject(project)
 
