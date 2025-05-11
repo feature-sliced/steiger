@@ -56,7 +56,7 @@
     "picocolors": "^1.1.1",
     "prexit": "^2.3.0",
     "terminal-link": "^3.0.0",
-    "tinyexec": "^0.3.1",
+    "tinyexec": "^0.3.2",
     "yargs": "^17.7.2",
     "zod": "^3.24.1",
     "zod-validation-error": "^3.4.0"

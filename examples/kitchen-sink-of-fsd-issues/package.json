@@ -1,7 +1,8 @@
 {
+  "name": "kitchen-sink-of-fsd-issues",
   "private": true,
   "devDependencies": {
-    "steiger": "workspace:*",
-    "@feature-sliced/steiger-plugin": "workspace:*"
+    "@feature-sliced/steiger-plugin": "workspace:*",
+    "steiger": "workspace:*"
   }
 }
