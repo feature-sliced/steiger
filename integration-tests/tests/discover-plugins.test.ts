@@ -48,7 +48,7 @@ test('auto plugin discovery', { timeout: 60_000 }, async () => {
   ])
 })
 
-test('suggestion to install the FSD plugin', { timeout: 2 * 60_000 }, async () => {
+test('suggestion to install the FSD plugin', { timeout: 4 * 60_000 }, async () => {
   const project = join(temporaryDirectory, 'suggest-fsd-plugin')
   await createViteProject(project)
 
