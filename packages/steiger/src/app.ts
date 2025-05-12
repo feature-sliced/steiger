@@ -8,6 +8,7 @@ import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/confi
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
+import { handleError } from './features/handle-error'
 
 // TODO: make this part of a plugin
 function getRuleDescriptionUrl(ruleName: string) {
@@ -18,26 +19,30 @@ function getRuleDescriptionUrl(ruleName: string) {
 }
 
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
+  try {
+    const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
 
-  const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
-  return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
-    const ruleName = rules[ruleResultsIndex].name
-    const severities = calculateFinalSeverities(
-      vfsWithoutGlobalIgnores,
-      ruleName,
-      diagnostics.map((d) => d.location.path),
-    )
-
-    return diagnostics
-      .sort((a, b) => a.location.path.localeCompare(b.location.path))
-      .map((d, index) => ({
-        ...d,
+    const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
+    return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
+      const ruleName = rules[ruleResultsIndex].name
+      const severities = calculateFinalSeverities(
+        vfsWithoutGlobalIgnores,
         ruleName,
-        getRuleDescriptionUrl,
-        severity: severities[index],
-      }))
-  })
+        diagnostics.map((d) => d.location.path),
+      )
+
+      return diagnostics
+        .sort((a, b) => a.location.path.localeCompare(b.location.path))
+        .map((d, index) => ({
+          ...d,
+          ruleName,
+          getRuleDescriptionUrl,
+          severity: severities[index],
+        }))
+    })
+  } catch (error) {
+    handleError(error, { vfs })
+  }
 }
 
 export const linter = {
