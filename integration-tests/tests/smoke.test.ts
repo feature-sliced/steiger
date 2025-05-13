@@ -19,6 +19,8 @@ test('basic functionality in the kitchen sink example project', { timeout: 30_00
   const project = join(temporaryDirectory, 'smoke')
   await fs.rm(project, { recursive: true, force: true })
   await fs.cp(kitchenSinkExample, project, { recursive: true })
+  await fs.rm(join(project, 'node_modules'), { recursive: true, force: true })
+  await fs.rm(join(project, 'package.json'), { force: true })
 
   const steigerPluginPath = join(repoRoot, 'packages', 'steiger-plugin-fsd')
   const { stdout: steigerPluginTarball } = await exec('npm', ['pack'], {
