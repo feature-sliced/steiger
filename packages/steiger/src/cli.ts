@@ -8,29 +8,64 @@ import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
+import type { Diagnostic } from '@steiger/types'
 
 import { linter } from './app'
 import { processConfiguration, $plugins } from './models/config'
 import { applyAutofixes } from './features/autofix'
-import { chooseRootFolderFromGuesses, chooseRootFolderFromSimilar, ExitException } from './features/choose-root-folder'
-import fsd from '@feature-sliced/steiger-plugin'
-import type { Diagnostic } from '@steiger/types'
+import { chooseRootFolderFromGuesses, chooseRootFolderFromSimilar } from './features/choose-root-folder'
+import { discoverPlugins, suggestInstallingFsdPlugin } from './features/discover-plugins'
+import { handleExitRequest } from './shared/exit-exception'
 import packageJson from '../package.json'
 import { existsAndIsFolder } from './shared/file-system'
 
-const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
-const defaultConfig = fsd.configs.recommended
+const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: null }
 
-try {
-  const configLocationDirectory = filepath ? dirname(filepath) : null
-  // use FSD recommended config as a default
-  processConfiguration(config || defaultConfig, configLocationDirectory)
-} catch (err) {
-  if (filepath !== undefined) {
+if (config !== null && filepath !== null) {
+  const configLocationDirectory = dirname(filepath)
+  try {
+    processConfiguration(config, configLocationDirectory)
+  } catch (err) {
     console.error(
       fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
     )
     process.exit(100)
+  }
+} else {
+  let installedPlugins = await discoverPlugins()
+  if (installedPlugins.length === 0) {
+    try {
+      await handleExitRequest(suggestInstallingFsdPlugin, { exitCode: 0 })
+    } catch {
+      // In this case, the error message is already printed, we just need to exit
+      process.exit(102)
+    }
+    installedPlugins = await discoverPlugins()
+
+    if (installedPlugins.length === 0) {
+      console.error(
+        "Sorry, I tried to add the FSD plugin, but it didn't work :(\n" +
+          `Please report this case to ${packageJson.bugs.url}`,
+      )
+      process.exit(101)
+    }
+  }
+
+  try {
+    processConfiguration(
+      installedPlugins
+        .map((plugin) => plugin.autoConfig)
+        .filter(Boolean)
+        .flat(),
+      null,
+    )
+  } catch (err) {
+    console.error(
+      fromError(err, {
+        prefix: `Failed to auto-construct a configuration from plugins ${installedPlugins.map(({ plugin }) => `"${plugin.meta.name}"`).join(', ')}`,
+      }).toString(),
+    )
+    process.exit(103)
   }
 }
 
@@ -93,26 +128,20 @@ if (inputPaths.length > 0) {
   if (await existsAndIsFolder(inputPaths[0])) {
     targetPath = resolve(inputPaths[0])
   } else {
-    try {
-      targetPath = resolve(await chooseRootFolderFromSimilar(inputPaths[0]))
-    } catch (e) {
-      if (e instanceof ExitException) {
-        process.exit(0)
-      } else {
-        throw e
-      }
-    }
+    await handleExitRequest(
+      async () => {
+        targetPath = resolve(await chooseRootFolderFromSimilar(inputPaths[0]))
+      },
+      { exitCode: 0 },
+    )
   }
 } else {
-  try {
-    targetPath = resolve(await chooseRootFolderFromGuesses())
-  } catch (e) {
-    if (e instanceof ExitException) {
-      process.exit(0)
-    } else {
-      throw e
-    }
-  }
+  await handleExitRequest(
+    async () => {
+      targetPath = resolve(await chooseRootFolderFromGuesses())
+    },
+    { exitCode: 0 },
+  )
 }
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
@@ -124,7 +153,7 @@ const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
 }
 
 if (consoleArgs.watch) {
-  const [diagnosticsChanged, stopWatching] = await linter.watch(targetPath)
+  const [diagnosticsChanged, stopWatching] = await linter.watch(targetPath!)
   const unsubscribe = diagnosticsChanged.watch((state) => {
     console.clear()
     printDiagnostics(state)
@@ -137,7 +166,7 @@ if (consoleArgs.watch) {
     unsubscribe()
   })
 } else {
-  const diagnostics = await linter.run(targetPath)
+  const diagnostics = await linter.run(targetPath!)
   let stillRelevantDiagnostics = diagnostics
 
   printDiagnostics(diagnostics)

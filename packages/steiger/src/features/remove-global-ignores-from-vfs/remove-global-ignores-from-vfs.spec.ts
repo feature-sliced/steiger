@@ -1,5 +1,5 @@
 import { expect, it, describe } from 'vitest'
-import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit/test'
 
 import removeGlobalIgnoresFromVfs from './remove-global-ignores-from-vfs'
 

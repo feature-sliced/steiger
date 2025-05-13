@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 
 import segmentsByPurpose from './index.js'
-import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
 it('reports no errors on a project with good segments', () => {
   const root = parseIntoFsdRoot(

@@ -1,5 +1,6 @@
 import { getIndex, getLayers, getSegments, getSlices, isSliced, type LayerName } from '@feature-sliced/filesystem'
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot, type File, type Folder } from '@steiger/toolkit'
+import type { File, Folder } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
 type SourceFile = {
   file: File

@@ -2,3 +2,4 @@ packages:
   - 'packages/*'
   - 'tooling/*'
   - 'integration-tests'
+  - 'examples/*'

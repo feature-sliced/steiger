@@ -7,7 +7,7 @@ import * as find from 'empathic/find'
 import { distance } from 'fastest-levenshtein'
 import { isCancel, outro, select, confirm } from '@clack/prompts'
 import { formatCommand } from './format-command'
-import { ExitException } from './exit-exception'
+import { ExitException } from '../../shared/exit-exception'
 
 /** The maximum Levenshtein distance between the input and the reference for the input to be considered a typo. */
 const typoThreshold = 5
@@ -99,7 +99,7 @@ async function resolveWithCorrections(path: string) {
 if (import.meta.vitest) {
   const { test, expect, vi } = import.meta.vitest
   const { vol } = await import('memfs')
-  const { joinFromRoot } = await import('@steiger/toolkit')
+  const { joinFromRoot } = await import('@steiger/toolkit/test')
 
   vi.mock('node:fs/promises', () => import('memfs').then((memfs) => memfs.fs.promises))
 
