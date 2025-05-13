@@ -26,9 +26,11 @@ test('basic functionality in the kitchen sink example project', { timeout: 30_00
   const steigerPluginPath = join(repoRoot, 'packages', 'steiger-plugin-fsd')
   const { stdout: steigerPluginTarball } = await exec('npm', ['pack'], {
     nodeOptions: { cwd: steigerPluginPath },
+    throwOnError: true,
   })
   await exec('npm', ['install', join(steigerPluginPath, steigerPluginTarball.trim())], {
     nodeOptions: { cwd: project },
+    throwOnError: true,
   })
 
   const { stderr } = await exec('node', [steiger, 'src'], { nodeOptions: { cwd: project, env: { NO_COLOR: '1' } } })

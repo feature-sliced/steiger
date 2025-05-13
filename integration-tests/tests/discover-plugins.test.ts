@@ -60,16 +60,19 @@ test('suggestion to install the FSD plugin', { timeout: 4 * 60_000 }, async () =
   await expect(getNewProcessOutput(steigerProcess, { until: '○ No' })).resolves.toContain(
     "Couldn't find any plugins in package.json. Are you trying to check this project's compliance to Feature-Sliced Design (https://feature-sliced.design)?",
   )
+  console.log('got first batch of output')
   steigerProcess.stdin?.write('y')
 
   await expect(getNewProcessOutput(steigerProcess, { until: '○ No' })).resolves.toContain(
     'Okay! Would you like to run `npm add -D @feature-sliced/steiger-plugin` in suggest-fsd-plugin (path: .) to install the FSD plugin?',
   )
+  console.log('got second batch of output')
   steigerProcess.stdin?.write('y')
 
   await expect(getNewProcessOutput(steigerProcess, { until: 'All done!' })).resolves.toContain(
     "All done! Now let's run the FSD checks.",
   )
+  console.log('got third batch of output')
 
   const packageJson = (await fs
     .readFile(join(project, 'package.json'), { encoding: 'utf-8' })
