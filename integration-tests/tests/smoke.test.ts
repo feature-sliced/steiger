@@ -18,9 +18,10 @@ const kitchenSinkExample = join(dirname(fileURLToPath(import.meta.url)), '../../
 test('basic functionality in the kitchen sink example project', { timeout: 30_000 }, async () => {
   const project = join(temporaryDirectory, 'smoke')
   await fs.rm(project, { recursive: true, force: true })
-  await fs.cp(kitchenSinkExample, project, { recursive: true })
-  await fs.rm(join(project, 'node_modules'), { recursive: true, force: true })
-  await fs.rm(join(project, 'package.json'), { force: true })
+  await fs.mkdir(join(project, 'src'), { recursive: true })
+  await fs.cp(join(kitchenSinkExample, 'src'), join(project, 'src'), { recursive: true })
+  await fs.cp(join(kitchenSinkExample, 'tsconfig.app.json'), join(project, 'tsconfig.app.json'))
+  await fs.cp(join(kitchenSinkExample, 'tsconfig.json'), join(project, 'tsconfig.json'))
 
   const steigerPluginPath = join(repoRoot, 'packages', 'steiger-plugin-fsd')
   const { stdout: steigerPluginTarball } = await exec('npm', ['pack'], {
