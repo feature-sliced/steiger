@@ -39,7 +39,7 @@ flowchart BT
 flowchart BT
   subgraph entities
     subgraph entities/user[user]
-      subgraph entities/user/at-x[@x]
+      subgraph entities/user/at-x["@x"]
         entities/user/at-x/product.ts[product.ts]
       end
       subgraph entities/user/ui[ui]
