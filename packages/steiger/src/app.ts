@@ -4,7 +4,7 @@ import type { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getGlobalIgnores } from './models/config'
+import { $enabledRules, getEnabledRules, getGlobalIgnores, processConfiguration } from './models/config'
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
@@ -70,3 +70,5 @@ export const linter = {
 export function defineConfig<Rules extends Array<Rule> = Array<Rule>>(config: Config<Rules>) {
   return config
 }
+
+export { processConfiguration }
