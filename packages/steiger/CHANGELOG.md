@@ -1,5 +1,11 @@
 # steiger
 
+## 0.5.8
+
+### Patch Changes
+
+- 3947639: Added processConfiguration to exports
+
 ## 0.5.7
 
 ### Patch Changes
