@@ -15,6 +15,11 @@
       "url": "https://github.com/illright"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feature-sliced/steiger.git",
+    "directory": "packages/steiger"
+  },
   "scripts": {
     "dev": "tsx src/cli.ts",
     "lint": "eslint .",
