@@ -43,7 +43,7 @@
     "@clack/prompts": "^0.9.1",
     "@feature-sliced/steiger-plugin": "workspace:*",
     "chokidar": "^4.0.3",
-    "cosmiconfig": "^9.0.0",
+    "lilconfig": "^3.1.3",
     "effector": "^23.2.3",
     "empathic": "^1.0.0",
     "fastest-levenshtein": "^1.0.16",
