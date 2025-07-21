@@ -1,6 +1,7 @@
 {
   "name": "@steiger/root",
   "private": true,
+  "homepage": "https://github.com/feature-sliced/steiger",
   "scripts": {
     "format": "prettier --cache --write . \"!packages/**\" \"!tooling/**\"",
     "check-formatting": "prettier --cache --check . \"!packages/**\" \"!tooling/**\"",
