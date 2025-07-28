@@ -1,7 +1,7 @@
 import { isNegatedGlob } from './utilities'
-import micromatch from 'micromatch'
+import picomatch from 'picomatch'
 
-// ! Don't use platform specific path separators in the glob patterns for globby/micromatch
+// ! Don't use platform specific path separators in the glob patterns for globby/picomatch
 // as it only works with forward slashes!
 
 interface ApplyGlobsOptions {
@@ -14,28 +14,27 @@ export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGl
   const thereAreExclusions = Array.isArray(exclusions)
   const inclusionsEmpty = thereAreInclusions && inclusions.length === 0
 
-  function filterAccordingToGlobs(path: string) {
-    const matchesInclusionPatterns =
-      !thereAreInclusions || inclusions.some((pattern) => micromatch.isMatch(path, pattern))
-    let isIgnored = false
+  const isIncluded = thereAreInclusions ? picomatch(inclusions) : () => true
 
+  const positiveExclusionPatterns =
+    (thereAreExclusions && exclusions.filter((pattern) => !isNegatedGlob(pattern))) || []
+  const negativeExclusionPatterns =
+    (thereAreExclusions && exclusions.filter((pattern) => isNegatedGlob(pattern)).map((pattern) => pattern.slice(1))) ||
+    []
+
+  const isPositivelyExcluded = picomatch(positiveExclusionPatterns)
+  const isReIncluded = picomatch(negativeExclusionPatterns)
+
+  function filterAccordingToGlobs(path: string) {
     if (inclusionsEmpty) {
       return false
     }
 
+    const matchesInclusionPatterns = isIncluded(path)
+    let isIgnored = false
+
     if (matchesInclusionPatterns && thereAreExclusions) {
-      isIgnored = exclusions
-        .filter((pattern) => !isNegatedGlob(pattern))
-        .some((pattern) => micromatch.isMatch(path, pattern))
-
-      // If the path is ignored, check for any negated patterns that would include it back
-      if (isIgnored) {
-        const isNegated = exclusions.some(
-          (ignorePattern) => isNegatedGlob(ignorePattern) && micromatch.isMatch(path, ignorePattern.slice(1)),
-        )
-
-        isIgnored = !isNegated
-      }
+      isIgnored = isPositivelyExcluded(path) && !isReIncluded(path)
     }
 
     return matchesInclusionPatterns && !isIgnored
