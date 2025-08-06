@@ -6,5 +6,5 @@
     "types": ["vitest/importMeta"],
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
-  "include": ["./src", "./reset.d.ts", "./tsup.config.ts", "./cjs-shim.ts"]
+  "include": ["./src", "./reset.d.ts", "./tsup.config.ts"]
 }
