@@ -7,7 +7,7 @@ import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
-import { lilconfig } from 'lilconfig'
+import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
 import { processConfiguration, $plugins } from './models/config'
@@ -18,7 +18,7 @@ import type { Diagnostic } from '@steiger/types'
 import packageJson from '../package.json'
 import { existsAndIsFolder } from './shared/file-system'
 
-const { config, filepath } = (await lilconfig('steiger').search()) ?? { config: null, filepath: undefined }
+const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
 const defaultConfig = fsd.configs.recommended
 
 try {
