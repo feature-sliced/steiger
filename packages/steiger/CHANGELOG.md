@@ -1,5 +1,11 @@
 # steiger
 
+## 0.5.11
+
+### Patch Changes
+
+- Fix the build files
+
 ## 0.5.10
 
 ### Patch Changes
