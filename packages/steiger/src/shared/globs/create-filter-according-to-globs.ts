@@ -19,12 +19,12 @@ export function createFilterAccordingToGlobs({ inclusions, exclusions }: ApplyGl
 
   const positiveExclusionPatterns =
     (thereAreExclusions && exclusions.filter((pattern) => !isNegatedGlob(pattern))) || []
-  const negativeExclusionPatterns =
+  const reInclusionPatterns =
     (thereAreExclusions && exclusions.filter((pattern) => isNegatedGlob(pattern)).map((pattern) => pattern.slice(1))) ||
     []
 
   const isPositivelyExcluded = picomatch(positiveExclusionPatterns, picomatchOptions)
-  const isReIncluded = picomatch(negativeExclusionPatterns, picomatchOptions)
+  const isReIncluded = picomatch(reInclusionPatterns, picomatchOptions)
 
   function filterAccordingToGlobs(path: string) {
     if (inclusionsEmpty) {
