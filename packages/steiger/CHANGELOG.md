@@ -1,5 +1,11 @@
 # steiger
 
+## 0.5.10
+
+### Patch Changes
+
+- 8a7f6b3: Revert the switch from cosmiconfig to lilconfig due to missing support for TS files
+
 ## 0.5.9
 
 ### Patch Changes
