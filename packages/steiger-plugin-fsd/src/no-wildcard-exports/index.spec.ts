@@ -29,13 +29,13 @@ it('reports no errors on a project with valid exports', () => {
     for (const child of folder.children) {
       if (child.type === 'file') {
         const fileWithContent = child as FileWithContent
-        if (child.path.endsWith('shared/ui/index.ts')) {
+        if (child.path === joinFromRoot('shared', 'ui', 'index.ts')) {
           fileWithContent.content = "export { Button } from './Button'"
-        } else if (child.path.endsWith('entities/user/ui/index.ts')) {
+        } else if (child.path === joinFromRoot('entities', 'user', 'ui', 'index.ts')) {
           fileWithContent.content = "export { UserCard } from './UserCard'"
-        } else if (child.path.endsWith('entities/user/index.ts')) {
+        } else if (child.path === joinFromRoot('entities', 'user', 'index.ts')) {
           fileWithContent.content = "export * as userModel from './model'"
-        } else if (child.path.endsWith('features/auth/ui/index.ts')) {
+        } else if (child.path === joinFromRoot('features', 'auth', 'ui', 'index.ts')) {
           fileWithContent.content = "export { LoginForm } from './LoginForm'"
         } else {
           fileWithContent.content = ''
@@ -69,9 +69,9 @@ it('reports errors on a project with wildcard exports', () => {
     for (const child of folder.children) {
       if (child.type === 'file') {
         const fileWithContent = child as FileWithContent
-        if (child.path.endsWith('shared/ui/index.ts')) {
+        if (child.path === joinFromRoot('shared', 'ui', 'index.ts')) {
           fileWithContent.content = "export * from './Button'"
-        } else if (child.path.endsWith('entities/user/ui/index.ts')) {
+        } else if (child.path === joinFromRoot('entities', 'user', 'ui', 'index.ts')) {
           fileWithContent.content = "export * from './UserCard'"
         } else {
           fileWithContent.content = ''
@@ -116,9 +116,9 @@ it('allows export * as namespace pattern', () => {
     for (const child of folder.children) {
       if (child.type === 'file') {
         const fileWithContent = child as FileWithContent
-        if (child.path.endsWith('shared/ui/index.ts')) {
+        if (child.path === joinFromRoot('shared', 'ui', 'index.ts')) {
           fileWithContent.content = "export * as positions from './positions'"
-        } else if (child.path.endsWith('entities/user/index.ts')) {
+        } else if (child.path === joinFromRoot('entities', 'user', 'index.ts')) {
           fileWithContent.content = "export * as userModel from './model'"
         } else {
           fileWithContent.content = ''
@@ -233,15 +233,15 @@ it('allows wildcard exports in unsliced layers (shared and app)', () => {
     for (const child of folder.children) {
       if (child.type === 'file') {
         const fileWithContent = child as FileWithContent
-        if (child.path.endsWith('shared/ui/index.ts')) {
+        if (child.path === joinFromRoot('shared', 'ui', 'index.ts')) {
           fileWithContent.content = "export * from './Button'\nexport * from './Modal'"
-        } else if (child.path.endsWith('shared/api/index.ts')) {
+        } else if (child.path === joinFromRoot('shared', 'api', 'index.ts')) {
           fileWithContent.content = "export * from './client'\nexport * from './endpoints'"
-        } else if (child.path.endsWith('app/providers/index.ts')) {
+        } else if (child.path === joinFromRoot('app', 'providers', 'index.ts')) {
           fileWithContent.content = "export * from './AuthProvider'\nexport * from './ThemeProvider'"
-        } else if (child.path.endsWith('app/routes/index.ts')) {
+        } else if (child.path === joinFromRoot('app', 'routes', 'index.ts')) {
           fileWithContent.content = "export * from './home'\nexport * from './auth'"
-        } else if (child.path.endsWith('entities/user/ui/index.ts')) {
+        } else if (child.path === joinFromRoot('entities', 'user', 'ui', 'index.ts')) {
           fileWithContent.content = "export { UserCard } from './UserCard'"
         } else {
           fileWithContent.content = ''
