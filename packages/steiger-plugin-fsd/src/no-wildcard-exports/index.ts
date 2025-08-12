@@ -31,7 +31,7 @@ const noWildcardExports = {
 
       // Parse file content using oxc-parser
       const content = (file as FileWithContent).content
-      if (!content) continue // 파일 내용이 없으면 건너뜁니다
+      if (!content) continue // Skip if file has no contents
 
       const parseResult = parseSync(file.path, content)
 
