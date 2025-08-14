@@ -19,6 +19,7 @@ import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json' with { type: 'json' }
 import noCrossImports from './no-cross-imports/index.js'
 import noHigherLevelImports from './no-higher-level-imports/index.js'
+import importLocality from './import-locality';
 
 const enabledRules = [
   ambiguousSliceNames,
@@ -39,7 +40,7 @@ const enabledRules = [
   typoInLayerName,
   noProcesses,
 ]
-const disabledRules = [noCrossImports, noHigherLevelImports]
+const disabledRules = [noCrossImports, noHigherLevelImports, importLocality]
 
 const rules = [...enabledRules, ...disabledRules]
 
