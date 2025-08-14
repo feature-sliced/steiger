@@ -124,8 +124,8 @@ Currently, Steiger is not extendable with more rules, though that will change in
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/ambiguous-slice-names/README.md"><code>fsd/ambiguous-slice-names</code></a></td> <td>Forbid slice names that that match some segment’s name in the Shared layer.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/excessive-slicing/README.md"><code>fsd/excessive-slicing</code></a></td> <td>Forbid having too many ungrouped slices or too many slices in a group.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/forbidden-imports/README.md"><code>fsd/forbidden-imports</code></a></td> <td>Forbid imports from higher layers and cross-imports between slices on the same layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-cross-imports/README.md"><code>fsd/no-cross-imports</code></a></td> <td>Forbid cross-imports between slices on the same layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-higher-level-imports/README.md"><code>fsd/no-higher-level-imports</code></a></td> <td>Forbid imports from higher layers.</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-cross-imports/README.md"><code>fsd/no-cross-imports</code></a></td> <td>[disabled] Forbid cross-imports between slices on the same layer.</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-higher-level-imports/README.md"><code>fsd/no-higher-level-imports</code></a></td> <td>[disabled] Forbid imports from higher layers.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/inconsistent-naming/README.md"><code>fsd/inconsistent-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/insignificant-slice/README.md"><code>fsd/insignificant-slice</code></a></td> <td>Detect slices that have just one reference or no references to them at all.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-layer-public-api/README.md"><code>fsd/no-layer-public-api</code></a></td> <td>Forbid index files on the layer level.</td> </tr>
@@ -140,7 +140,7 @@ Currently, Steiger is not extendable with more rules, though that will change in
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/shared-lib-grouping/README.md"><code>fsd/shared-lib-grouping</code></a></td> <td>Forbid having too many ungrouped modules in <code>shared/lib</code>.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/typo-in-layer-name/README.md"><code>fsd/typo-in-layer-name</code></a></td> <td>Ensure that all layers are named without any typos.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-processes/README.md"><code>fsd/no-processes</code></a></td> <td>Discourage the use of the deprecated Processes layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/import-locality/README.md"><code>fsd/import-locality</code></a></td> <td>Require that imports from the same slice be relative and imports from one slice to another be absolute.</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/import-locality/README.md"><code>fsd/import-locality</code></a></td> <td>[disabled] Require that imports from the same slice be relative and imports from one slice to another be absolute.</td> </tr>
 </tbody>
 </table>
 
