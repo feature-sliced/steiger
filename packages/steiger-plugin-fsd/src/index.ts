@@ -19,7 +19,7 @@ import noProcesses from './no-processes/index.js'
 import packageJson from '../package.json' with { type: 'json' }
 import noCrossImports from './no-cross-imports/index.js'
 import noHigherLevelImports from './no-higher-level-imports/index.js'
-import importLocality from './import-locality';
+import importLocality from './import-locality/index.js'
 
 const enabledRules = [
   ambiguousSliceNames,
