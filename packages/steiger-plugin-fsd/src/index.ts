@@ -10,6 +10,7 @@ import noReservedFolderNames from './no-reserved-folder-names/index.js'
 import noSegmentlessSlices from './no-segmentless-slices/index.js'
 import noSegmentsOnSlicedLayers from './no-segments-on-sliced-layers/index.js'
 import noUiInApp from './no-ui-in-app/index.js'
+import noWildcardExports from './no-wildcard-exports/index.js'
 import publicApi from './public-api/index.js'
 import repetitiveNaming from './repetitive-naming/index.js'
 import segmentsByPurpose from './segments-by-purpose/index.js'
@@ -33,6 +34,7 @@ const enabledRules = [
   noSegmentlessSlices,
   noSegmentsOnSlicedLayers,
   noUiInApp,
+  noWildcardExports,
   publicApi,
   repetitiveNaming,
   segmentsByPurpose,
