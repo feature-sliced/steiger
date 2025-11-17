@@ -214,6 +214,40 @@ describe('createFilterAccordingToGlobs', () => {
     expect(filteredFiles).toEqual(expected)
   })
 
+  it('should correctly handle brace expansion in inclusion patterns', () => {
+    const files = ['/src/shared/lib/feature-a.ts', '/src/shared/lib/feature-a.tsx', '/src/shared/lib/feature-a.js']
+
+    const expected = ['/src/shared/lib/feature-a.ts', '/src/shared/lib/feature-a.tsx']
+
+    const filter = createFilterAccordingToGlobs({
+      inclusions: ['**/*.{ts,tsx}'],
+    })
+
+    const filteredFiles = files.filter(filter)
+
+    expect(filteredFiles).toEqual(expected)
+  })
+
+  it('should correctly handle brace expansion in negated exclusion patterns', () => {
+    const files = [
+      '/src/shared/lib/keep.ts',
+      '/src/shared/lib/keep.tsx',
+      '/src/shared/lib/keep.js',
+      '/src/shared/lib/remove.ts',
+      '/src/shared/lib/remove.tsx',
+    ]
+
+    const expected = ['/src/shared/lib/keep.ts', '/src/shared/lib/keep.tsx', '/src/shared/lib/keep.js']
+
+    const filter = createFilterAccordingToGlobs({
+      exclusions: ['**/*.{ts,tsx}', '!**/keep.{ts,tsx}'],
+    })
+
+    const filteredFiles = files.filter(filter)
+
+    expect(filteredFiles).toEqual(expected)
+  })
+
   it('should correctly handle folder paths', () => {
     const files = [
       '/src/shared/ui/styles.css',
