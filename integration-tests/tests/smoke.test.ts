@@ -3,6 +3,7 @@ import os from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { exec } from 'tinyexec'
+import figures from 'figures'
 
 import { expect, test } from 'vitest'
 
@@ -13,6 +14,8 @@ const steiger = await getSteigerBinPath()
 const kitchenSinkExample = join(dirname(fileURLToPath(import.meta.url)), '../../examples/kitchen-sink-of-fsd-issues')
 const pathPlatform = os.platform() === 'win32' ? 'windows' : 'posix'
 
+const unsafeChars = new RegExp(`[${figures.cross}${figures.warning}${figures.tick}]`, 'g')
+
 test('basic functionality in the kitchen sink example project', async () => {
   const project = join(temporaryDirectory, 'smoke')
   await fs.rm(project, { recursive: true, force: true })
@@ -20,5 +23,7 @@ test('basic functionality in the kitchen sink example project', async () => {
 
   const { stderr } = await exec('node', [steiger, 'src'], { nodeOptions: { cwd: project, env: { NO_COLOR: '1' } } })
 
-  await expect(stderr).toMatchFileSnapshot(join('__snapshots__', `smoke-stderr-${pathPlatform}.txt`))
+  await expect(stderr.replaceAll(unsafeChars, '')).toMatchFileSnapshot(
+    join('__snapshots__', `smoke-stderr-${pathPlatform}.txt`),
+  )
 })
