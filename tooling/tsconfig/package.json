@@ -5,7 +5,7 @@
   "files": [
     "base.json"
   ],
-  "devDependencies": {
+  "dependencies": {
     "@tsconfig/node18": "^18.2.4"
   }
 }
