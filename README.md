@@ -12,7 +12,7 @@ Universal file structure and project architecture linter.
 
 ## Features
 
-- Built-in set of rules to validate adherence to [Feature-Sliced Design](https://feature-sliced.design/)
+- Built-in set of rules to validate adherence to [Feature-Sliced Design](https://fsd.how/)
 - Watch mode
 - Rule configurability
 
