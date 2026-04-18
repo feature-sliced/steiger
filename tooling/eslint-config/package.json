@@ -5,6 +5,9 @@
   "files": [
     "./eslint.config.mjs"
   ],
+  "engines": {
+    "node": ">= 22"
+  },
   "exports": {
     ".": "./eslint.config.mjs"
   },

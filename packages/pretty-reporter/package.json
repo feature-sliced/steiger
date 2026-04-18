@@ -15,6 +15,9 @@
   },
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">= 22"
+  },
   "authors": [
     {
       "name": "Anton Medvedev",
@@ -32,7 +35,7 @@
     "@steiger/tsconfig": "workspace:*",
     "@steiger/types": "workspace:*",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^18.19.121",
+    "@types/node": "^22.19.17",
     "eslint": "^9.32.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.3",
