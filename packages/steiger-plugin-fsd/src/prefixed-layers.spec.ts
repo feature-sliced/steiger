@@ -1,3 +1,4 @@
+import { sep } from 'node:path'
 import { expect, it } from 'vitest'
 
 import { parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
@@ -25,8 +26,8 @@ it('correctly resolves layers with underscore and number prefixes', () => {
   const layers = getLayers(root)
 
   // prefixed layers take precedence over non-prefixed layers
-  expect(layers.pages?.path).toEqual('/_pages')
+  expect(layers.pages?.path).toEqual(`${sep}_pages`)
 
   // layers can be prefixed with a number for ordering
-  expect(layers.shared?.path).toEqual('/6_shared')
+  expect(layers.shared?.path).toEqual(`${sep}6_shared`)
 })
