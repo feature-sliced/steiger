@@ -41,9 +41,6 @@
     "url": "git+https://github.com/feature-sliced/steiger.git",
     "directory": "packages/toolkit"
   },
-  "engines": {
-    "node": ">= 22"
-  },
   "peerDependencies": {
     "vitest": "^1.6.0 || ^2.1.8 || ^3.0.0"
   },

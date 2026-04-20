@@ -39,9 +39,6 @@
     "url": "git+https://github.com/feature-sliced/steiger.git",
     "directory": "packages/steiger-plugin-fsd"
   },
-  "engines": {
-    "node": ">= 22"
-  },
   "dependencies": {
     "@feature-sliced/filesystem": "^3.0.1",
     "fastest-levenshtein": "^1.0.16",

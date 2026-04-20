@@ -13,9 +13,6 @@
   },
   "type": "module",
   "license": "MIT",
-  "engines": {
-    "node": ">= 22"
-  },
   "authors": [
     {
       "name": "Anton Medvedev",
@@ -30,7 +27,7 @@
   ],
   "devDependencies": {
     "@steiger/tsconfig": "workspace:*",
-    "@types/node": "^22.19.17",
+    "@types/node": "^18.19.121",
     "typescript": "^5.9.2"
   }
 }

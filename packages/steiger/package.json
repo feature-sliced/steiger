@@ -21,9 +21,6 @@
     "url": "git+https://github.com/feature-sliced/steiger.git",
     "directory": "packages/steiger"
   },
-  "engines": {
-    "node": ">= 22"
-  },
   "scripts": {
     "dev": "tsx src/cli.ts",
     "lint": "eslint .",
