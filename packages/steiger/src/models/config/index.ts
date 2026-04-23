@@ -10,6 +10,9 @@ import { transformGlobs } from './transform-globs'
 type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
 export type { GlobGroupWithSeverity } from './types'
+export { pluginSchema } from './schemas/plugin'
+export { configObjectSchema } from './schemas/config-object'
+export { globalIgnoreSchema } from './schemas/global-ignore'
 
 const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
 const setRuleInstructions = createEvent<RuleInstructionsPerRule>()

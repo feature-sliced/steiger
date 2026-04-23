@@ -1,8 +1,8 @@
 import { promises as fs } from 'node:fs'
 import * as process from 'node:process'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { getBinPath } from 'get-bin-path'
+import { getRepoRootPath } from './get-repo-root-path.js'
 
 /**
  * Resolve the full path to the built JS file of Steiger.
@@ -10,7 +10,7 @@ import { getBinPath } from 'get-bin-path'
  * Rejects if the file doesn't exist.
  */
 export async function getSteigerBinPath() {
-  const steiger = (await getBinPath({ cwd: join(dirname(fileURLToPath(import.meta.url)), '../../packages/steiger') }))!
+  const steiger = (await getBinPath({ cwd: join(getRepoRootPath(), './packages/steiger') }))!
   try {
     await fs.stat(steiger)
   } catch {

@@ -1,6 +1,6 @@
 import { TSConfckParseResult } from 'tsconfck'
 import { dirname, resolve } from 'node:path'
-import { joinFromRoot } from '@steiger/toolkit'
+import { joinFromRoot } from '@steiger/toolkit/test'
 
 export type CollectRelatedTsConfigsPayload = {
   tsconfig: TSConfckParseResult['tsconfig']

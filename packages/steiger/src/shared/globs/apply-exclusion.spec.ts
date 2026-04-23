@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit/test'
 
 import { applyExclusion } from './apply-exclusion'
 import { not } from './not'

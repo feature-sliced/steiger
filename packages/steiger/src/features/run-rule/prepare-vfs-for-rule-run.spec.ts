@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit/test'
 
 import { prepareVfsForRuleRun } from './prepare-vfs-for-rule-run'
 import { GlobGroupWithSeverity } from '../../models/config'

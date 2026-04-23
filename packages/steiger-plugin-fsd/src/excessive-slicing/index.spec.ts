@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 
-import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 import excessiveSlicing from './index.js'
 
 it('reports no errors on projects with moderate slicing', () => {

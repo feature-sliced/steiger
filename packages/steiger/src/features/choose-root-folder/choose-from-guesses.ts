@@ -1,9 +1,9 @@
 import { sep } from 'node:path'
 import { confirm, isCancel, outro, select } from '@clack/prompts'
 
-import { ExitException } from './exit-exception'
 import { formatCommand } from './format-command'
 import { existsAndIsFolder } from '../../shared/file-system'
+import { ExitException } from '../../shared/exit-exception'
 
 const commonRootFolders = ['src', 'app'].map((folder) => `.${sep}${folder}`)
 
@@ -58,7 +58,7 @@ async function findRootFolderCandidates(): Promise<Array<string>> {
 if (import.meta.vitest) {
   const { describe, test, expect, vi, beforeEach } = import.meta.vitest
   const { vol } = await import('memfs')
-  const { joinFromRoot } = await import('@steiger/toolkit')
+  const { joinFromRoot } = await import('@steiger/toolkit/test')
 
   vi.mock('node:fs/promises', () => import('memfs').then((memfs) => memfs.fs.promises))
 

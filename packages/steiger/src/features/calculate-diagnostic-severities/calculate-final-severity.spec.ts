@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit'
+import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit/test'
 
 import calculateFinalSeverities from './calculate-final-severity'
 import { GlobGroupWithSeverity } from '../../models/config'
