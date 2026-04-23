@@ -157,3 +157,24 @@ it('allows inconsistency between different slice groups', () => {
   const diagnostics = inconsistentNaming.check(root).diagnostics
   expect(diagnostics).toEqual([])
 })
+
+it('does not consider uncountable words as plural', () => {
+  const root = parseIntoFsdRoot(
+    `
+    📂 entities
+      📂 user
+        📂 ui
+        📄 index.ts
+      📂 firmware
+        📂 ui
+        📄 index.ts
+      📂 hardware
+        📂 ui
+        📄 index.ts
+  `,
+    joinFromRoot('users', 'user', 'project', 'src'),
+  )
+
+  const diagnostics = inconsistentNaming.check(root).diagnostics
+  expect(diagnostics).toEqual([])
+})

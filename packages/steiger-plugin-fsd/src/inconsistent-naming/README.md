@@ -2,8 +2,13 @@
 
 This rule ensures that all entities are named consistently in terms of pluralization.
 
-> [!WARNING]
-> This rule is in early development. It currently assumes that the slice name is a single English word. In the future it will be able to understand more complex names like `images-of-cats`.
+For names that consist of multiple words, the pluralization of the main subject is considered. For example:
+
+- in `a book with pages`, the main subject is `book`, singular
+- in `admin-users`, the main subject is `users`, plural
+- in `receiptsByOrder`, the main subject is `receipts`, plural
+
+Uncountable nouns like "firmware" are not counted as either singular or plural.
 
 Example of a project structure that passes this rule:
 
