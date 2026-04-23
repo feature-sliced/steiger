@@ -213,8 +213,8 @@ importers:
   packages/steiger-plugin-fsd:
     dependencies:
       '@feature-sliced/filesystem':
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0
+        version: 3.1.0
       fastest-levenshtein:
         specifier: ^1.0.16
         version: 1.0.16
@@ -606,8 +606,8 @@ packages:
     resolution: {integrity: sha512-Ul5l+lHEcw3L5+k8POx6r74mxEYKG5kOb6Xpy2gCRW6zweT6TEhAf8vhxGgjhqrd/VO/Dirhsb+1hNpD1ue9hw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@feature-sliced/filesystem@3.0.1':
-    resolution: {integrity: sha512-RlrfjhaX81o6E5OBc2A0tOLG/cZSOvcM+FpPlzEhTraIzBz8JmhxgwrYQbafMqiC+TOrqhd2pTLkU7PFQG1QdQ==}
+  '@feature-sliced/filesystem@3.1.0':
+    resolution: {integrity: sha512-kdNcVwJMCiORdi2Aog7epDeQMEREFUvdqqQHmE7D3ZjSdsQzZWMH6Ex7gtGAttTT/oRBFysqCtP5pl0CETEc9Q==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2929,7 +2929,7 @@ snapshots:
       '@eslint/core': 0.15.1
       levn: 0.4.1
 
-  '@feature-sliced/filesystem@3.0.1':
+  '@feature-sliced/filesystem@3.1.0':
     dependencies:
       typescript: 5.9.2
 

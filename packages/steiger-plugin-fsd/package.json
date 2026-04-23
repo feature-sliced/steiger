@@ -40,7 +40,7 @@
     "directory": "packages/steiger-plugin-fsd"
   },
   "dependencies": {
-    "@feature-sliced/filesystem": "^3.0.1",
+    "@feature-sliced/filesystem": "^3.1.0",
     "fastest-levenshtein": "^1.0.16",
     "lodash-es": "^4.17.21",
     "pluralize": "^8.0.0",
