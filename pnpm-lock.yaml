@@ -221,6 +221,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      oxc-parser:
+        specifier: ^0.47.1
+        version: 0.47.1
       pluralize:
         specifier: ^8.0.0
         version: 8.0.0
@@ -315,7 +318,7 @@ importers:
         version: 10.1.8(eslint@9.32.0)
 
   tooling/tsconfig:
-    devDependencies:
+    dependencies:
       '@tsconfig/node18':
         specifier: ^18.2.4
         version: 18.2.4
@@ -729,6 +732,49 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@oxc-parser/binding-darwin-arm64@0.47.1':
+    resolution: {integrity: sha512-WxlX4VVqFciQY+atVEzvZ+4m72vcHgXGDJfoMG+vBQ19+79+pipZTUhM4mIVe73IDe+B5l8AKgaMIWyEYE/cDg==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxc-parser/binding-darwin-x64@0.47.1':
+    resolution: {integrity: sha512-yrZIVDtpxfneTmBy3sHw8uUnVqkFhbUBEHHl4Nms/IZ/CYrA3oE8FDhwy0nF30kZBxcGk/0+32OZ6h8jZETPUA==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxc-parser/binding-linux-arm64-gnu@0.47.1':
+    resolution: {integrity: sha512-F0gsHSTp4q2+3G/cESfZ22Ri60MCMT2UDbrypIgQscgqyDCq3RXa91QPcwa3Q4SNrmWNSfGYawUcJyDrcJ3Bjw==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-arm64-musl@0.47.1':
+    resolution: {integrity: sha512-CKPOjxhNxZ9pmFIQD7IGeXktS22XhRVHmQC9HHsCTWQPI4IezlNOgdfZyNjmuN9Zin47LntYTEkRrThg7s1GFQ==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-x64-gnu@0.47.1':
+    resolution: {integrity: sha512-PTnTtbUxz5wXTCDh7USLO2x17FEUhdfqKd8V1xzf1T5BIMDOvGqx95v+C7+sT/hGWf4mUKsjeLXAwsXMb86Zrw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-x64-musl@0.47.1':
+    resolution: {integrity: sha512-bnkI/xu6sruQnk4ee5SljFGUHzX4cucOtBbuz7vj/PI6pifp4QI9MgEkTN/LIvYbwQ1ja5yCreSoMU8uaFVgHg==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oxc-parser/binding-win32-arm64-msvc@0.47.1':
+    resolution: {integrity: sha512-gIgyBxgsUcZivNSRJNpVLP2vPQsjhPKgTnkeBZoWgPFFS3ZLqEEXb4Q5z84l/pmnTQLwDF2WbMeZrY3yKo4CsQ==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxc-parser/binding-win32-x64-msvc@0.47.1':
+    resolution: {integrity: sha512-BmqQoNNa71NVdQVIYDALUld/b/C/XHPVu0mTN+F8N3lC360hoFzczrngAnE9UxJ3N4YAi6elqDzqoQuS9aQk1Q==}
+    cpu: [x64]
+    os: [win32]
+
+  '@oxc-project/types@0.47.1':
+    resolution: {integrity: sha512-fGa82XCkNqP/TT3z8sMb6Y+uVJBf7uvdP9nfwMzYgjZyVgdgzFwvsNMHp+iNLRP9jbM5VsGkb2/f/zG0POM2nA==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1904,6 +1950,9 @@ packages:
 
   outdent@0.5.0:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
+
+  oxc-parser@0.47.1:
+    resolution: {integrity: sha512-Z5TDh96dzit1i8a8GOt7cXmsiBkUPDthz4lh4yNNwdb7EPZyPrBjFpwC6Mqr+Dtq3qxTr0c4FDLFnWaIp/ncSw==}
 
   p-filter@2.1.0:
     resolution: {integrity: sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw==}
@@ -3096,6 +3145,32 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
+
+  '@oxc-parser/binding-darwin-arm64@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-darwin-x64@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm64-gnu@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm64-musl@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-linux-x64-gnu@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-linux-x64-musl@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-win32-arm64-msvc@0.47.1':
+    optional: true
+
+  '@oxc-parser/binding-win32-x64-msvc@0.47.1':
+    optional: true
+
+  '@oxc-project/types@0.47.1': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -4301,6 +4376,19 @@ snapshots:
   os-tmpdir@1.0.2: {}
 
   outdent@0.5.0: {}
+
+  oxc-parser@0.47.1:
+    dependencies:
+      '@oxc-project/types': 0.47.1
+    optionalDependencies:
+      '@oxc-parser/binding-darwin-arm64': 0.47.1
+      '@oxc-parser/binding-darwin-x64': 0.47.1
+      '@oxc-parser/binding-linux-arm64-gnu': 0.47.1
+      '@oxc-parser/binding-linux-arm64-musl': 0.47.1
+      '@oxc-parser/binding-linux-x64-gnu': 0.47.1
+      '@oxc-parser/binding-linux-x64-musl': 0.47.1
+      '@oxc-parser/binding-win32-arm64-msvc': 0.47.1
+      '@oxc-parser/binding-win32-x64-msvc': 0.47.1
 
   p-filter@2.1.0:
     dependencies:
