@@ -4,13 +4,13 @@ inputs:
   node-version:
     description: 'Version of Node.js'
     required: true
-    default: 20
+    default: '22'
 
 runs:
   using: composite
   steps:
     - shell: bash
-      run: npm i -g pnpm@^9 turbo
+      run: npm i -g pnpm@10.33.0 turbo
 
     - uses: actions/setup-node@v4
       with:
