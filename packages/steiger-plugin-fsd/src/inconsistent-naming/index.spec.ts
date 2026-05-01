@@ -73,3 +73,34 @@ it('prefers the singular form when there are more singular slices', () => {
     },
   ])
 })
+
+it('ignores neutral words like k8s and kubernetes when checking pluralization', () => {
+  const root = parseIntoFsdRoot(`
+    📂 entities
+      📂 user
+        📂 ui
+        📄 index.ts
+      📂 k8s
+        📂 ui
+        📄 index.ts
+      📂 kubernetes
+        📂 ui
+        📄 index.ts
+  `)
+
+  expect(inconsistentNaming.check(root)).toEqual({ diagnostics: [] })
+})
+
+it('ignores uncountable words like media when checking pluralization', () => {
+  const root = parseIntoFsdRoot(`
+    📂 entities
+      📂 user
+        📂 ui
+        📄 index.ts
+      📂 media
+        📂 ui
+        📄 index.ts
+  `)
+
+  expect(inconsistentNaming.check(root)).toEqual({ diagnostics: [] })
+})
