@@ -1,5 +1,11 @@
 # steiger
 
+## 0.5.12
+
+### Patch Changes
+
+- Updated dependencies
+
 ## 0.5.11
 
 ### Patch Changes
