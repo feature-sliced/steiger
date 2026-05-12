@@ -1,6 +1,6 @@
 # Contributing
 
-To start with this project, you will need [pnpm 9](https://pnpm.io). Install the dependencies with `pnpm i` in the root.
+To start with this project, you will need [pnpm 10](https://pnpm.io). Install the dependencies with `pnpm i` in the root.
 
 This project is a monorepo of the following packages:
 

@@ -1,5 +1,13 @@
 # @feature-sliced/steiger-plugin
 
+## 0.5.8
+
+### Patch Changes
+
+- 26e2f71: Add support for prefixed layers
+- 5f1cf86: Ignore neutral words like k8s, kubernetes, and media in fsd/inconsistent-naming
+- f618107: Add `import-locality` rule
+
 ## 0.5.7
 
 ### Patch Changes
