@@ -45,7 +45,9 @@
     "lodash-es": "^4.17.21",
     "pluralize": "^8.0.0",
     "precinct": "^12.2.0",
-    "tsconfck": "^3.1.6"
+    "tree-sitter-typescript": "^0.23.2",
+    "tsconfck": "^3.1.6",
+    "web-tree-sitter": "^0.26.8"
   },
   "devDependencies": {
     "@steiger/eslint-config": "workspace:*",

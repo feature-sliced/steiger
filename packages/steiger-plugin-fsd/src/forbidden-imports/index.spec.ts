@@ -28,7 +28,21 @@ vi.mock('node:fs', async (importOriginal) => {
   return createFsMocks(
     {
       '/src/shared/ui/styles.ts': '',
-      '/src/shared/ui/Button.tsx': 'import styles from "./styles";',
+      // '/src/shared/ui/Button.tsx': 'import styles from "./styles";',
+      '/src/shared/ui/Button.tsx': `
+      import Stack from '@mui/material/Stack';
+      import Button from '@mui/material/Button';
+
+      export default function BasicButtons() {
+        return (
+          <Stack spacing={2} direction="row">
+            <Button variant="text">Text</Button>
+            <Button variant="contained">Contained</Button>
+            <Button variant="outlined">Outlined</Button>
+          </Stack>
+        );
+      }
+      `,
       '/src/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/src/shared/ui/index.ts': '',
       '/src/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
