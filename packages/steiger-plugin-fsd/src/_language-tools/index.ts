@@ -12,6 +12,7 @@ const EXTENSION_MAP: Record<string, SourceType> = {
   js: 'tsx',
 }
 
+const CAPTURE_NAME = 'path'
 const STATIC_IMPORT_QUERIES: Record<SourceType, string[]> = {
   tsx: [
     '(import_statement source: (string (string_fragment) @path))',
@@ -55,7 +56,9 @@ export async function extractDependencies(sourceType: SourceType, sourceCode: st
   const queries = STATIC_IMPORT_QUERIES[sourceType].map((source) => new Query(language, source))
   for (const query of queries) {
     const matches = query.matches(tree.rootNode)
-    dependencies.push(...matches.flatMap((m) => m.captures.map((c) => c.node.text)))
+    dependencies.push(
+      ...matches.flatMap((m) => m.captures.filter((c) => c.name === CAPTURE_NAME).map((c) => c.node.text)),
+    )
   }
 
   tree.delete()
