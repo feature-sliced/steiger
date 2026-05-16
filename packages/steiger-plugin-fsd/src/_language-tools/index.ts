@@ -3,7 +3,7 @@ import { Parser, Query, Language, Range } from 'web-tree-sitter'
 
 await Parser.init()
 
-type SourceType = 'tsx' | 'svelte'
+type SourceType = 'tsx' | 'svelte' | 'astro'
 
 const EXTENSION_MAP: Record<string, SourceType> = {
   tsx: 'tsx',
@@ -22,6 +22,7 @@ const STATIC_IMPORT_QUERIES: Record<SourceType, string[]> = {
         arguments: (arguments (string (string_fragment) @path)))`,
   ],
   svelte: ['(script_element (raw_text) @source)'],
+  astro: ['(frontmatter_js_block) @source'],
 }
 
 const languges: Map<SourceType, Language> = new Map()
@@ -42,6 +43,14 @@ async function loadLanguage(sourceType: SourceType): Promise<Language> {
       ])
       languges.set(sourceType, svelte)
       return svelte
+    }
+    case 'astro': {
+      const [, astro] = await Promise.all([
+        loadLanguage('tsx'),
+        Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-astro.wasm')),
+      ])
+      languges.set(sourceType, astro)
+      return astro
     }
     default:
       throw new Error(`Unsupported language: ${sourceType}`)
@@ -64,6 +73,29 @@ export async function extractDependencies(sourceType: SourceType, sourceCode: st
 
   if (sourceType === 'svelte') {
     const query = new Query(language, STATIC_IMPORT_QUERIES.svelte[0])
+    const matches = query.matches(tree.rootNode)
+
+    const includedRanges: Range[] = []
+    for (const match of matches) {
+      for (const capture of match.captures) {
+        if (capture.name === 'source') {
+          includedRanges.push({
+            startIndex: capture.node.startIndex,
+            endIndex: capture.node.endIndex,
+            startPosition: capture.node.startPosition,
+            endPosition: capture.node.endPosition,
+          })
+        }
+      }
+    }
+
+    language = await loadLanguage('tsx')
+    parsers.setLanguage(language)
+    tree.delete()
+    tree = parsers.parse(sourceCode, null, { includedRanges })
+    if (tree === null) return []
+  } else if (sourceType === 'astro') {
+    const query = new Query(language, STATIC_IMPORT_QUERIES.astro[0])
     const matches = query.matches(tree.rootNode)
 
     const includedRanges: Range[] = []
