@@ -35,6 +35,15 @@ const extractors: Array<Extractor> = [
         ),
         type: 'static',
       },
+      {
+        query: new Query(
+          tsx,
+          `(call_expression
+           	function: (import)
+            arguments: (arguments (string (string_fragment) @path)))`,
+        ),
+        type: 'dynamic',
+      },
     ],
     injections: [],
   },
