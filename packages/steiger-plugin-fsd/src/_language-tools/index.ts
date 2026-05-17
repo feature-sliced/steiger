@@ -1,131 +1,135 @@
-import { join } from 'node:path'
-import { Parser, Query, Language, Range } from 'web-tree-sitter'
+import { join, extname } from 'node:path'
+import { Parser, Query, Language, Range, type Tree } from 'web-tree-sitter'
 
 await Parser.init()
+const [tsx, svelte, astro] = await Promise.all([
+  Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-tsx.wasm')),
+  Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-svelte.wasm')),
+  Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-astro.wasm')),
+])
 
-type SourceType = 'tsx' | 'svelte' | 'astro'
-
-const EXTENSION_MAP: Record<string, SourceType> = {
-  tsx: 'tsx',
-  jsx: 'tsx',
-  ts: 'tsx',
-  js: 'tsx',
-  svelte: 'svelte',
+interface Extractor {
+  type: string
+  extensions: string[]
+  language: Language
+  injections: Array<{ query: Query; lang: string }>
+  queries: Array<{ query: Query; type: 'static' | 'dynamic' }>
 }
 
-const CAPTURE_NAME = 'path'
-const STATIC_IMPORT_QUERIES: Record<SourceType, string[]> = {
-  tsx: [
-    '(import_statement source: (string (string_fragment) @path))',
-    `(call_expression
-        function: (identifier) @_require (#eq? @_require "require")
-        arguments: (arguments (string (string_fragment) @path)))`,
-  ],
-  svelte: ['(script_element (raw_text) @source)'],
-  astro: ['(frontmatter_js_block) @source'],
-}
+const extractors: Array<Extractor> = [
+  {
+    type: 'tsx',
+    extensions: ['.tsx', '.jsx', '.ts', '.js', '.cjs', '.mjs'],
+    language: tsx,
+    queries: [
+      {
+        query: new Query(tsx, '(import_statement source: (string (string_fragment) @path))'),
+        type: 'static',
+      },
+      {
+        query: new Query(
+          tsx,
+          `(call_expression
+            function: (identifier) @_require (#eq? @_require "require")
+            arguments: (arguments (string (string_fragment) @path)))`,
+        ),
+        type: 'static',
+      },
+    ],
+    injections: [],
+  },
+  {
+    type: 'svelte',
+    extensions: ['.svelte'],
+    language: svelte,
+    queries: [],
+    injections: [
+      {
+        query: new Query(svelte, '(script_element (raw_text) @tsx)'),
+        lang: 'tsx',
+      },
+    ],
+  },
+  {
+    type: 'astro',
+    extensions: ['.astro'],
+    language: astro,
+    queries: [],
+    injections: [
+      {
+        query: new Query(astro, '(frontmatter_js_block) @tsx'),
+        lang: 'tsx',
+      },
+    ],
+  },
+]
 
-const languges: Map<SourceType, Language> = new Map()
-
-async function loadLanguage(sourceType: SourceType): Promise<Language> {
-  if (languges.has(sourceType)) return languges.get(sourceType)!
-
-  switch (sourceType) {
-    case 'tsx': {
-      const tsx = await Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-tsx.wasm'))
-      languges.set(sourceType, tsx)
-      return tsx
+export function getSourceType(sourcePath: string): string | undefined {
+  const extension = extname(sourcePath)
+  for (const extractor of extractors) {
+    if (extractor.extensions.includes(extension)) {
+      return extractor.type
     }
-    case 'svelte': {
-      const [, svelte] = await Promise.all([
-        loadLanguage('tsx'),
-        Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-svelte.wasm')),
-      ])
-      languges.set(sourceType, svelte)
-      return svelte
-    }
-    case 'astro': {
-      const [, astro] = await Promise.all([
-        loadLanguage('tsx'),
-        Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-astro.wasm')),
-      ])
-      languges.set(sourceType, astro)
-      return astro
-    }
-    default:
-      throw new Error(`Unsupported language: ${sourceType}`)
   }
+
+  return undefined
 }
 
-export function getSourceType(sourcePath: string): SourceType | undefined {
-  const extension = sourcePath.split('.').at(-1)
-  if (!extension) return undefined
+function processExtractor(extractor: Extractor, tree: Tree): string[] {
+  const result: string[] = []
 
-  return EXTENSION_MAP[extension]
-}
-
-export async function extractDependencies(sourceType: SourceType, sourceCode: string): Promise<string[]> {
-  const parsers = new Parser()
-  let language = await loadLanguage(sourceType)
-  parsers.setLanguage(language)
-  let tree = parsers.parse(sourceCode)
-  if (tree === null) return []
-
-  if (sourceType === 'svelte') {
-    const query = new Query(language, STATIC_IMPORT_QUERIES.svelte[0])
+  for (const { query } of extractor.queries) {
     const matches = query.matches(tree.rootNode)
-
-    const includedRanges: Range[] = []
     for (const match of matches) {
       for (const capture of match.captures) {
-        if (capture.name === 'source') {
-          includedRanges.push({
-            startIndex: capture.node.startIndex,
-            endIndex: capture.node.endIndex,
-            startPosition: capture.node.startPosition,
-            endPosition: capture.node.endPosition,
-          })
+        if (capture.name === 'path') {
+          result.push(capture.node.text)
         }
       }
     }
-
-    language = await loadLanguage('tsx')
-    parsers.setLanguage(language)
-    tree.delete()
-    tree = parsers.parse(sourceCode, null, { includedRanges })
-    if (tree === null) return []
-  } else if (sourceType === 'astro') {
-    const query = new Query(language, STATIC_IMPORT_QUERIES.astro[0])
-    const matches = query.matches(tree.rootNode)
-
-    const includedRanges: Range[] = []
-    for (const match of matches) {
-      for (const capture of match.captures) {
-        if (capture.name === 'source') {
-          includedRanges.push({
-            startIndex: capture.node.startIndex,
-            endIndex: capture.node.endIndex,
-            startPosition: capture.node.startPosition,
-            endPosition: capture.node.endPosition,
-          })
-        }
-      }
-    }
-
-    language = await loadLanguage('tsx')
-    parsers.setLanguage(language)
-    tree.delete()
-    tree = parsers.parse(sourceCode, null, { includedRanges })
-    if (tree === null) return []
   }
+
+  return result
+}
+
+export async function extractDependencies(sourceType: string, sourceCode: string): Promise<string[]> {
+  const extractor = extractors.find((extractor) => extractor.type === sourceType)
+  if (!extractor) throw new Error(`No extractor found for "${sourceType}"`)
 
   const dependencies: string[] = []
-  const queries = STATIC_IMPORT_QUERIES['tsx'].map((source) => new Query(language, source))
-  for (const query of queries) {
+
+  const parser = new Parser()
+  parser.setLanguage(extractor.language)
+  const tree = parser.parse(sourceCode)
+  if (tree === null) return dependencies
+
+  dependencies.push(...processExtractor(extractor, tree))
+
+  for (const { query, lang } of extractor.injections) {
+    const injectedExtractor = extractors.find((extractor) => extractor.type === lang)
+    if (!injectedExtractor) throw new Error(`No extractor found for "${lang}"`)
+
     const matches = query.matches(tree.rootNode)
-    dependencies.push(
-      ...matches.flatMap((m) => m.captures.filter((c) => c.name === CAPTURE_NAME).map((c) => c.node.text)),
-    )
+
+    const includedRanges: Range[] = []
+    for (const match of matches) {
+      for (const capture of match.captures) {
+        if (capture.name === lang) {
+          includedRanges.push({
+            startIndex: capture.node.startIndex,
+            endIndex: capture.node.endIndex,
+            startPosition: capture.node.startPosition,
+            endPosition: capture.node.endPosition,
+          })
+        }
+      }
+    }
+
+    parser.setLanguage(injectedExtractor.language)
+    const injectedTree = parser.parse(sourceCode, null, { includedRanges })
+    if (injectedTree === null) continue
+    dependencies.push(...processExtractor(injectedExtractor, injectedTree))
+    injectedTree.delete()
   }
 
   tree.delete()
