@@ -14,10 +14,7 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild",
-      "tree-sitter",
-      "tree-sitter-javascript",
-      "tree-sitter-typescript"
+      "esbuild"
     ]
   },
   "devDependencies": {
