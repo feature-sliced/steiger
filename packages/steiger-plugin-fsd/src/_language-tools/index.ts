@@ -2,7 +2,7 @@ import { join, extname } from 'node:path'
 import { Parser, Query, Language, Range, type Tree } from 'web-tree-sitter'
 
 await Parser.init()
-const [tsx, svelte, astro] = await Promise.all([
+const [tsx, svelte, astro, vue] = await Promise.all([
   Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-tsx.wasm')),
   Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-svelte.wasm')),
   Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-astro.wasm')),
@@ -67,6 +67,18 @@ const extractors: Array<Extractor> = [
     injections: [
       {
         query: new Query(astro, '(frontmatter_js_block) @tsx'),
+        lang: 'tsx',
+      },
+    ],
+  },
+  {
+    type: 'vue',
+    extensions: ['.vue'],
+    language: vue,
+    queries: [],
+    injections: [
+      {
+        query: new Query(vue, '(document (script_element (raw_text) @tsx))'),
         lang: 'tsx',
       },
     ],
