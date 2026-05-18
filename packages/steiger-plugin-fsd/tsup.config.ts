@@ -11,6 +11,7 @@ export default defineConfig({
     options.define = { 'import.meta.vitest': 'undefined' }
   },
   onSuccess: async () => {
+    exec('cp -r src/_language-tools/parsers ./dist')
     exec('tsc --emitDeclarationOnly')
   },
 })
