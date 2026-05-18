@@ -35,9 +35,12 @@ const extractors: Array<Extractor> = [
       {
         query: new Query(
           tsx,
-          `(call_expression
-            function: (identifier) @_require (#eq? @_require "require")
-            arguments: (arguments (string (string_fragment) @path)))`,
+          `(program
+            (lexical_declaration
+              (variable_declarator
+                value: (call_expression
+                  function: (identifier) @function.name (#eq? @function.name "require")
+                  arguments: (arguments (string (string_fragment) @path))))))`,
         ),
         type: 'static',
       },
@@ -47,6 +50,18 @@ const extractors: Array<Extractor> = [
           `(call_expression
            	function: (import)
             arguments: (arguments (string (string_fragment) @path)))`,
+        ),
+        type: 'dynamic',
+      },
+      {
+        query: new Query(
+          tsx,
+          `(program
+            (expression_statement
+              (call_expression
+                function: (identifier) @function.name (#eq? @function.name "require")
+           			arguments: (arguments (string (string_fragment) @path)))))
+          `,
         ),
         type: 'dynamic',
       },
