@@ -1,7 +1,5 @@
 import * as fs from 'node:fs'
 import { basename, relative, sep } from 'node:path'
-import precinct from 'precinct'
-const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import { getIndexes, getLayers, getSegments, isSliced, crossReferenceToken } from '@feature-sliced/filesystem'
 import type { Folder, File, PartialDiagnostic, Rule } from '@steiger/toolkit'
@@ -10,6 +8,7 @@ import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
+import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {
@@ -21,7 +20,10 @@ const noPublicApiSidestep = {
     const sourceFileIndex = indexSourceFiles(root)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
-      const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
+      const sourceType = getSourceType(sourceFile.file.path)
+      if (!sourceType) continue
+
+      const dependencies = await extractDependencies(sourceType, fs.readFileSync(sourceFile.file.path, 'utf8'))
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
           dependency,
