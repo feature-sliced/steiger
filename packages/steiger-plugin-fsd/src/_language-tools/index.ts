@@ -1,4 +1,5 @@
 import { join, extname } from 'node:path'
+import { isBuiltin } from 'node:module'
 import { Parser, Query, Language, Range, type Tree } from 'web-tree-sitter'
 
 await Parser.init()
@@ -6,6 +7,7 @@ const [tsx, svelte, astro, vue] = await Promise.all([
   Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-tsx.wasm')),
   Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-svelte.wasm')),
   Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-astro.wasm')),
+  Language.load(join(import.meta.dirname, 'parsers', 'tree-sitter-vue.wasm')),
 ])
 
 interface Extractor {
@@ -96,10 +98,12 @@ export function getSourceType(sourcePath: string): string | undefined {
   return undefined
 }
 
-function processExtractor(extractor: Extractor, tree: Tree): string[] {
+function processExtractor(extractor: Extractor, tree: Tree, importType?: 'static' | 'dynamic'): string[] {
   const result: string[] = []
 
-  for (const { query } of extractor.queries) {
+  for (const { query, type } of extractor.queries) {
+    if (importType !== undefined && type !== importType) continue
+
     const matches = query.matches(tree.rootNode)
     for (const match of matches) {
       for (const capture of match.captures) {
@@ -113,7 +117,17 @@ function processExtractor(extractor: Extractor, tree: Tree): string[] {
   return result
 }
 
-export async function extractDependencies(sourceType: string, sourceCode: string): Promise<string[]> {
+export async function extractDependencies(
+  sourceType: string,
+  sourceCode: string,
+  options?: {
+    includeBuiltIns?: boolean
+    importType?: 'static' | 'dynamic'
+  },
+): Promise<string[]> {
+  const includeBuiltIns = options?.includeBuiltIns ?? false
+  const importType = options?.importType
+
   const extractor = extractors.find((extractor) => extractor.type === sourceType)
   if (!extractor) throw new Error(`No extractor found for "${sourceType}"`)
 
@@ -124,7 +138,7 @@ export async function extractDependencies(sourceType: string, sourceCode: string
   const tree = parser.parse(sourceCode)
   if (tree === null) return dependencies
 
-  dependencies.push(...processExtractor(extractor, tree))
+  dependencies.push(...processExtractor(extractor, tree, importType))
 
   for (const { query, lang } of extractor.injections) {
     const injectedExtractor = extractors.find((extractor) => extractor.type === lang)
@@ -149,11 +163,14 @@ export async function extractDependencies(sourceType: string, sourceCode: string
     parser.setLanguage(injectedExtractor.language)
     const injectedTree = parser.parse(sourceCode, null, { includedRanges })
     if (injectedTree === null) continue
-    dependencies.push(...processExtractor(injectedExtractor, injectedTree))
+    dependencies.push(...processExtractor(injectedExtractor, injectedTree, importType))
     injectedTree.delete()
   }
 
   tree.delete()
 
+  if (includeBuiltIns === false) {
+    return dependencies.filter((dep) => !isBuiltin(dep))
+  }
   return dependencies
 }
