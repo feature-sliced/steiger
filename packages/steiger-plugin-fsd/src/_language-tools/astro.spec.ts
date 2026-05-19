@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { extractDependencies } from './index.js'
 
-it('extracts esm dependencies from Svelte source code', async () => {
+it('extracts esm dependencies from Astro source code', async () => {
   const dependencies = await extractDependencies(
     'astro',
     `
