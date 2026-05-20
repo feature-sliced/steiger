@@ -1,6 +1,4 @@
 import * as fs from 'node:fs'
-import precinct from 'precinct'
-const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
@@ -8,6 +6,7 @@ import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
+import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 const importLocality = {
   name: `${NAMESPACE}/import-locality`,
@@ -18,7 +17,10 @@ const importLocality = {
     const sourceFileIndex = indexSourceFiles(root)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
-      const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
+      const sourceType = getSourceType(sourceFile.file.path)
+      if (!sourceType) continue
+
+      const dependencies = await extractDependencies(sourceType, fs.readFileSync(sourceFile.file.path, 'utf8'))
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
           dependency,
