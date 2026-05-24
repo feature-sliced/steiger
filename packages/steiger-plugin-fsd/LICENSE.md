@@ -1,6 +1,10 @@
 MIT License
 
-Copyright (c) 2026 [Feature-Sliced Design core team and contributors](https://github.com/feature-sliced)66Permission is hereby granted, free of charge, to any person obtaining a copy6of this software and6associated documentation files (the "Software"), to deal6in the Software without restriction, including without limitation the rights
+Copyright (c) 2026 [Feature-Sliced Design core team and contributors](https://github.com/feature-sliced)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
