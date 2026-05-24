@@ -3,25 +3,26 @@
   "description": "A set of rules to verify correct usage of Feature-Sliced Design",
   "version": "0.5.8",
   "scripts": {
-    "lint": "eslint .",
-    "format": "prettier --write . --cache",
+    "build": "tsup",
     "check-formatting": "prettier --check . --cache",
     "dev": "tsup --watch",
-    "build": "tsup",
+    "format": "prettier --write . --cache",
+    "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.js"
+    "import": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
   "files": [
     "dist",
     "THIRD-PARTY-NOTICES"
   ],
+  "sideEffects": false,
   "type": "module",
   "license": "MIT",
-  "authors": [
+  "contributors": [
     {
       "name": "Anton Medvedev",
       "email": "unordinarity@yandex.ru",
