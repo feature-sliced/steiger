@@ -22,6 +22,7 @@
     "@manypkg/cli": "^0.23.0",
     "@steiger/eslint-config": "workspace:*",
     "eslint": "^9.32.0",
+    "eslint-plugin-package-json": "^1.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.6.2",
