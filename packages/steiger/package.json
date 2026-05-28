@@ -3,7 +3,7 @@
   "description": "Universal file structure and project architecture linter",
   "version": "0.5.12",
   "license": "MIT",
-  "authors": [
+  "contributors": [
     {
       "name": "Anton Medvedev",
       "email": "unordinarity@yandex.ru",
@@ -22,18 +22,19 @@
     "directory": "packages/steiger"
   },
   "scripts": {
-    "dev": "tsx src/cli.ts",
-    "lint": "eslint .",
-    "format": "prettier --write . --cache",
-    "check-formatting": "prettier --check . --cache",
-    "typecheck": "tsc --noEmit",
     "build": "tsup",
-    "test": "vitest run"
+    "check-formatting": "prettier --check . --cache",
+    "dev": "tsx src/cli.ts",
+    "format": "prettier --write . --cache",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module",
   "bin": {
     "steiger": "dist/cli.mjs"
   },
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/app.d.ts",
@@ -42,8 +43,7 @@
   },
   "files": [
     "dist",
-    "src",
-    "README.md"
+    "src"
   ],
   "dependencies": {
     "@clack/prompts": "^0.9.1",
