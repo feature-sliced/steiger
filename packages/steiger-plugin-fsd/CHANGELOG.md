@@ -1,5 +1,15 @@
 # @feature-sliced/steiger-plugin
 
+## 0.6.0
+
+### Minor Changes
+
+- 12bb1a2: replace dependency extraction algorithm with tree-sitter, add support for astro and svelte files
+
+### Patch Changes
+
+- ac8320b: Cleanup package.json
+
 ## 0.5.8
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # steiger
 
+## 0.5.13
+
+### Patch Changes
+
+- ac8320b: Cleanup package.json
+- Updated dependencies [ac8320b]
+- Updated dependencies [12bb1a2]
+  - @feature-sliced/steiger-plugin@0.6.0
+
 ## 0.5.12
 
 ### Patch Changes
