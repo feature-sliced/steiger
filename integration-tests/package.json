@@ -2,7 +2,7 @@
   "private": true,
   "name": "@steiger/integration-tests",
   "description": "Integration tests for Steiger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "test": "vitest run",
     "update-windows-snapshots": "node ./scripts/update-windows-snapshots.mjs"
