@@ -4,11 +4,53 @@ Discourage the use of segment names that group code by its essence, and instead 
 
 To pass this rule, avoid using the following segment names:
 
-- `utils`
-- `helpers`
+**Generic (essence-based naming):**
+
+- `components`, `component`
+- `helpers`, `helper`
+- `utils`, `util`
+- `constants`, `constant`, `consts`, `const`
+- `types`, `type`
+- `stores`, `store`
+- `modals`, `modal`
+- `services`, `service`
+- `functions`, `function`
+- `classes`, `class`
+- `enums`, `enum`
+- `interfaces`, `interface`
+- `decorators`, `decorator`
+- `schemas`, `schema`
+- `handlers`, `handler`
+- `fixtures`, `fixture`
+- `middlewares`, `middleware`
+- `validators`, `validator`, `validations`, `validation`
+- `resolvers`, `resolver`
+- `mutations`, `mutation`
+- `assets`, `asset`
+
+**React-specific:**
+
 - `hooks`
-- `modals`
-- `components`
+- `context`
+- `providers`
+
+**Vue-specific:**
+
+- `composables`
+- `directives`
+
+**Redux-specific:**
+
+- `actions`, `action`
+- `reducers`, `reducer`
+- `selectors`, `selector`
+- `effects`, `effect`
+- `sagas`, `saga`
+- `thunks`, `thunk`
+
+**Angular-specific:**
+
+- `pipes`, `pipe`
 
 Examples of project structures that pass this rule:
 
