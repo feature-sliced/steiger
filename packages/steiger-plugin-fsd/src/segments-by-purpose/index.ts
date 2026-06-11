@@ -68,13 +68,13 @@ const BAD_NAMES_REDUX = [
 ]
 const BAD_NAMES_ANGULAR = ['pipe', 'pipes']
 
-const BAD_NAMES = new Set(
+const BAD_NAMES = new Set([
   ...BAD_NAMES_GENERIC,
   ...BAD_NAMES_REACT,
   ...BAD_NAMES_VUE,
   ...BAD_NAMES_REDUX,
   ...BAD_NAMES_ANGULAR,
-)
+])
 
 /** Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose. */
 const segmentsByPurpose = {
