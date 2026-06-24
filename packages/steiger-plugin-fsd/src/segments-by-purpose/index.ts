@@ -50,8 +50,8 @@ const BAD_NAMES_GENERIC = [
   'asset',
   'assets',
 ]
-const BAD_NAMES_REACT = ['hooks', 'context', 'providers']
-const BAD_NAMES_VUE = ['composables', 'directives']
+const BAD_NAMES_REACT = ['hook', 'hooks', 'context', 'provider', 'providers']
+const BAD_NAMES_VUE = ['composable', 'composables', 'directive', 'directives']
 const BAD_NAMES_REDUX = [
   'action',
   'actions',

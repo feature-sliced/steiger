@@ -30,14 +30,14 @@ To pass this rule, avoid using the following segment names:
 
 **React-specific:**
 
-- `hooks`
+- `hooks`, `hook`
 - `context`
-- `providers`
+- `providers`, `provider`
 
 **Vue-specific:**
 
-- `composables`
-- `directives`
+- `composables`, `composable`
+- `directives`, `directive`
 
 **Redux-specific:**
 
