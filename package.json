@@ -12,11 +12,6 @@
     "node": ">= 18"
   },
   "packageManager": "pnpm@10.33.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
     "@manypkg/cli": "^0.23.0",
