@@ -34,6 +34,37 @@ To run in watch mode, add `-w`/`--watch` to the command:
 npx steiger ./src --watch
 ```
 
+## Performance profiling
+
+If Steiger feels slow, you can find out which rules take the most time by enabling timing output with the `TIMING` environment variable.
+
+```bash
+TIMING=1 npx steiger ./src
+```
+
+Steiger prints a table to **stderr** that shows how long each rule took to run, sorted from slowest to fastest. Durations are in milliseconds. In watch mode (`--watch`), Steiger prints a fresh table on every re-run after the project files change.
+
+```
+┌─────────┬───────────────────────────┬──────────┐
+│ (index) │           Rule            │ Duration │
+├─────────┼───────────────────────────┼──────────┤
+│    0    │   'fsd/forbidden-imports' │  340.12  │
+│    1    │   'fsd/public-api'        │  120.45  │
+│    2    │   'fsd/import-locality'   │   85.30  │
+└─────────┴───────────────────────────┴──────────┘
+```
+
+`TIMING` accepts any value to enable timing, except `0`, `false`, and an empty value. Unsetting it disables timing.
+
+```bash
+TIMING=1 npx steiger ./src       # enabled
+TIMING=0 npx steiger ./src       # disabled
+TIMING=false npx steiger ./src   # disabled
+```
+
+> [!NOTE]
+> Rules run concurrently, so each rule's duration is an independent measurement that can overlap with others in wall-clock time. Compare rules against each other, but do not sum the durations to estimate total runtime.
+
 ## Configuration
 
 Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.

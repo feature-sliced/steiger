@@ -1,3 +1,5 @@
+import { performance } from 'node:perf_hooks'
+import { Console } from 'node:console'
 import { createEffect, sample } from 'effector'
 import { debounce, not } from 'patronum'
 import type { Config, Folder, Rule } from '@steiger/types'
@@ -17,10 +19,39 @@ function getRuleDescriptionUrl(ruleName: string) {
   )
 }
 
+function isTimingEnabled() {
+  const timing = process.env.TIMING
+  return timing && timing !== '0' && timing !== 'false'
+}
+
 async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
   const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
 
-  const ruleResults = await Promise.all(rules.map((rule) => runRule(vfsWithoutGlobalIgnores, rule)))
+  const timingEnabled = isTimingEnabled()
+  const measurements: Array<{ rule: string; duration: number }> = []
+
+  const ruleResults = await Promise.all(
+    rules.map(async (rule) => {
+      const start = performance.now()
+      try {
+        return await runRule(vfsWithoutGlobalIgnores, rule)
+      } finally {
+        const end = performance.now()
+        if (timingEnabled) {
+          measurements.push({ rule: rule.name, duration: end - start })
+        }
+      }
+    }),
+  )
+
+  if (timingEnabled) {
+    new Console(process.stderr).table(
+      measurements
+        .sort((a, b) => b.duration - a.duration)
+        .map((m) => ({ Rule: m.rule, Duration: +m.duration.toFixed(2) })),
+    )
+  }
+
   return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
     const ruleName = rules[ruleResultsIndex].name
     const severities = calculateFinalSeverities(
