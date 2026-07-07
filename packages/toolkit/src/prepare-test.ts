@@ -1,5 +1,5 @@
 import { join, sep } from 'node:path'
-import type { readFileSync, existsSync } from 'node:fs'
+import type { readFileSync, existsSync, statSync } from 'node:fs'
 import type { Folder, File, PartialDiagnostic } from '@steiger/types'
 import { vi } from 'vitest'
 
@@ -68,6 +68,14 @@ export function createFsMocks(mockedFiles: Record<string, string>, original: typ
         (key) => key === normalizedPath || key.startsWith(normalizedPath + sep),
       )
     }) as typeof existsSync),
+    statSync: vi.fn(((path) => {
+      const normalizedPath = typeof path === 'string' ? path.replace(/\//g, sep) : path
+      if (typeof normalizedPath === 'string' && normalizedPath in normalizedMockedFiles) {
+        return { mtimeMs: 0 }
+      } else {
+        return original.statSync(normalizedPath)
+      }
+    }) as typeof statSync),
   } as typeof import('fs')
 }
 
