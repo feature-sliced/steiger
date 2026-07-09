@@ -2,15 +2,16 @@ import { join } from 'node:path'
 import { getLayers, getSegments, isSliced, getIndexes, getSlices } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {
   name: `${NAMESPACE}/public-api` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const [layerName, layer] of Object.entries(getLayers(root))) {
-      if (!isSliced(layer)) {
+    for (const [layerName, layer] of Object.entries(getLayers(root, ruleOptions.layerConvention))) {
+      if (!isSliced(layer, ruleOptions.layerConvention)) {
         if (layerName === 'app') {
           // The app layer is the top-level layer, there's no need for public API.
           continue
@@ -71,6 +72,6 @@ const publicApi = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default publicApi

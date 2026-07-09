@@ -92,6 +92,24 @@ export default defineConfig([
 ])
 ```
 
+### Layer aliases
+
+If your project uses a different folder name for a canonical FSD layer, create a configured FSD plugin instance and use its recommended config:
+
+```javascript
+// ./steiger.config.js
+import { defineConfig } from 'steiger'
+import { createFsdPlugin } from '@feature-sliced/steiger-plugin'
+
+const fsd = createFsdPlugin({
+  layerAliases: {
+    pages: 'screens',
+  },
+})
+
+export default defineConfig([...fsd.configs.recommended])
+```
+
 > [!TIP]
 > If you want Steiger to ignore certain files, add an object like this to the config array:
 >

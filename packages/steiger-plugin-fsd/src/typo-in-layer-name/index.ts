@@ -3,13 +3,15 @@ import { NAMESPACE } from '../constants.js'
 import { LayerName, layerSequence } from '@feature-sliced/filesystem'
 import { distance } from 'fastest-levenshtein'
 import { basename, join } from 'node:path'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const LEVENSHTEIN_DISTANCE_UPPER_BOUND = 3
 
 const typoInLayerName = {
   name: `${NAMESPACE}/typo-in-layer-name` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
+    const layerAliases = new Set(Object.values(ruleOptions.layerConvention?.layerAliases ?? {}))
 
     // construct list of suggestions, like [{ input: 'shraed', suggestion: 'shared', distance: 2 }, ...],
     // limit Levenshtein distance upper bound to 3,
@@ -18,6 +20,9 @@ const typoInLayerName = {
       .filter((child) => child.type === 'folder')
       .flatMap((child) => {
         const layer = basename(child.path)
+        if (layerAliases.has(layer)) {
+          return []
+        }
 
         return layerSequence
           .map((sequenceLayer) => ({
@@ -62,6 +67,6 @@ const typoInLayerName = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default typoInLayerName

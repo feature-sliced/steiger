@@ -105,6 +105,26 @@ export default defineConfig([
   [You can see more examples here](CONFIG_EXAMPLES.md)
 </details>
 
+### Layer aliases
+
+Some projects use FSD semantics with project-specific folder names during migrations or while integrating existing codebases.
+
+Use `createFsdPlugin` to configure these aliases:
+
+```js
+// ./steiger.config.js
+import { defineConfig } from 'steiger'
+import { createFsdPlugin } from '@feature-sliced/steiger-plugin'
+
+const fsd = createFsdPlugin({
+  layerAliases: {
+    pages: 'screens',
+  },
+})
+
+export default defineConfig([...fsd.configs.recommended])
+```
+
 ### Migration from 0.4.0
 
 Version 0.5.0 introduced a new config file format. Follow the [instructions](MIGRATION_GUIDE.md) to migrate your config file.

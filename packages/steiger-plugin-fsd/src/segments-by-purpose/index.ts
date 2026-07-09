@@ -1,6 +1,7 @@
 import { getLayers, getSegments, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const BAD_NAMES_GENERIC = [
   'component',
@@ -79,15 +80,15 @@ const BAD_NAMES = new Set([
 /** Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose. */
 const segmentsByPurpose = {
   name: `${NAMESPACE}/segments-by-purpose` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const layer of Object.values(getLayers(root))) {
+    for (const layer of Object.values(getLayers(root, ruleOptions.layerConvention))) {
       if (layer === null) {
         continue
       }
 
-      if (!isSliced(layer)) {
+      if (!isSliced(layer, ruleOptions.layerConvention)) {
         for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
           if (BAD_NAMES.has(segmentName)) {
             diagnostics.push({
@@ -112,6 +113,6 @@ const segmentsByPurpose = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default segmentsByPurpose

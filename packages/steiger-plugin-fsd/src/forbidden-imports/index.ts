@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { join } from 'node:path'
 import { layerSequence, isCrossImportPublicApi } from '@feature-sliced/filesystem'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
@@ -9,14 +8,15 @@ import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 import { NAMESPACE } from '../constants.js'
+import { getLayerDisplayName, getLayerPath, type FsdRuleOptions } from '../fsd-options.js'
 
 const forbiddenImports = {
   name: `${NAMESPACE}/forbidden-imports` as const,
-  async check(root) {
+  async check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, ruleOptions.layerConvention)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)
@@ -51,7 +51,7 @@ const forbiddenImports = {
             !isCrossImportPublicApi(dependencyLocation.file, {
               inSlice: dependencyLocation.sliceName,
               forSlice: sourceFile.sliceName,
-              layerPath: join(root.path, dependencyLocation.layerName),
+              layerPath: getLayerPath(root, dependencyLocation.layerName, ruleOptions.layerConvention),
             })
           ) {
             diagnostics.push({
@@ -65,7 +65,7 @@ const forbiddenImports = {
 
           if (thisLayerIndex < dependencyLayerIndex) {
             diagnostics.push({
-              message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
+              message: `Forbidden import from higher layer "${getLayerDisplayName(root, dependencyLocation.layerName, ruleOptions.layerConvention)}".`,
               location: { path: sourceFile.file.path },
             })
           }
@@ -75,6 +75,6 @@ const forbiddenImports = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default forbiddenImports

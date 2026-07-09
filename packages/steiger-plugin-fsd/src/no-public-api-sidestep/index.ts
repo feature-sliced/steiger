@@ -9,15 +9,16 @@ import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {
   name: `${NAMESPACE}/no-public-api-sidestep` as const,
-  async check(root) {
+  async check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, ruleOptions.layerConvention)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)
@@ -44,12 +45,13 @@ const noPublicApiSidestep = {
         // This rule only concerns imports from other slices
         if (
           sourceFile.layerName === dependencyLocation.layerName &&
-          (!isSliced(dependencyLocation.layerName) || sourceFile.sliceName === dependencyLocation.sliceName)
+          (!isSliced(dependencyLocation.layerName, ruleOptions.layerConvention) ||
+            sourceFile.sliceName === dependencyLocation.sliceName)
         ) {
           continue
         }
 
-        if (isSliced(dependencyLocation.layerName)) {
+        if (isSliced(dependencyLocation.layerName, ruleOptions.layerConvention)) {
           if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== crossReferenceToken) {
             diagnostics.push({
               message: `Forbidden sidestep of public API when importing from "${dependency}".`,
@@ -57,7 +59,7 @@ const noPublicApiSidestep = {
             })
           }
         } else if (dependencyLocation.segmentName !== null) {
-          const layer = getLayers(root)[dependencyLocation.layerName]
+          const layer = getLayers(root, ruleOptions.layerConvention)[dependencyLocation.layerName]
           if (layer === undefined) {
             continue
           }
@@ -104,6 +106,6 @@ const noPublicApiSidestep = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default noPublicApiSidestep

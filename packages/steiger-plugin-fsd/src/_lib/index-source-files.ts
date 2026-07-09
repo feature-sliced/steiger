@@ -1,6 +1,7 @@
 import { getIndexes, getLayers, getSegments, getSlices, isSliced, type LayerName } from '@feature-sliced/filesystem'
 import type { File, Folder } from '@steiger/toolkit'
 import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
+import type { LayerConvention } from '@feature-sliced/filesystem'
 
 type SourceFile = {
   file: File
@@ -14,7 +15,7 @@ type SourceFile = {
  *
  * @returns A mapping of source file paths to their file object and location information.
  */
-export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
+export function indexSourceFiles(root: Folder, layerConvention?: LayerConvention): Record<string, SourceFile> {
   const index = {} as Record<string, SourceFile>
   function walk(node: File | Folder, metadata: Pick<SourceFile, 'layerName' | 'sliceName' | 'segmentName'>) {
     if (node.type === 'file') {
@@ -26,7 +27,7 @@ export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
     }
   }
 
-  for (const [layerName, layer] of Object.entries(getLayers(root))) {
+  for (const [layerName, layer] of Object.entries(getLayers(root, layerConvention))) {
     // Even though files that are directly inside a layer are not encouraged by the FSD and are forbidden in most cases
     // (except for an index/root file for the app layer as an entry point to the application), users can still add them.
     // So, we need to index all files directly inside a layer to find errors.
@@ -34,7 +35,7 @@ export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
       .filter((child) => child.type === 'file')
       .forEach((file) => walk(file, { layerName: layerName as LayerName, sliceName: null, segmentName: null }))
 
-    if (!isSliced(layer)) {
+    if (!isSliced(layer, layerConvention)) {
       for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
         walk(segment, { layerName: layerName as LayerName, sliceName: null, segmentName })
       }
