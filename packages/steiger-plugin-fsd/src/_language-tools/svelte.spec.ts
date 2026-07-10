@@ -1,10 +1,10 @@
-import { expect, it } from 'vitest'
-import { extractDependencies } from './index.js'
+import { expect, it, vi } from 'vitest'
 
-it('extracts esm dependencies from Svelte source code', async () => {
-  const dependencies = await extractDependencies(
-    'svelte',
-    `
+import { createMockedNodeFs } from './mock-node-fs.js'
+
+vi.mock('node:fs', () =>
+  createMockedNodeFs({
+    '/src/App.svelte': `
       <script>
         // [Learn1]Imports content from another Svelte file.
         // SvelteKit automatically makes files under "src/lib" available using the "$lib" import alias.(https://svelte.dev/docs/kit/$lib)
@@ -64,6 +64,12 @@ it('extracts esm dependencies from Svelte source code', async () => {
         }
       </style>
   `,
-  )
+  }),
+)
+
+import { extractDependencies } from './index.js'
+
+it('extracts esm dependencies from Svelte source code', async () => {
+  const dependencies = await extractDependencies('/src/App.svelte')
   expect(dependencies).toEqual(['$lib/components/Hello.svelte', '$lib/components/Counter.svelte'])
 })

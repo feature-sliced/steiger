@@ -20,7 +20,7 @@ const importLocality = {
       const sourceType = getSourceType(sourceFile.file.path)
       if (!sourceType) continue
 
-      const dependencies = await extractDependencies(sourceType, fs.readFileSync(sourceFile.file.path, 'utf8'))
+      const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
           dependency,
