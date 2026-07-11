@@ -71,7 +71,9 @@ export function createVfsRoot(rootPath: string) {
     }),
   )
 
-  return { $tree, fileAdded, fileRemoved }
+  const fileChanged = createEvent<string>()
+
+  return { $tree, fileAdded, fileRemoved, fileChanged }
 }
 
 if (import.meta.vitest) {
@@ -221,6 +223,18 @@ if (import.meta.vitest) {
           },
         ],
       })
+    })
+
+    it('emits a signal via fileChanged', () => {
+      const { $tree, fileAdded, fileChanged } = createVfsRoot(join('/', 'project', 'src'))
+
+      fileAdded(join('/', 'project', 'src', 'index.ts'))
+      const stateBefore = $tree.getState()
+
+      expect(() => fileChanged(join('/', 'project', 'src', 'index.ts'))).not.toThrow()
+
+      const stateAfter = $tree.getState()
+      expect(stateAfter).toEqual(stateBefore)
     })
   })
 }
