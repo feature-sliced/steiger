@@ -18,83 +18,104 @@ import type { Diagnostic } from '@steiger/types'
 import packageJson from '../package.json'
 import { existsAndIsFolder } from './shared/file-system'
 
-const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
 const defaultConfig = fsd.configs.recommended
+const configExplorer = cosmiconfig('steiger', { searchStrategy: 'project' })
+const rawArgs = hideBin(process.argv)
 
-try {
-  const configLocationDirectory = filepath ? dirname(filepath) : null
-  // use FSD recommended config as a default
-  processConfiguration(config || defaultConfig, configLocationDirectory)
-} catch (err) {
-  if (filepath !== undefined) {
-    console.error(
-      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
-    )
-    process.exit(100)
+function createYargsProgram() {
+  return yargs(rawArgs)
+    .scriptName('steiger')
+    .usage('$0 [options] <path>')
+    .option('watch', {
+      alias: 'w',
+      demandOption: false,
+      describe: 'watch filesystem changes',
+      type: 'boolean',
+    })
+    .option('fix', {
+      demandOption: false,
+      describe: 'apply auto-fixes',
+      type: 'boolean',
+    })
+    .option('fail-on-warnings', {
+      demandOption: false,
+      describe: 'exit with an error code if there are warnings',
+      type: 'boolean',
+    })
+    .option('reporter', {
+      demandOption: false,
+      describe: 'specify output format (pretty or json)',
+      type: 'string',
+      choices: ['pretty', 'json'],
+      default: 'pretty',
+    })
+    .string('_')
+    .check((argv) => {
+      const filePaths = argv._
+      if (filePaths.length > 1) {
+        throw new Error('Pass only one path to watch')
+      } else {
+        return true
+      }
+    })
+    .help('help', 'display help message')
+    .alias('help', 'h')
+    .showHelpOnFail(true)
+}
+
+function createVersionString() {
+  return [
+    packageJson.version,
+    $plugins
+      .getState()
+      .map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
+      .join('\n'),
+  ]
+    .filter(Boolean)
+    .join('\n\n')
+}
+
+function includesCliFlag(flag: string) {
+  return rawArgs.some((arg) => arg === `--${flag}` || (/^-[^-]+$/.test(arg) && arg.includes(flag[0])))
+}
+
+async function loadConfiguration(searchFrom: string) {
+  const { config, filepath } = (await configExplorer.search(searchFrom)) ?? { config: null, filepath: undefined }
+
+  try {
+    const configLocationDirectory = filepath ? dirname(filepath) : null
+    // use FSD recommended config as a default
+    processConfiguration(config || defaultConfig, configLocationDirectory)
+  } catch (err) {
+    if (filepath !== undefined) {
+      console.error(
+        fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
+      )
+      process.exit(100)
+    }
   }
 }
 
-const yargsProgram = yargs(hideBin(process.argv))
-  .scriptName('steiger')
-  .usage('$0 [options] <path>')
-  .option('watch', {
-    alias: 'w',
-    demandOption: false,
-    describe: 'watch filesystem changes',
-    type: 'boolean',
-  })
-  .option('fix', {
-    demandOption: false,
-    describe: 'apply auto-fixes',
-    type: 'boolean',
-  })
-  .option('fail-on-warnings', {
-    demandOption: false,
-    describe: 'exit with an error code if there are warnings',
-    type: 'boolean',
-  })
-  .option('reporter', {
-    demandOption: false,
-    describe: 'specify output format (pretty or json)',
-    type: 'string',
-    choices: ['pretty', 'json'],
-    default: 'pretty',
-  })
-  .string('_')
-  .check((argv) => {
-    const filePaths = argv._
-    if (filePaths.length > 1) {
-      throw new Error('Pass only one path to watch')
+async function resolveTargetPath(inputPaths: Array<string | number>) {
+  if (inputPaths.length > 0) {
+    const inputPath = String(inputPaths[0])
+
+    if (await existsAndIsFolder(inputPath)) {
+      return resolve(inputPath)
     } else {
-      return true
+      try {
+        return resolve(await chooseRootFolderFromSimilar(inputPath))
+      } catch (e) {
+        if (e instanceof ExitException) {
+          process.exit(0)
+        } else {
+          throw e
+        }
+      }
     }
-  })
-  .help('help', 'display help message')
-  .alias('help', 'h')
-  .version(
-    [
-      packageJson.version,
-      $plugins
-        .getState()
-        .map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
-        .join('\n'),
-    ]
-      .filter(Boolean)
-      .join('\n\n'),
-  )
-  .alias('version', 'v')
-  .showHelpOnFail(true)
-
-const consoleArgs = yargsProgram.parseSync()
-const inputPaths = consoleArgs._
-
-let targetPath: string | undefined
-if (inputPaths.length > 0) {
-  if (await existsAndIsFolder(inputPaths[0])) {
-    targetPath = resolve(inputPaths[0])
   } else {
     try {
-      targetPath = resolve(await chooseRootFolderFromSimilar(inputPaths[0]))
+      return resolve(await chooseRootFolderFromGuesses())
     } catch (e) {
       if (e instanceof ExitException) {
         process.exit(0)
@@ -103,17 +124,22 @@ if (inputPaths.length > 0) {
       }
     }
   }
-} else {
-  try {
-    targetPath = resolve(await chooseRootFolderFromGuesses())
-  } catch (e) {
-    if (e instanceof ExitException) {
-      process.exit(0)
-    } else {
-      throw e
-    }
-  }
 }
+
+if (includesCliFlag('version') || includesCliFlag('help')) {
+  await loadConfiguration(process.cwd())
+  createYargsProgram().version(createVersionString()).alias('version', 'v').parseSync()
+  process.exit(0)
+}
+
+const consoleArgs = createYargsProgram().help(false).version(false).parseSync()
+const targetPath = await resolveTargetPath(consoleArgs._)
+
+if (targetPath === undefined) {
+  process.exit(0)
+}
+
+await loadConfiguration(targetPath)
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
   if (consoleArgs.reporter === 'json') {
