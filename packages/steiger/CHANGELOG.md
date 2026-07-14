@@ -1,5 +1,19 @@
 # steiger
 
+## 0.6.0
+
+### Minor Changes
+
+- acc97d0: Add performance profiling
+- 5d698c3: watch file changes in watch mode
+
+### Patch Changes
+
+- Updated dependencies [fe45525]
+- Updated dependencies [3bdcb95]
+- Updated dependencies [4fbedf6]
+  - @feature-sliced/steiger-plugin@0.7.0
+
 ## 0.5.13
 
 ### Patch Changes

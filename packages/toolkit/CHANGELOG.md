@@ -1,5 +1,11 @@
 # @steiger/toolkit
 
+## 0.2.3
+
+### Patch Changes
+
+- fe45525: add fs cache for import rules
+
 ## 0.2.2
 
 ### Patch Changes
