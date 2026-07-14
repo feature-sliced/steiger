@@ -1,5 +1,16 @@
 # @feature-sliced/steiger-plugin
 
+## 0.7.0
+
+### Minor Changes
+
+- fe45525: add fs cache for import rules
+- 3bdcb95: extend segments-by-purpose rule to forbid more essence-based and framework-specific segment names
+
+### Patch Changes
+
+- 4fbedf6: add fall back to sequential parser load
+
 ## 0.6.0
 
 ### Minor Changes
