@@ -9,12 +9,34 @@ import { createFSCache } from '../_lib/fs-cache.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 await Parser.init()
-const [tsx, svelte, astro, vue] = await Promise.all([
-  Language.load(join(__dirname, 'parsers', 'tree-sitter-tsx.wasm')),
-  Language.load(join(__dirname, 'parsers', 'tree-sitter-svelte.wasm')),
-  Language.load(join(__dirname, 'parsers', 'tree-sitter-astro.wasm')),
-  Language.load(join(__dirname, 'parsers', 'tree-sitter-vue.wasm')),
-])
+
+const parserPaths = [
+  join(__dirname, 'parsers', 'tree-sitter-tsx.wasm'),
+  join(__dirname, 'parsers', 'tree-sitter-svelte.wasm'),
+  join(__dirname, 'parsers', 'tree-sitter-astro.wasm'),
+  join(__dirname, 'parsers', 'tree-sitter-vue.wasm'),
+]
+let tsx: Language
+let svelte: Language
+let astro: Language
+let vue: Language
+
+// Node.js 20 has a bug where loading tree-sitter parsers concurrently via Promise.all can reject. Load sequentially as a fallback.
+try {
+  ;[tsx, svelte, astro, vue] = await Promise.all(parserPaths.map((path) => Language.load(path)))
+} catch (parallelError) {
+  console.error(
+    '@feature-sliced/steiger-plugin: recovered from a known Node.js 20 bug while loading tree-sitter parsers in parallel. Loading them sequentially instead. Set DEBUG=1 for the full error.',
+  )
+  if (process.env.DEBUG) {
+    console.error(parallelError)
+  }
+
+  tsx = await Language.load(parserPaths[0])
+  svelte = await Language.load(parserPaths[1])
+  astro = await Language.load(parserPaths[2])
+  vue = await Language.load(parserPaths[3])
+}
 
 interface Extractor {
   type: string
