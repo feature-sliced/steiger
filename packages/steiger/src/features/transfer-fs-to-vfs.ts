@@ -32,6 +32,10 @@ export async function createWatcher(path: string) {
     vfs.fileRemoved(join(path, relativePath))
   })
 
+  watcher.on('change', async (relativePath) => {
+    vfs.fileChanged(join(path, relativePath))
+  })
+
   return {
     vfs,
     watcher,

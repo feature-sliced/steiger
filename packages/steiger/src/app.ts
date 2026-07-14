@@ -1,6 +1,6 @@
 import { performance } from 'node:perf_hooks'
 import { Console } from 'node:console'
-import { createEffect, sample } from 'effector'
+import { createEffect, merge, sample } from 'effector'
 import { debounce, not } from 'patronum'
 import type { Config, Folder, Rule } from '@steiger/types'
 
@@ -82,7 +82,7 @@ export const linter = {
   watch: async (path: string) => {
     const { vfs, watcher } = await createWatcher(path)
 
-    const treeChanged = debounce(vfs.$tree, 500)
+    const treeChanged = debounce(merge([vfs.$tree, vfs.fileChanged]), 500)
     const runRulesFx = createEffect(runRules)
 
     sample({
