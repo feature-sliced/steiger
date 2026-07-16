@@ -11,7 +11,7 @@ import { createVfsRoot } from '../models/vfs'
  *
  * Returns a reactive virtual file system (VFS) and a reference to the watcher
  */
-export async function createWatcher(path: string) {
+export async function createWatcher(path: string, options?: { stabilityThreshold?: number; pollInterval?: number }) {
   const vfs = createVfsRoot(path)
   const gitFolder = find.up('.git', { cwd: path })
   const isIgnored = await isGitIgnored({ cwd: gitFolder ? dirname(gitFolder) : path })
@@ -20,7 +20,10 @@ export async function createWatcher(path: string) {
     ignored: (path) => path.split(sep).includes('node_modules') || path.split(sep).includes('.git') || isIgnored(path),
     ignoreInitial: false,
     alwaysStat: true,
-    awaitWriteFinish: true,
+    awaitWriteFinish: {
+      stabilityThreshold: options?.stabilityThreshold ?? 2000,
+      pollInterval: options?.pollInterval ?? 100,
+    },
     cwd: path,
   })
 

@@ -39,7 +39,11 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
   processConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
 
   const targetPath = join(fileURLToPath(rootUri), 'src')
-  const [diagnosticsChanged] = await linter.watch(targetPath)
+  const [diagnosticsChanged] = await linter.watch(targetPath, {
+    debounceInterval: 100,
+    pollInterval: 50,
+    stabilityThreshold: 100,
+  })
   diagnosticsChanged.watch((state) => {
     steigerDiagnostic = state
 
