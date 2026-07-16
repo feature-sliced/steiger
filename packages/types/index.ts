@@ -33,6 +33,10 @@ export interface PartialDiagnostic {
     path: string
     line?: number
     column?: number
+    end?: {
+      line?: number
+      column?: number
+    }
   }
 }
 
