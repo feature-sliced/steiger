@@ -5,54 +5,62 @@ import { dirname, join } from 'node:path'
 import { statSync } from 'node:fs'
 import {
   createConnection,
-  TextDocuments,
   InitializeResult,
   TextDocumentSyncKind,
   DiagnosticSeverity,
   WorkspaceDocumentDiagnosticReport,
   Diagnostic,
 } from 'vscode-languageserver/node'
-import { TextDocument } from 'vscode-languageserver-textdocument'
 import { cosmiconfig } from 'cosmiconfig'
 import fsd from '@feature-sliced/steiger-plugin'
+import type { Diagnostic as SteigerDiagnostic } from '@steiger/types'
 
 import { processConfiguration } from './models/config'
 import { linter } from './app'
 
 const connection = createConnection(process.stdin, process.stdout)
 
-const documents = new TextDocuments(TextDocument)
-
-let rootUri: string
-
 let steigerDiagnostic: SteigerDiagnostic[] = []
 
-connection.onInitialize(async (params): Promise<InitializeResult> => {
-  rootUri = params.workspaceFolders?.[0]?.uri ?? ''
+let disposeWatcher: (() => void) | undefined
+function stopWatcher() {
+  disposeWatcher?.()
+  disposeWatcher = undefined
+}
 
-  const searchPath = rootUri ? fileURLToPath(rootUri) : undefined
-  const { config, filepath } = (await cosmiconfig('steiger').search(searchPath)) ?? {
+connection.onInitialize(async (params): Promise<InitializeResult> => {
+  const rootUri = params.workspaceFolders?.[0]?.uri ?? ''
+
+  const rootPath = rootUri ? fileURLToPath(rootUri) : undefined
+  const { config, filepath } = (await cosmiconfig('steiger').search(rootPath)) ?? {
     config: null,
     filepath: undefined,
   }
   const configLocationDirectory = filepath ? dirname(filepath) : null
   processConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
 
-  const targetPath = join(fileURLToPath(rootUri), 'src')
-  const [diagnosticsChanged] = await linter.watch(targetPath, {
-    debounceInterval: 100,
-    pollInterval: 50,
-    stabilityThreshold: 100,
-  })
-  diagnosticsChanged.watch((state) => {
-    steigerDiagnostic = state
+  if (rootPath !== undefined) {
+    // Tear down any watcher from a previous initialization before starting a new one.
+    stopWatcher()
 
-    connection.languages.diagnostics.refresh()
-  })
+    const targetPath = join(rootPath, 'src')
+    const [diagnosticsChanged, dispose] = await linter.watch(targetPath, {
+      debounceInterval: 100,
+      pollInterval: 50,
+      stabilityThreshold: 100,
+    })
+    disposeWatcher = dispose
+
+    diagnosticsChanged.watch((state) => {
+      steigerDiagnostic = state
+
+      connection.languages.diagnostics.refresh()
+    })
+  }
 
   return {
     capabilities: {
-      textDocumentSync: TextDocumentSyncKind.Incremental,
+      textDocumentSync: TextDocumentSyncKind.None,
       diagnosticProvider: {
         interFileDependencies: true,
         workspaceDiagnostics: true,
@@ -60,8 +68,6 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
     },
   }
 })
-
-type SteigerDiagnostic = Awaited<ReturnType<(typeof linter)['run']>>[number]
 
 function toLspDiagnostic(d: SteigerDiagnostic): Diagnostic {
   return {
@@ -117,13 +123,20 @@ function getRelevantPublicApiPath(path: string): string | undefined {
   return undefined
 }
 
+function resolveDiagnosticDocumentPath(locationPath: string): string | undefined {
+  const stats = statSync(locationPath, { throwIfNoEntry: false })
+  if (stats?.isFile()) return locationPath
+  if (stats?.isDirectory()) return getRelevantPublicApiPath(locationPath)
+  return undefined
+}
+
 connection.languages.diagnostics.on((params) => {
   const path = fileURLToPath(params.textDocument.uri)
 
   const items: Diagnostic[] = []
 
   for (const d of steigerDiagnostic) {
-    if (path.endsWith(d.location.path)) {
+    if (resolveDiagnosticDocumentPath(d.location.path) === path) {
       items.push(toLspDiagnostic(d))
     }
   }
@@ -137,38 +150,28 @@ connection.languages.diagnostics.on((params) => {
 connection.languages.diagnostics.onWorkspace(() => {
   const byPath = new Map<string, SteigerDiagnostic[]>()
   for (const d of steigerDiagnostic) {
-    const group = byPath.get(d.location.path) ?? []
+    const documentPath = resolveDiagnosticDocumentPath(d.location.path)
+    if (documentPath === undefined) continue
+
+    const group = byPath.get(documentPath) ?? []
     group.push(d)
-    byPath.set(d.location.path, group)
+    byPath.set(documentPath, group)
   }
 
   const items: WorkspaceDocumentDiagnosticReport[] = []
   for (const [path, diagnostics] of byPath) {
-    const stats = statSync(path, { throwIfNoEntry: false })
-    if (stats?.isFile()) {
-      items.push({
-        kind: 'full' as const,
-        uri: pathToFileURL(path).toString(),
-        version: null,
-        items: diagnostics.map(toLspDiagnostic),
-      })
-    } else if (stats?.isDirectory()) {
-      const indexPath = getRelevantPublicApiPath(path)
-      if (!indexPath) {
-        continue
-      }
-
-      items.push({
-        kind: 'full' as const,
-        uri: pathToFileURL(indexPath).toString(),
-        version: null,
-        items: diagnostics.map(toLspDiagnostic),
-      })
-    }
+    items.push({
+      kind: 'full' as const,
+      uri: pathToFileURL(path).toString(),
+      version: null,
+      items: diagnostics.map(toLspDiagnostic),
+    })
   }
 
   return { items }
 })
 
-documents.listen(connection)
+connection.onShutdown(stopWatcher)
+connection.onExit(stopWatcher)
+
 connection.listen()
