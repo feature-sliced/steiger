@@ -23,7 +23,7 @@ const importLocality = {
       const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
-          dependency,
+          dependency.path,
           sourceFile.file.path,
           tsConfigs,
           fs.existsSync,
@@ -38,19 +38,29 @@ const importLocality = {
           continue
         }
 
-        const isRelative = ['.', '..'].includes(dependency.split('/')[0])
+        const isRelative = ['.', '..'].includes(dependency.path.split('/')[0])
         const isWithinSameSlice =
           sourceFile.layerName === dependencyLocation.layerName && sourceFile.sliceName === dependencyLocation.sliceName
 
         if (isRelative && !isWithinSameSlice) {
           diagnostics.push({
-            message: `Import from "${dependency}" should not be relative.`,
-            location: { path: sourceFile.file.path },
+            message: `Import from "${dependency.path}" should not be relative.`,
+            location: {
+              path: sourceFile.file.path,
+              column: dependency.column,
+              line: dependency.line,
+              end: { column: dependency.end.column, line: dependency.end.line },
+            },
           })
         } else if (!isRelative && isWithinSameSlice) {
           diagnostics.push({
-            message: `Import from "${dependency}" should be relative.`,
-            location: { path: sourceFile.file.path },
+            message: `Import from "${dependency.path}" should be relative.`,
+            location: {
+              path: sourceFile.file.path,
+              column: dependency.column,
+              line: dependency.line,
+              end: { column: dependency.end.column, line: dependency.end.line },
+            },
           })
         }
       }

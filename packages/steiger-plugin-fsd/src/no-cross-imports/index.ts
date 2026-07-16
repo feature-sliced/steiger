@@ -25,7 +25,7 @@ const noCrossImports = {
       const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
-          dependency,
+          dependency.path,
           sourceFile.file.path,
           tsConfigs,
           fs.existsSync,
@@ -56,7 +56,12 @@ const noCrossImports = {
           ) {
             diagnostics.push({
               message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
-              location: { path: sourceFile.file.path },
+              location: {
+                path: sourceFile.file.path,
+                column: dependency.column,
+                line: dependency.line,
+                end: { column: dependency.end.column, line: dependency.end.line },
+              },
             })
           }
         }
