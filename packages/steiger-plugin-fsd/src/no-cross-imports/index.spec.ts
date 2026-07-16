@@ -114,7 +114,12 @@ it('reports errors on a project with cross-imports in entities', async () => {
   expect((await noCrossImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx') },
+      location: {
+        path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx'),
+        column: 29,
+        line: 1,
+        end: { column: 44, line: 1 },
+      },
     },
   ])
 })
@@ -223,7 +228,12 @@ it('reports errors on a project with incorrect cross-imports through @x', async 
   expect((await noCrossImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx') },
+      location: {
+        path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx'),
+        column: 29,
+        line: 1,
+        end: { column: 55, line: 1 },
+      },
     },
   ])
 })

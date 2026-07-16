@@ -112,7 +112,12 @@ it('reports errors on a project with a public API sidestep on entities', async (
   expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden sidestep of public API when importing from "@/entities/product/ui/ProductCard.tsx".`,
-      location: { path: joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx') },
+      location: {
+        path: joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx'),
+        column: 71,
+        line: 1,
+        end: { column: 108, line: 1 },
+      },
     },
   ])
 })
@@ -139,7 +144,12 @@ it('reports errors on a project with a public API sidestep on shared', async () 
   expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden sidestep of public API when importing from "@/shared/i18n/translator".`,
-      location: { path: joinFromRoot('pages', 'editor', 'ui', 'SubmitButton.tsx') },
+      location: {
+        path: joinFromRoot('pages', 'editor', 'ui', 'SubmitButton.tsx'),
+        column: 74,
+        line: 1,
+        end: { column: 98, line: 1 },
+      },
     },
   ])
 })
@@ -203,7 +213,12 @@ describe('specifics of shared/lib and shared/ui', () => {
     expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
       {
         message: `Forbidden sidestep of public API when importing from "@/shared/lib/i18n/translator".`,
-        location: { path: joinFromRoot('pages', 'settings', 'ui', 'Password.tsx') },
+        location: {
+          path: joinFromRoot('pages', 'settings', 'ui', 'Password.tsx'),
+          column: 29,
+          line: 1,
+          end: { column: 57, line: 1 },
+        },
       },
     ])
   })

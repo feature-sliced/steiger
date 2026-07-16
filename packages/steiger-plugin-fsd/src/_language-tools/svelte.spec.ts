@@ -71,5 +71,22 @@ import { extractDependencies } from './index.js'
 
 it('extracts esm dependencies from Svelte source code', async () => {
   const dependencies = await extractDependencies('/src/App.svelte')
-  expect(dependencies).toEqual(['$lib/components/Hello.svelte', '$lib/components/Counter.svelte'])
+  expect(dependencies).toEqual([
+    {
+      path: '$lib/components/Hello.svelte',
+      builtIn: false,
+      dynamic: false,
+      line: 5,
+      column: 28,
+      end: { line: 5, column: 56 },
+    },
+    {
+      path: '$lib/components/Counter.svelte',
+      builtIn: false,
+      dynamic: false,
+      line: 6,
+      column: 30,
+      end: { line: 6, column: 60 },
+    },
+  ])
 })
