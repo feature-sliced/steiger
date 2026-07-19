@@ -58,7 +58,7 @@ if (import.meta.vitest) {
       { compilerOptions: { moduleResolution: 'Bundler' as const, baseUrl: '.', paths: { '~/*': ['./src/*'] } } },
     ]
 
-    const expectedFile = join('src', 'shared', 'ui', 'index.ts')
+    const expectedFile = 'src/shared/ui/index.ts'
     const fileExists = (path: string) => path === expectedFile
     const directoryExists = (path: string) => path !== expectedFile && expectedFile.startsWith(path)
 
