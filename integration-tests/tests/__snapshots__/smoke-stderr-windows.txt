@@ -42,3 +42,4 @@
 
 ────────────────────────────────────────────────────────
  Found 8 errors (1 can be fixed automatically with --fix)
+
