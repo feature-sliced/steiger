@@ -1,16 +1,17 @@
 import { getLayers, getSegments } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const THRESHOLD = 15
 
 /** Warn about too much stuff in shared/lib. */
 const sharedLibGrouping = {
   name: `${NAMESPACE}/shared-lib-grouping` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    const { shared } = getLayers(root)
+    const { shared } = getLayers(root, ruleOptions.layerConvention)
     if (!shared) {
       return { diagnostics }
     }
@@ -29,6 +30,6 @@ const sharedLibGrouping = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default sharedLibGrouping

@@ -1,14 +1,15 @@
 import { getLayers, isSlice, isSliced } from '@feature-sliced/filesystem'
 import type { Folder, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const noSegmentlessSlices = {
   name: `${NAMESPACE}/no-segmentless-slices` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const layer of Object.values(getLayers(root))) {
-      if (!isSliced(layer)) {
+    for (const layer of Object.values(getLayers(root, ruleOptions.layerConvention))) {
+      if (!isSliced(layer, ruleOptions.layerConvention)) {
         continue
       }
 
@@ -36,7 +37,7 @@ const noSegmentlessSlices = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default noSegmentlessSlices
 

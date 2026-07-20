@@ -3,15 +3,16 @@ import { basename } from 'node:path'
 import { getLayers, isSliced, conventionalSegmentNames } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const noSegmentsOnSlicedLayers = {
   name: `${NAMESPACE}/no-segments-on-sliced-layers` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
-    const layers = Object.values(getLayers(root))
+    const layers = Object.values(getLayers(root, ruleOptions.layerConvention))
 
     for (const layer of layers) {
-      if (isSliced(layer)) {
+      if (isSliced(layer, ruleOptions.layerConvention)) {
         for (const directChild of layer.children) {
           if (directChild.type === 'folder') {
             const folderName = basename(directChild.path)
@@ -30,6 +31,6 @@ const noSegmentsOnSlicedLayers = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default noSegmentsOnSlicedLayers

@@ -2,14 +2,15 @@ import { basename } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const noFileSegments = {
   name: `${NAMESPACE}/no-file-segments`,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const layer of Object.values(getLayers(root))) {
-      if (!isSliced(layer)) {
+    for (const layer of Object.values(getLayers(root, ruleOptions.layerConvention))) {
+      if (!isSliced(layer, ruleOptions.layerConvention)) {
         for (const child of layer.children) {
           if (child.type === 'file') {
             diagnostics.push({
@@ -34,7 +35,7 @@ const noFileSegments = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default noFileSegments
 

@@ -8,14 +8,15 @@ import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
+import { getLayerDisplayName, type FsdRuleOptions } from '../fsd-options.js'
 
 const noHigherLevelImports = {
   name: `${NAMESPACE}/no-higher-level-imports` as const,
-  async check(root) {
+  async check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, ruleOptions.layerConvention)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)
@@ -45,7 +46,7 @@ const noHigherLevelImports = {
 
         if (thisLayerIndex < dependencyLayerIndex) {
           diagnostics.push({
-            message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
+            message: `Forbidden import from higher layer "${getLayerDisplayName(root, dependencyLocation.layerName, ruleOptions.layerConvention)}".`,
             location: { path: sourceFile.file.path },
           })
         }
@@ -54,6 +55,6 @@ const noHigherLevelImports = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default noHigherLevelImports

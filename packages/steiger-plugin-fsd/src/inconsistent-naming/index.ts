@@ -7,16 +7,17 @@ import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const neutralWords = new Set(['k8s', 'kubernetes', 'media'])
 
 /** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
   name: `${NAMESPACE}/inconsistent-naming` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    const { entities } = getLayers(root)
+    const { entities } = getLayers(root, ruleOptions.layerConvention)
     if (entities === undefined) {
       return { diagnostics }
     }
@@ -56,7 +57,7 @@ const inconsistentNaming = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default inconsistentNaming
 

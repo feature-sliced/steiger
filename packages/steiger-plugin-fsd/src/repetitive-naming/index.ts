@@ -4,6 +4,7 @@ import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { NAMESPACE } from '../constants.js'
 import { groupSlices } from '../_lib/group-slices.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 /**
  * Pattern that matches one word in different naming conventions.
@@ -20,11 +21,11 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 /** Warn about repetitive parts in slice names (e.g. adding page to every slice on Pages) */
 const repetitiveNaming = {
   name: `${NAMESPACE}/repetitive-naming` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const layer of Object.values(getLayers(root))) {
-      if (!isSliced(layer)) {
+    for (const layer of Object.values(getLayers(root, ruleOptions.layerConvention))) {
+      if (!isSliced(layer, ruleOptions.layerConvention)) {
         continue
       }
 
@@ -56,6 +57,6 @@ const repetitiveNaming = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default repetitiveNaming

@@ -7,14 +7,15 @@ import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 const importLocality = {
   name: `${NAMESPACE}/import-locality`,
-  async check(root) {
+  async check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, ruleOptions.layerConvention)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)
@@ -58,6 +59,6 @@ const importLocality = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default importLocality

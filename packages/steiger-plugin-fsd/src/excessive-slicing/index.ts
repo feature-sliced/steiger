@@ -4,6 +4,7 @@ import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
 import { NAMESPACE } from '../constants.js'
+import { getLayerDisplayName, type FsdRuleOptions } from '../fsd-options.js'
 
 const THRESHOLDS = {
   entities: 20,
@@ -15,11 +16,11 @@ const THRESHOLDS = {
 /** Warn about excessive amounts of ungrouped entities/features/widgets/pages. */
 const excessiveSlicing = {
   name: `${NAMESPACE}/excessive-slicing` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const [layerName, layer] of Object.entries(getLayers(root))) {
-      if (!isSliced(layer) || !(layerName in THRESHOLDS)) {
+    for (const [layerName, layer] of Object.entries(getLayers(root, ruleOptions.layerConvention))) {
+      if (!isSliced(layer, ruleOptions.layerConvention) || !(layerName in THRESHOLDS)) {
         continue
       }
 
@@ -33,7 +34,7 @@ const excessiveSlicing = {
 
         if (group === '') {
           diagnostics.push({
-            message: `Layer "${layerName}" has ${slices.length} ungrouped slices, which is above the recommended threshold of ${threshold}. Consider grouping them or moving the code inside to the layer where it's used.`,
+            message: `Layer "${getLayerDisplayName(root, layerName as keyof typeof THRESHOLDS, ruleOptions.layerConvention)}" has ${slices.length} ungrouped slices, which is above the recommended threshold of ${threshold}. Consider grouping them or moving the code inside to the layer where it's used.`,
             location: { path: layer.path },
           })
         } else {
@@ -47,6 +48,6 @@ const excessiveSlicing = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default excessiveSlicing

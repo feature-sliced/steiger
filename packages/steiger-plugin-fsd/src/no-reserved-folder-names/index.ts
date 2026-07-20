@@ -3,14 +3,15 @@ import { getAllSegments, conventionalSegmentNames, crossReferenceToken } from '@
 import { findAllRecursively, type PartialDiagnostic, type Rule } from '@steiger/toolkit'
 
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 /** Forbid subfolders in segments that have names of common segments (e.g., shared/lib/ui). */
 const noReservedFolderNames = {
   name: `${NAMESPACE}/no-reserved-folder-names` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const { segment } of getAllSegments(root)) {
+    for (const { segment } of getAllSegments(root, ruleOptions.layerConvention)) {
       if (segment.type === 'file') {
         continue
       }
@@ -44,6 +45,6 @@ const noReservedFolderNames = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default noReservedFolderNames

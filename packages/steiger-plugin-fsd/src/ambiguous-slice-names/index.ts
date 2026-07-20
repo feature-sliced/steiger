@@ -2,14 +2,15 @@ import { basename, sep } from 'node:path'
 import { getAllSlices, getLayers, getSegments, type LayerName } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Folder, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
+import type { FsdRuleOptions } from '../fsd-options.js'
 
 /** Forbid slice names that match some segment’s name in shared (e.g., theme, i18n) */
 const ambiguousSliceNames = {
   name: `${NAMESPACE}/ambiguous-slice-names` as const,
-  check(root) {
+  check(root, ruleOptions: FsdRuleOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    const layers = getLayers(root)
+    const layers = getLayers(root, ruleOptions.layerConvention)
     const sharedLayer = layers.shared
 
     if (sharedLayer === undefined) {
@@ -18,7 +19,7 @@ const ambiguousSliceNames = {
 
     const segmentNamesInShared = Object.keys(getSegments(sharedLayer))
 
-    for (const [sliceName, slice] of Object.entries(getAllSlices(root))) {
+    for (const [sliceName, slice] of Object.entries(getAllSlices(root, [], ruleOptions.layerConvention))) {
       const pathSegments = sliceName.split(sep)
       const matchingSegment = segmentNamesInShared.find((segmentName) => pathSegments.includes(segmentName))
 
@@ -68,6 +69,6 @@ const ambiguousSliceNames = {
 
     return { diagnostics }
   },
-} satisfies Rule
+} satisfies Rule<unknown, FsdRuleOptions>
 
 export default ambiguousSliceNames

@@ -20,6 +20,7 @@ import packageJson from '../package.json' with { type: 'json' }
 import noCrossImports from './no-cross-imports/index.js'
 import noHigherLevelImports from './no-higher-level-imports/index.js'
 import importLocality from './import-locality/index.js'
+import { createLayerConvention, type FsdPluginOptions, withFsdOptions } from './fsd-options.js'
 
 const enabledRules = [
   ambiguousSliceNames,
@@ -42,23 +43,30 @@ const enabledRules = [
 ]
 const disabledRules = [noCrossImports, noHigherLevelImports, importLocality]
 
-const rules = [...enabledRules, ...disabledRules]
+export function createFsdPlugin(options: FsdPluginOptions = {}) {
+  const ruleOptions = { layerConvention: createLayerConvention(options) }
+  const enabledRuleDefinitions = enabledRules.map((rule) => withFsdOptions(rule, ruleOptions))
+  const disabledRuleDefinitions = disabledRules.map((rule) => withFsdOptions(rule, ruleOptions))
 
-const plugin = createPlugin({
-  meta: {
-    name: '@feature-sliced/steiger-plugin',
-    version: packageJson.version,
-  },
-  ruleDefinitions: rules,
-})
+  const plugin = createPlugin({
+    meta: {
+      name: '@feature-sliced/steiger-plugin',
+      version: packageJson.version,
+    },
+    ruleDefinitions: [...enabledRuleDefinitions, ...disabledRuleDefinitions],
+  })
 
-const configs = createConfigs({
-  recommended: enableSpecificRules(plugin, enabledRules),
-})
+  const configs = createConfigs({
+    recommended: enableSpecificRules(plugin, enabledRuleDefinitions),
+  })
 
-export default {
-  plugin,
-  configs,
+  return {
+    plugin,
+    configs,
+  }
 }
 
-export type FSDConfigObject = ConfigObjectOf<typeof plugin>
+export default createFsdPlugin()
+
+export type FSDConfigObject = ConfigObjectOf<ReturnType<typeof createFsdPlugin>['plugin']>
+export type { FsdPluginOptions, LayerAliases } from './fsd-options.js'
