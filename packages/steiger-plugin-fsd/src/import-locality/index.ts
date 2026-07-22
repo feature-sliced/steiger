@@ -47,9 +47,8 @@ const importLocality = {
             message: `Import from "${dependency.path}" should not be relative.`,
             location: {
               path: sourceFile.file.path,
-              column: dependency.column,
-              line: dependency.line,
-              end: { column: dependency.end.column, line: dependency.end.line },
+              start: dependency.start,
+              end: dependency.end,
             },
           })
         } else if (!isRelative && isWithinSameSlice) {
@@ -57,9 +56,8 @@ const importLocality = {
             message: `Import from "${dependency.path}" should be relative.`,
             location: {
               path: sourceFile.file.path,
-              column: dependency.column,
-              line: dependency.line,
-              end: { column: dependency.end.column, line: dependency.end.line },
+              start: dependency.start,
+              end: dependency.end,
             },
           })
         }

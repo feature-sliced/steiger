@@ -55,9 +55,8 @@ const noPublicApiSidestep = {
               message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
               location: {
                 path: sourceFile.file.path,
-                column: dependency.column,
-                line: dependency.line,
-                end: { column: dependency.end.column, line: dependency.end.line },
+                start: dependency.start,
+                end: dependency.end,
               },
             })
           }
@@ -94,9 +93,8 @@ const noPublicApiSidestep = {
                     message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
                     location: {
                       path: sourceFile.file.path,
-                      column: dependency.column,
-                      line: dependency.line,
-                      end: { column: dependency.end.column, line: dependency.end.line },
+                      start: dependency.start,
+                      end: dependency.end,
                     },
                   })
                 }
@@ -106,9 +104,8 @@ const noPublicApiSidestep = {
                 message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
                 location: {
                   path: sourceFile.file.path,
-                  column: dependency.column,
-                  line: dependency.line,
-                  end: { column: dependency.end.column, line: dependency.end.line },
+                  start: dependency.start,
+                  end: dependency.end,
                 },
               })
             }

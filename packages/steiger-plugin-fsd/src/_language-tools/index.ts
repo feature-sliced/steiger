@@ -153,8 +153,10 @@ function processExtractor(extractor: Extractor, tree: Tree): Dependency[] {
             builtIn: isBuiltin(capture.node.text),
             path: capture.node.text,
             dynamic: type === 'dynamic',
-            line: capture.node.startPosition.row + 1,
-            column: capture.node.startPosition.column + 1,
+            start: {
+              line: capture.node.startPosition.row + 1,
+              column: capture.node.startPosition.column + 1,
+            },
             end: {
               line: capture.node.endPosition.row + 1,
               column: capture.node.endPosition.column + 1,
@@ -173,8 +175,10 @@ interface Dependency {
   builtIn: boolean
   dynamic: boolean
   // all indexes are 1-based
-  line: number
-  column: number
+  start: {
+    line: number
+    column: number
+  }
   end: {
     line: number
     column: number

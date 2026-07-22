@@ -24,10 +24,15 @@ it('extracts esm dependencies from Astro source code', async () => {
       path: '@components/controls/Button.astro',
       builtIn: false,
       dynamic: false,
-      line: 3,
-      column: 21,
+      start: { line: 3, column: 21 },
       end: { line: 3, column: 54 },
     },
-    { path: '@assets/logo.png?url', builtIn: false, dynamic: false, line: 4, column: 22, end: { line: 4, column: 42 } },
+    {
+      path: '@assets/logo.png?url',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 4, column: 22 },
+      end: { line: 4, column: 42 },
+    },
   ])
 })

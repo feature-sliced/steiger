@@ -27,10 +27,9 @@ it('extracts esm dependencies from Vue source code', async () => {
       path: '@shared/ui/Button.vue',
       builtIn: false,
       dynamic: false,
-      line: 3,
-      column: 27,
+      start: { line: 3, column: 27 },
       end: { line: 3, column: 48 },
     },
-    { path: 'vue', builtIn: false, dynamic: false, line: 7, column: 28, end: { line: 7, column: 31 } },
+    { path: 'vue', builtIn: false, dynamic: false, start: { line: 7, column: 28 }, end: { line: 7, column: 31 } },
   ])
 })

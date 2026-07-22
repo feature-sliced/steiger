@@ -76,10 +76,10 @@ function toLspDiagnostic(d: SteigerDiagnostic): Diagnostic {
     code: d.ruleName,
     codeDescription: { href: d.getRuleDescriptionUrl(d.ruleName).toString() },
     range: {
-      start: { line: (d.location.line ?? 1) - 1, character: (d.location.column ?? 1) - 1 },
+      start: { line: (d.location.start?.line ?? 1) - 1, character: (d.location.start?.column ?? 1) - 1 },
       end: {
-        line: (d.location.end?.line ?? d.location.line ?? 1) - 1,
-        character: (d.location.end?.column ?? d.location.column ?? 1) - 1,
+        line: (d.location.end?.line ?? d.location.start?.line ?? 1) - 1,
+        character: (d.location.end?.column ?? d.location.start?.column ?? 1) - 1,
       },
     },
   }

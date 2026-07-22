@@ -116,8 +116,7 @@ it('reports errors on a project with cross-imports in entities', async () => {
       message: `Forbidden cross-import from slice "user".`,
       location: {
         path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx'),
-        column: 29,
-        line: 1,
+        start: { column: 29, line: 1 },
         end: { column: 44, line: 1 },
       },
     },
@@ -230,8 +229,7 @@ it('reports errors on a project with incorrect cross-imports through @x', async 
       message: `Forbidden cross-import from slice "user".`,
       location: {
         path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx'),
-        column: 29,
-        line: 1,
+        start: { column: 29, line: 1 },
         end: { column: 55, line: 1 },
       },
     },

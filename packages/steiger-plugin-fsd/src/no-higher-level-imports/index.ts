@@ -48,9 +48,8 @@ const noHigherLevelImports = {
             message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
             location: {
               path: sourceFile.file.path,
-              column: dependency.column,
-              line: dependency.line,
-              end: { column: dependency.end.column, line: dependency.end.line },
+              start: dependency.start,
+              end: dependency.end,
             },
           })
         }
