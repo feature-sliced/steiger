@@ -31,8 +31,20 @@ export interface PartialDiagnostic {
   location: {
     /** Absolute path to a folder or a file that contains the issue. */
     path: string
-    line?: number
-    column?: number
+    /** 1-based line and column indexes of the start of the issue. */
+    start?: {
+      /** 1-based line index of the start of the issue. */
+      line?: number
+      /** 1-based column index of the start of the issue. */
+      column?: number
+    }
+    /** 1-based line and column indexes of the end of the issue. */
+    end?: {
+      /** 1-based line index of the end of the issue. */
+      line?: number
+      /** 1-based column index of the end of the issue. */
+      column?: number
+    }
   }
 }
 

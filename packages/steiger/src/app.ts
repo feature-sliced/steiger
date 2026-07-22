@@ -79,10 +79,13 @@ export const linter = {
         rules: getEnabledRules(),
       }),
     ),
-  watch: async (path: string) => {
-    const { vfs, watcher } = await createWatcher(path)
+  watch: async (
+    path: string,
+    options?: { stabilityThreshold?: number; pollInterval?: number; debounceInterval?: number },
+  ) => {
+    const { vfs, watcher } = await createWatcher(path, options)
 
-    const treeChanged = debounce(merge([vfs.$tree, vfs.fileChanged]), 500)
+    const treeChanged = debounce(merge([vfs.$tree, vfs.fileChanged]), options?.debounceInterval ?? 500)
     const runRulesFx = createEffect(runRules)
 
     sample({

@@ -141,17 +141,27 @@ export function getSourceType(sourcePath: string): string | undefined {
   return undefined
 }
 
-function processExtractor(extractor: Extractor, tree: Tree, importType?: 'static' | 'dynamic'): string[] {
-  const result: string[] = []
+function processExtractor(extractor: Extractor, tree: Tree): Dependency[] {
+  const result: Dependency[] = []
 
   for (const { query, type } of extractor.queries) {
-    if (importType !== undefined && type !== importType) continue
-
     const matches = query.matches(tree.rootNode)
     for (const match of matches) {
       for (const capture of match.captures) {
         if (capture.name === 'path') {
-          result.push(capture.node.text)
+          result.push({
+            builtIn: isBuiltin(capture.node.text),
+            path: capture.node.text,
+            dynamic: type === 'dynamic',
+            start: {
+              line: capture.node.startPosition.row + 1,
+              column: capture.node.startPosition.column + 1,
+            },
+            end: {
+              line: capture.node.endPosition.row + 1,
+              column: capture.node.endPosition.column + 1,
+            },
+          })
         }
       }
     }
@@ -164,6 +174,15 @@ interface Dependency {
   path: string
   builtIn: boolean
   dynamic: boolean
+  // all indexes are 1-based
+  start: {
+    line: number
+    column: number
+  }
+  end: {
+    line: number
+    column: number
+  }
 }
 
 const cache = createFSCache<Dependency[]>()
@@ -181,18 +200,7 @@ function extractAllDependencies(path: string): Dependency[] {
   const tree = parser.parse(sourceCode)
   if (tree === null) return []
 
-  dependencies.push(
-    ...processExtractor(extractor, tree, 'dynamic').map((dep) => ({
-      path: dep,
-      builtIn: isBuiltin(dep),
-      dynamic: true,
-    })),
-    ...processExtractor(extractor, tree, 'static').map((dep) => ({
-      path: dep,
-      builtIn: isBuiltin(dep),
-      dynamic: false,
-    })),
-  )
+  dependencies.push(...processExtractor(extractor, tree))
 
   for (const { query, lang } of extractor.injections) {
     const injectedExtractor = extractors.find((extractor) => extractor.type === lang)
@@ -217,18 +225,7 @@ function extractAllDependencies(path: string): Dependency[] {
     parser.setLanguage(injectedExtractor.language)
     const injectedTree = parser.parse(sourceCode, null, { includedRanges })
     if (injectedTree === null) continue
-    dependencies.push(
-      ...processExtractor(injectedExtractor, injectedTree, 'dynamic').map((dep) => ({
-        path: dep,
-        builtIn: isBuiltin(dep),
-        dynamic: true,
-      })),
-      ...processExtractor(injectedExtractor, injectedTree, 'static').map((dep) => ({
-        path: dep,
-        builtIn: isBuiltin(dep),
-        dynamic: false,
-      })),
-    )
+    dependencies.push(...processExtractor(injectedExtractor, injectedTree))
     injectedTree.delete()
   }
 
@@ -243,7 +240,7 @@ export async function extractDependencies(
     includeBuiltIns?: boolean
     importType?: 'static' | 'dynamic'
   },
-): Promise<string[]> {
+): Promise<Dependency[]> {
   const includeBuiltIns = options?.includeBuiltIns ?? false
   const importType = options?.importType
 
@@ -253,13 +250,11 @@ export async function extractDependencies(
     cache.set(path, dependencies)
   }
 
-  return dependencies
-    .filter((dep) => {
-      if (includeBuiltIns === false && dep.builtIn === true) return false
-      if (importType === 'dynamic' && dep.dynamic === false) return false
-      if (importType === 'static' && dep.dynamic === true) return false
+  return dependencies.filter((dep) => {
+    if (includeBuiltIns === false && dep.builtIn === true) return false
+    if (importType === 'dynamic' && dep.dynamic === false) return false
+    if (importType === 'static' && dep.dynamic === true) return false
 
-      return true
-    })
-    .map((dep) => dep.path)
+    return true
+  })
 }

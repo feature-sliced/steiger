@@ -67,7 +67,7 @@ async function traceSliceReferences(root: Folder) {
     const dependencies = await extractDependencies(sourceFile.file.path)
     for (const dependency of dependencies) {
       const resolvedDependency = resolveDependency(
-        dependency,
+        dependency.path,
         sourceFile.file.path,
         tsConfigs,
         fs.existsSync,

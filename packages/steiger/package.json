@@ -32,7 +32,8 @@
   },
   "type": "module",
   "bin": {
-    "steiger": "dist/cli.mjs"
+    "steiger": "dist/cli.mjs",
+    "steiger-language-server": "dist/language-server.mjs"
   },
   "sideEffects": false,
   "exports": {
@@ -60,6 +61,7 @@
     "patronum": "^2.3.0",
     "picocolors": "^1.1.1",
     "prexit": "^2.3.0",
+    "vscode-languageserver": "^10.1.0",
     "yargs": "^17.7.2",
     "zod": "^3.25.76",
     "zod-validation-error": "^3.5.3"

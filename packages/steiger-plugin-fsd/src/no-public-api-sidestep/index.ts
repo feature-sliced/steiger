@@ -26,7 +26,7 @@ const noPublicApiSidestep = {
       const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
-          dependency,
+          dependency.path,
           sourceFile.file.path,
           tsConfigs,
           fs.existsSync,
@@ -52,8 +52,12 @@ const noPublicApiSidestep = {
         if (isSliced(dependencyLocation.layerName)) {
           if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== crossReferenceToken) {
             diagnostics.push({
-              message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-              location: { path: sourceFile.file.path },
+              message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
+              location: {
+                path: sourceFile.file.path,
+                start: dependency.start,
+                end: dependency.end,
+              },
             })
           }
         } else if (dependencyLocation.segmentName !== null) {
@@ -86,15 +90,23 @@ const noPublicApiSidestep = {
 
                 if (!topLevelFolderIndexes.map((topLevelFolder) => topLevelFolder.path).includes(resolvedDependency)) {
                   diagnostics.push({
-                    message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-                    location: { path: sourceFile.file.path },
+                    message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
+                    location: {
+                      path: sourceFile.file.path,
+                      start: dependency.start,
+                      end: dependency.end,
+                    },
                   })
                 }
               }
             } else {
               diagnostics.push({
-                message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-                location: { path: sourceFile.file.path },
+                message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
+                location: {
+                  path: sourceFile.file.path,
+                  start: dependency.start,
+                  end: dependency.end,
+                },
               })
             }
           }
