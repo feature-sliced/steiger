@@ -19,5 +19,20 @@ import { extractDependencies } from './index.js'
 
 it('extracts esm dependencies from Astro source code', async () => {
   const dependencies = await extractDependencies('/src/Button.astro')
-  expect(dependencies).toEqual(['@components/controls/Button.astro', '@assets/logo.png?url'])
+  expect(dependencies).toEqual([
+    {
+      path: '@components/controls/Button.astro',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 3, column: 21 },
+      end: { line: 3, column: 54 },
+    },
+    {
+      path: '@assets/logo.png?url',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 4, column: 22 },
+      end: { line: 4, column: 42 },
+    },
+  ])
 })

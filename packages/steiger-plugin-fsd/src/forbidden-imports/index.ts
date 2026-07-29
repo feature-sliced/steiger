@@ -25,7 +25,7 @@ const forbiddenImports = {
       const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
-          dependency,
+          dependency.path,
           sourceFile.file.path,
           tsConfigs,
           fs.existsSync,
@@ -56,7 +56,11 @@ const forbiddenImports = {
           ) {
             diagnostics.push({
               message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
-              location: { path: sourceFile.file.path },
+              location: {
+                path: sourceFile.file.path,
+                start: dependency.start,
+                end: dependency.end,
+              },
             })
           }
         } else {
@@ -66,7 +70,11 @@ const forbiddenImports = {
           if (thisLayerIndex < dependencyLayerIndex) {
             diagnostics.push({
               message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
-              location: { path: sourceFile.file.path },
+              location: {
+                path: sourceFile.file.path,
+                start: dependency.start,
+                end: dependency.end,
+              },
             })
           }
         }

@@ -1,5 +1,5 @@
 
-┌ src\entities\user\api\getUser.ts
+┌ src\entities\user\api\getUser.ts:1:22
 × Forbidden import from higher layer "app".
 │
 └ fsd/forbidden-imports: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/forbidden-imports
@@ -20,7 +20,7 @@
 │
 └ fsd/insignificant-slice: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/insignificant-slice
 
-┌ src\entities\user\api\getUser.ts
+┌ src\entities\user\api\getUser.ts:1:22
 × Forbidden sidestep of public API when importing from "@/app/ui/App".
 │
 └ fsd/no-public-api-sidestep: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-public-api-sidestep
