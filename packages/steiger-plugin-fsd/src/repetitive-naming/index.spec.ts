@@ -3,7 +3,7 @@ import { expect, it } from 'vitest'
 import repetitiveNaming from './index.js'
 import { compareMessages, joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/toolkit/test'
 
-it('reports no errors on a project with no repetitive words in slices', () => {
+it('reports no errors on a project with no repetitive words in slices', async () => {
   const root = parseIntoFsdRoot(`
     📂 pages
       📂 home
@@ -17,10 +17,10 @@ it('reports no errors on a project with no repetitive words in slices', () => {
         📄 index.ts
   `)
 
-  expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
+  expect(await repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
-it('reports errors on a project with repetition of "page"', () => {
+it('reports errors on a project with repetition of "page"', async () => {
   const root = parseIntoFsdRoot(`
     📂 pages
       📂 homePage
@@ -34,13 +34,13 @@ it('reports errors on a project with repetition of "page"', () => {
         📄 index.ts
   `)
 
-  const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
+  const diagnostics = (await repetitiveNaming.check(root)).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     { message: 'Repetitive word "page" in slice names.', location: { path: joinFromRoot('pages') } },
   ])
 })
 
-it('recognizes words in different naming conventions', () => {
+it('recognizes words in different naming conventions', async () => {
   const root = parseIntoFsdRoot(`
     📂 entities
       📂 ClientFolder
@@ -54,13 +54,13 @@ it('recognizes words in different naming conventions', () => {
         📄 index.ts
   `)
 
-  const diagnostics = repetitiveNaming.check(root).diagnostics.sort(compareMessages)
+  const diagnostics = (await repetitiveNaming.check(root)).diagnostics.sort(compareMessages)
   expect(diagnostics).toEqual([
     { message: 'Repetitive word "folder" in slice names.', location: { path: joinFromRoot('entities') } },
   ])
 })
 
-it('does not complain about layers with just one slice', () => {
+it('does not complain about layers with just one slice', async () => {
   const root = parseIntoFsdRoot(`
     📂 pages
       📂 create-post
@@ -90,10 +90,10 @@ it('does not complain about layers with just one slice', () => {
         📄 index.ts
   `)
 
-  expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
+  expect(await repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
-it('does not treat slice groups as repetitive words', () => {
+it('does not treat slice groups as repetitive words', async () => {
   const root = parseIntoFsdRoot(`
     📂 features
       📂 session
@@ -111,10 +111,10 @@ it('does not treat slice groups as repetitive words', () => {
           📄 index.ts
   `)
 
-  expect(repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
+  expect(await repetitiveNaming.check(root)).toEqual({ diagnostics: [] })
 })
 
-it('still recognizes repetitive words inside slice groups', () => {
+it('still recognizes repetitive words inside slice groups', async () => {
   const root = parseIntoFsdRoot(`
     📂 pages
       📂 login-word
@@ -141,7 +141,7 @@ it('still recognizes repetitive words inside slice groups', () => {
             📄 index.ts
   `)
 
-  expect(repetitiveNaming.check(root)).toEqual({
+  expect(await repetitiveNaming.check(root)).toEqual({
     diagnostics: [
       {
         location: {
