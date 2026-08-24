@@ -54,6 +54,16 @@ export interface Diagnostic extends PartialDiagnostic {
   getRuleDescriptionUrl(ruleName: string): URL
 }
 
+/** A replacement of a range of text in a file. */
+export interface TextEdit {
+  /** 0-based inclusive start offset, in UTF-16 code units. */
+  start: number
+  /** 0-based exclusive end offset, in UTF-16 code units. */
+  end: number
+  /** The text to put in place of the range. */
+  replacement: string
+}
+
 export type Fix =
   | {
       type: 'rename'
@@ -77,6 +87,18 @@ export type Fix =
       type: 'modify-file'
       path: string
       content: string
+    }
+  | {
+      /**
+       * A set of replacements to make inside an existing file.
+       *
+       * The autofix executor merges the edits that different diagnostics make in the same file, so two
+       * fixes can change one file without overwriting each other. A `modify-file` fix cannot do that,
+       * because it carries the whole content of the file.
+       */
+      type: 'edit-file'
+      path: string
+      edits: Array<TextEdit>
     }
 
 export type Config<Rules extends Array<Rule>> = Array<ConfigObject<Rules> | Plugin<unknown, Rules> | GlobalIgnore>
