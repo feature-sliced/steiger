@@ -43,7 +43,7 @@ interface Extractor {
   extensions: string[]
   language: Language
   injections: Array<{ query: Query; lang: string }>
-  queries: Array<{ query: Query; type: 'static' | 'dynamic' }>
+  queries: Array<{ query: Query; type: 'static' | 'dynamic'; reExport?: true }>
 }
 
 const extractors: Array<Extractor> = [
@@ -55,6 +55,12 @@ const extractors: Array<Extractor> = [
       {
         query: new Query(tsx, '(import_statement source: (string (string_fragment) @path))'),
         type: 'static',
+      },
+      {
+        // `export { a } from '...'`, `export * from '...'`, `export * as ns from '...'`
+        query: new Query(tsx, '(export_statement source: (string (string_fragment) @path))'),
+        type: 'static',
+        reExport: true,
       },
       {
         query: new Query(
@@ -144,7 +150,7 @@ export function getSourceType(sourcePath: string): string | undefined {
 function processExtractor(extractor: Extractor, tree: Tree): Dependency[] {
   const result: Dependency[] = []
 
-  for (const { query, type } of extractor.queries) {
+  for (const { query, type, reExport } of extractor.queries) {
     const matches = query.matches(tree.rootNode)
     for (const match of matches) {
       for (const capture of match.captures) {
@@ -153,6 +159,7 @@ function processExtractor(extractor: Extractor, tree: Tree): Dependency[] {
             builtIn: isBuiltin(capture.node.text),
             path: capture.node.text,
             dynamic: type === 'dynamic',
+            ...(reExport ? { reExport: true as const } : {}),
             start: {
               line: capture.node.startPosition.row + 1,
               column: capture.node.startPosition.column + 1,
@@ -174,6 +181,8 @@ interface Dependency {
   path: string
   builtIn: boolean
   dynamic: boolean
+  /** Present and `true` only for `export ... from` statements. */
+  reExport?: true
   // all indexes are 1-based
   start: {
     line: number
@@ -239,10 +248,17 @@ export async function extractDependencies(
   options?: {
     includeBuiltIns?: boolean
     importType?: 'static' | 'dynamic'
+    /**
+     * Whether to also report the modules that the file re-exports from (`export ... from '...'`).
+     *
+     * Off by default, so that rules that only care about what a file *uses* don't see re-exports.
+     */
+    includeReExports?: boolean
   },
 ): Promise<Dependency[]> {
   const includeBuiltIns = options?.includeBuiltIns ?? false
   const importType = options?.importType
+  const includeReExports = options?.includeReExports ?? false
 
   let dependencies = cache.get(path)
   if (!dependencies) {
@@ -251,6 +267,7 @@ export async function extractDependencies(
   }
 
   return dependencies.filter((dep) => {
+    if (includeReExports === false && dep.reExport === true) return false
     if (includeBuiltIns === false && dep.builtIn === true) return false
     if (importType === 'dynamic' && dep.dynamic === false) return false
     if (importType === 'static' && dep.dynamic === true) return false
