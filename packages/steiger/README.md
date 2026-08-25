@@ -12,7 +12,7 @@ Universal file structure and project architecture linter.
 
 ## Features
 
-- Built-in set of rules to validate adherence to [Feature-Sliced Design](https://feature-sliced.design/)
+- Built-in set of rules to validate adherence to [Feature-Sliced Design](https://fsd.how/)
 - Watch mode
 - Rule configurability
 
@@ -141,7 +141,7 @@ Version 0.5.0 introduced a new config file format. Follow the [instructions](../
 
 ## Rules
 
-Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://feature-sliced.design/).
+Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://fsd.how/).
 
 <table>
 <thead>
