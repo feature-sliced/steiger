@@ -44,6 +44,8 @@ interface Extractor {
   language: Language
   injections: Array<{ query: Query; lang: string }>
   queries: Array<{ query: Query; type: 'static' | 'dynamic' }>
+  /** Matches `export * from` statements, capturing the whole statement as `@statement` and the module specifier as `@path`. */
+  wildcardExportQuery?: Query
 }
 
 const extractors: Array<Extractor> = [
@@ -90,6 +92,9 @@ const extractors: Array<Extractor> = [
         type: 'dynamic',
       },
     ],
+    // Deliberately does not match `export * as ns from`: a namespace re-export adds one name to the
+    // module's exports rather than an unknown number of them.
+    wildcardExportQuery: new Query(tsx, '(export_statement "*" source: (string (string_fragment) @path)) @statement'),
     injections: [],
   },
   {
@@ -170,6 +175,46 @@ function processExtractor(extractor: Extractor, tree: Tree): Dependency[] {
   return result
 }
 
+function processWildcardExports(extractor: Extractor, tree: Tree): WildcardExport[] {
+  if (extractor.wildcardExportQuery === undefined) return []
+
+  const result: WildcardExport[] = []
+
+  for (const match of extractor.wildcardExportQuery.matches(tree.rootNode)) {
+    const pathCapture = match.captures.find((capture) => capture.name === 'path')
+    const statementCapture = match.captures.find((capture) => capture.name === 'statement')
+    if (pathCapture === undefined || statementCapture === undefined) continue
+
+    result.push({
+      path: pathCapture.node.text,
+      start: {
+        line: statementCapture.node.startPosition.row + 1,
+        column: statementCapture.node.startPosition.column + 1,
+      },
+      end: {
+        line: statementCapture.node.endPosition.row + 1,
+        column: statementCapture.node.endPosition.column + 1,
+      },
+    })
+  }
+
+  return result
+}
+
+interface WildcardExport {
+  /** The module specifier that the names are re-exported from. */
+  path: string
+  // all indexes are 1-based, and they span the whole `export * from` statement
+  start: {
+    line: number
+    column: number
+  }
+  end: {
+    line: number
+    column: number
+  }
+}
+
 interface Dependency {
   path: string
   builtIn: boolean
@@ -185,14 +230,16 @@ interface Dependency {
   }
 }
 
-const cache = createFSCache<Dependency[]>()
-
-function extractAllDependencies(path: string): Dependency[] {
+/**
+ * Parse a source file and run `process` on its syntax tree, as well as on the syntax trees of the
+ * languages injected into it (for example, the `<script>` block of a Vue component).
+ */
+function processSourceFile<T>(path: string, process: (extractor: Extractor, tree: Tree) => Array<T>): Array<T> {
   const extension = extname(path)
   const extractor = extractors.find((extractor) => extractor.extensions.includes(extension))
   if (!extractor) throw new Error(`No extractor found for "${extension}"`)
 
-  const dependencies: Dependency[] = []
+  const results: Array<T> = []
 
   const sourceCode = readFileSync(path, 'utf8')
   const parser = new Parser()
@@ -200,7 +247,7 @@ function extractAllDependencies(path: string): Dependency[] {
   const tree = parser.parse(sourceCode)
   if (tree === null) return []
 
-  dependencies.push(...processExtractor(extractor, tree))
+  results.push(...process(extractor, tree))
 
   for (const { query, lang } of extractor.injections) {
     const injectedExtractor = extractors.find((extractor) => extractor.type === lang)
@@ -225,13 +272,19 @@ function extractAllDependencies(path: string): Dependency[] {
     parser.setLanguage(injectedExtractor.language)
     const injectedTree = parser.parse(sourceCode, null, { includedRanges })
     if (injectedTree === null) continue
-    dependencies.push(...processExtractor(injectedExtractor, injectedTree))
+    results.push(...process(injectedExtractor, injectedTree))
     injectedTree.delete()
   }
 
   tree.delete()
 
-  return dependencies
+  return results
+}
+
+const cache = createFSCache<Dependency[]>()
+
+function extractAllDependencies(path: string): Dependency[] {
+  return processSourceFile(path, processExtractor)
 }
 
 export async function extractDependencies(
@@ -257,4 +310,22 @@ export async function extractDependencies(
 
     return true
   })
+}
+
+const wildcardExportCache = createFSCache<WildcardExport[]>()
+
+/**
+ * Find the wildcard re-exports (`export * from`) in a file.
+ *
+ * Namespace re-exports (`export * as ns from`) are not reported. They add one name to the module's
+ * exports, so they don't hide what the module exports.
+ */
+export async function extractWildcardExports(path: string): Promise<WildcardExport[]> {
+  let wildcardExports = wildcardExportCache.get(path)
+  if (!wildcardExports) {
+    wildcardExports = processSourceFile(path, processWildcardExports)
+    wildcardExportCache.set(path, wildcardExports)
+  }
+
+  return wildcardExports
 }
