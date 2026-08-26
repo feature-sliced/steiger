@@ -37,6 +37,12 @@ To run in watch mode, add `-w`/`--watch` to the command:
 npx steiger ./src --watch
 ```
 
+To report errors only and hide warnings, use `--quiet`:
+
+```bash
+npx steiger ./src --quiet
+```
+
 ## Configuration
 
 Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.
