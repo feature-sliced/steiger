@@ -1,0 +1,26 @@
+Without --ignore-warnings:
+
+┌ src/app/ui
+× Layer "app" should not have "ui" segment.
+│
+└ fsd/no-ui-in-app: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-ui-in-app
+
+┌ src/processes
+⚠ Layer "processes" is deprecated, avoid using it
+│
+└ fsd/no-processes: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-processes
+
+─────────────────────────────────────────────────────────────
+ Found 1 error and 1 warning (none can be fixed automatically)
+
+
+With --ignore-warnings:
+
+┌ src/app/ui
+× Layer "app" should not have "ui" segment.
+│
+└ fsd/no-ui-in-app: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-ui-in-app
+
+───────────────────────────────────────────────
+ Found 1 error (none can be fixed automatically)
+

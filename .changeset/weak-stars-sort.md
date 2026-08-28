@@ -2,4 +2,4 @@
 'steiger': minor
 ---
 
-Add a --quiet CLI option to report errors only.
+Add a --ignore-warnings CLI option to report errors only.
