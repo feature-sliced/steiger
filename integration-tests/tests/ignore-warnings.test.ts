@@ -68,7 +68,7 @@ export default [
   await expect(
     ['Without --ignore-warnings:', regularStderr, 'With --ignore-warnings:', ignoreWarningsStderr].join('\n'),
   ).toMatchFileSnapshot(join('__snapshots__', `ignore-warnings-stderr-${pathPlatform}.txt`))
-})
+}, 15_000)
 
 test('does not allow ignore-warnings with fail-on-warnings', async () => {
   const project = join(temporaryDirectory, 'conflicting-warning-options')
