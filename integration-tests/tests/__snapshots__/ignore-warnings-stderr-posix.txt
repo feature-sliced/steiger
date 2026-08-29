@@ -6,7 +6,7 @@ Without --ignore-warnings:
 └ fsd/no-ui-in-app: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-ui-in-app
 
 ┌ src/processes
-⚠ Layer "processes" is deprecated, avoid using it
+‼ Layer "processes" is deprecated, avoid using it
 │
 └ fsd/no-processes: https://github.com/feature-sliced/steiger/tree/master/packages/steiger-plugin-fsd/src/no-processes
 
