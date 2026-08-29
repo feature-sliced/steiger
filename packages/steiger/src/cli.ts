@@ -53,6 +53,12 @@ const yargsProgram = yargs(hideBin(process.argv))
     describe: 'exit with an error code if there are warnings',
     type: 'boolean',
   })
+  .option('ignore-warnings', {
+    demandOption: false,
+    describe: 'report errors only',
+    type: 'boolean',
+  })
+  .conflicts('ignore-warnings', 'fail-on-warnings')
   .option('reporter', {
     demandOption: false,
     describe: 'specify output format (pretty or json)',
@@ -116,10 +122,14 @@ if (inputPaths.length > 0) {
 }
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
+  const diagnosticsToReport = consoleArgs['ignore-warnings']
+    ? diagnostics.filter((diagnostic) => diagnostic.severity === 'error')
+    : diagnostics
+
   if (consoleArgs.reporter === 'json') {
-    console.log(JSON.stringify(diagnostics, null, 2))
+    console.log(JSON.stringify(diagnosticsToReport, null, 2))
   } else {
-    reportPretty(diagnostics, process.cwd())
+    reportPretty(diagnosticsToReport, process.cwd())
   }
 }
 
