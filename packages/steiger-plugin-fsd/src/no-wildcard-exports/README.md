@@ -1,6 +1,6 @@
 # `no-wildcard-exports`
 
-Forbid wildcard re-exports (`export * from`) in public APIs.
+Forbid wildcard re-exports (`export * from`, `export * as ns from`) in public APIs.
 
 According to the _public API rule on slices_:
 
@@ -16,7 +16,13 @@ The FSD documentation lists wildcard re-exports as bad practice:
 
 This rule checks every public API file on every layer, including index variants like `index.client.ts` and `index.server.ts`. It skips every other file, because a wildcard export inside a module stays private to the slice or segment that contains it.
 
-Namespace re-exports (`export * as ns from`) are allowed. They add one name to the public API, so a reader can still tell what the module exports.
+Namespace re-exports (`export * as ns from`) are reported too. The name in front only says where the re-exported names live, so the public API is still whatever the other module happens to export:
+
+```ts
+// entities/user/index.ts
+export * as model from './model'
+export * as ui from './ui'
+```
 
 Examples of public APIs that pass this rule:
 
@@ -29,7 +35,7 @@ export { type User, useUser } from './model/user'
 ```ts
 // shared/ui/index.ts
 export { Form, Field } from './form'
-export * as positions from './tooltip-positions'
+export { top, bottom } from './tooltip-positions'
 ```
 
 Examples of public APIs that fail this rule:
@@ -44,10 +50,11 @@ export * from './model/user' // ❌
 // shared/ui/index.ts
 export { Form, Field } from './form'
 export * from './tooltip-positions' // ❌
+export * as positions from './tooltip-positions' // ❌
 ```
 
 ## Rationale
 
-A wildcard re-export hides the public API of a group of modules, so you can't tell what a slice exports without opening every file inside it.
+A wildcard re-export hides the public API of a group of modules, so you can't tell what a slice exports without opening every file inside it. A namespace re-export moves the names behind a prefix but leaves the same question open.
 
 It also lets the public API change by accident. Adding an export to an internal module adds it to the public API too, and removing that export later breaks whoever started using it. Listing the names means the public API only changes when someone edits the index file.

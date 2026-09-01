@@ -12,7 +12,7 @@ vi.mock('node:fs', async (importOriginal) => {
       // Public APIs that list everything they export
       '/src/shared/ui/index.ts': [
         "export { Button } from './Button'",
-        "export * as positions from './tooltip-positions'",
+        "export { top } from './tooltip-positions'",
       ].join('\n'),
       '/src/shared/ui/Button.tsx': 'export function Button() {}',
       '/src/shared/ui/tooltip-positions.ts': "export const top = 'top'",
@@ -43,6 +43,14 @@ vi.mock('node:fs', async (importOriginal) => {
       // Wildcard exports on the App layer
       '/src/app/index.ts': "export * from './providers'",
       '/src/app/providers.tsx': 'export function Providers() {}',
+
+      // A public API built only out of namespace re-exports
+      '/src/entities/order/index.ts': [
+        "export * as model from './model/order'",
+        "export * as ui from './ui/OrderCard'",
+      ].join('\n'),
+      '/src/entities/order/model/order.ts': 'export const order = {}',
+      '/src/entities/order/ui/OrderCard.tsx': 'export function OrderCard() {}',
 
       // A public API that mixes export kinds
       '/src/widgets/header/index.ts': [
@@ -146,7 +154,7 @@ it('reports wildcard exports in the public API of a slice', async () => {
 
   expect((await noWildcardExports.check(root)).diagnostics).toEqual([
     {
-      message: `Wildcard export from "./ui/ProductCard" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./ui/ProductCard" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'entities', 'product', 'index.ts'),
         start: { line: 1, column: 1 },
@@ -154,7 +162,7 @@ it('reports wildcard exports in the public API of a slice', async () => {
       },
     },
     {
-      message: `Wildcard export from "./model/product" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./model/product" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'entities', 'product', 'index.ts'),
         start: { line: 2, column: 1 },
@@ -180,7 +188,7 @@ it('reports wildcard exports on the Shared and App layers', async () => {
 
   expect((await noWildcardExports.check(root)).diagnostics.sort(compareMessages)).toEqual([
     {
-      message: `Wildcard export from "./format-date" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./format-date" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'shared', 'lib', 'index.ts'),
         start: { line: 1, column: 1 },
@@ -188,7 +196,7 @@ it('reports wildcard exports on the Shared and App layers', async () => {
       },
     },
     {
-      message: `Wildcard export from "./providers" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./providers" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'app', 'index.ts'),
         start: { line: 1, column: 1 },
@@ -198,7 +206,41 @@ it('reports wildcard exports on the Shared and App layers', async () => {
   ])
 })
 
-it('reports only the wildcard exports in a public API that mixes export kinds', async () => {
+it('reports a public API built only out of namespace re-exports', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 entities
+        📂 order
+          📂 ui
+            📄 OrderCard.tsx
+          📂 model
+            📄 order.ts
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await noWildcardExports.check(root)).diagnostics).toEqual([
+    {
+      message: `Wildcard re-export from "./model/order" does not define an explicit public API. Prefer explicit named exports.`,
+      location: {
+        path: joinFromRoot('src', 'entities', 'order', 'index.ts'),
+        start: { line: 1, column: 1 },
+        end: { line: 1, column: 39 },
+      },
+    },
+    {
+      message: `Wildcard re-export from "./ui/OrderCard" does not define an explicit public API. Prefer explicit named exports.`,
+      location: {
+        path: joinFromRoot('src', 'entities', 'order', 'index.ts'),
+        start: { line: 2, column: 1 },
+        end: { line: 2, column: 37 },
+      },
+    },
+  ])
+})
+
+it('reports the wildcard and namespace re-exports of a public API that mixes export kinds', async () => {
   const root = parseIntoFsdRoot(
     `
       📂 widgets
@@ -217,7 +259,7 @@ it('reports only the wildcard exports in a public API that mixes export kinds', 
 
   expect((await noWildcardExports.check(root)).diagnostics).toEqual([
     {
-      message: `Wildcard export from "./ui/Nav" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./ui/Nav" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'widgets', 'header', 'index.ts'),
         start: { line: 2, column: 1 },
@@ -225,7 +267,15 @@ it('reports only the wildcard exports in a public API that mixes export kinds', 
       },
     },
     {
-      message: `Wildcard export from "./lib/use-scroll" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./model/theme" does not define an explicit public API. Prefer explicit named exports.`,
+      location: {
+        path: joinFromRoot('src', 'widgets', 'header', 'index.ts'),
+        start: { line: 3, column: 1 },
+        end: { line: 3, column: 39 },
+      },
+    },
+    {
+      message: `Wildcard re-export from "./lib/use-scroll" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'widgets', 'header', 'index.ts'),
         start: { line: 5, column: 1 },
@@ -253,7 +303,7 @@ it('checks index file variants like index.client.ts and index.server.ts', async 
 
   expect((await noWildcardExports.check(root)).diagnostics).toEqual([
     {
-      message: `Wildcard export from "./ui/HomePage" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./ui/HomePage" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'pages', 'home', 'index.client.ts'),
         start: { line: 1, column: 1 },
@@ -261,7 +311,7 @@ it('checks index file variants like index.client.ts and index.server.ts', async 
       },
     },
     {
-      message: `Wildcard export from "./api/errors" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./api/errors" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'pages', 'home', 'index.server.ts'),
         start: { line: 2, column: 1 },
@@ -287,7 +337,7 @@ it('does not confuse a named export spread over several lines with a wildcard ex
 
   expect((await noWildcardExports.check(root)).diagnostics).toEqual([
     {
-      message: `Wildcard export from "./ui/LoginForm" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./ui/LoginForm" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'features', 'auth', 'index.ts'),
         start: { line: 5, column: 1 },
@@ -313,7 +363,7 @@ it('checks the public API of a folder nested inside a segment', async () => {
 
   expect((await noWildcardExports.check(root)).diagnostics).toEqual([
     {
-      message: `Wildcard export from "./endpoints" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./endpoints" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: joinFromRoot('src', 'shared', 'api', 'rest', 'index.ts'),
         start: { line: 1, column: 1 },

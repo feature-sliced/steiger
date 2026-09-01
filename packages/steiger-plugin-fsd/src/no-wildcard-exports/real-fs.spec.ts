@@ -32,7 +32,7 @@ await Promise.all([
   writeFile('src/entities/user/index.ts', "export * from './ui/UserCard'\n"),
 ])
 
-it('reports wildcard exports in a project on disk', async () => {
+it('reports wildcard and namespace re-exports in a project on disk', async () => {
   const root = parseIntoFsdRoot(
     `
       📂 shared
@@ -53,7 +53,15 @@ it('reports wildcard exports in a project on disk', async () => {
 
   expect((await noWildcardExports.check(root)).diagnostics).toEqual([
     {
-      message: `Wildcard export from "./ui/UserCard" hides the public API. List the exported names instead.`,
+      message: `Wildcard re-export from "./tooltip-positions" does not define an explicit public API. Prefer explicit named exports.`,
+      location: {
+        path: join(project, 'src', 'shared', 'ui', 'index.ts'),
+        start: { line: 2, column: 1 },
+        end: { line: 2, column: 49 },
+      },
+    },
+    {
+      message: `Wildcard re-export from "./ui/UserCard" does not define an explicit public API. Prefer explicit named exports.`,
       location: {
         path: join(project, 'src', 'entities', 'user', 'index.ts'),
         start: { line: 1, column: 1 },
