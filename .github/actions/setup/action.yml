@@ -17,7 +17,5 @@ runs:
         node-version: ${{ inputs.node-version }}
         cache: 'pnpm'
 
-    - uses: actions/checkout@v4
-
     - shell: bash
       run: pnpm install
