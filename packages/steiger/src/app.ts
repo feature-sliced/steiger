@@ -6,10 +6,18 @@ import type { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getGlobalIgnores, processConfiguration } from './models/config'
+import {
+  $globalConfig,
+  getEnabledRules,
+  getGlobalIgnores,
+  ProcessedConfig,
+  processConfiguration,
+  processScopedConfiguration,
+} from './models/config'
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
+import { combine } from 'effector/effector.mjs'
 
 // TODO: make this part of a plugin
 function getRuleDescriptionUrl(ruleName: string) {
@@ -24,17 +32,19 @@ function isTimingEnabled() {
   return timing && timing !== '0' && timing !== 'false'
 }
 
-async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
+async function runRules({ vfs, config }: { vfs: Folder; config: ProcessedConfig }) {
+  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores(config))
 
   const timingEnabled = isTimingEnabled()
   const measurements: Array<{ rule: string; duration: number }> = []
+
+  const rules = getEnabledRules(config)
 
   const ruleResults = await Promise.all(
     rules.map(async (rule) => {
       const start = performance.now()
       try {
-        return await runRule(vfsWithoutGlobalIgnores, rule)
+        return await runRule(config, vfsWithoutGlobalIgnores, rule)
       } finally {
         const end = performance.now()
         if (timingEnabled) {
@@ -76,23 +86,33 @@ export const linter = {
     scan(path).then((vfs) =>
       runRules({
         vfs,
-        rules: getEnabledRules(),
+        config: $globalConfig.getState()!,
       }),
     ),
   watch: async (
     path: string,
-    options?: { stabilityThreshold?: number; pollInterval?: number; debounceInterval?: number },
+    options?: {
+      stabilityThreshold?: number
+      pollInterval?: number
+      debounceInterval?: number
+      config?: ProcessedConfig
+    },
   ) => {
     const { vfs, watcher } = await createWatcher(path, options)
 
     const treeChanged = debounce(merge([vfs.$tree, vfs.fileChanged]), options?.debounceInterval ?? 500)
     const runRulesFx = createEffect(runRules)
 
+    const $config = combine($globalConfig, (c) => {
+      if (options?.config) return options.config
+      return c!
+    })
+
     sample({
-      clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
+      clock: defer({ clock: [treeChanged, $config], until: not(runRulesFx.pending) }),
       source: {
         vfs: vfs.$tree,
-        rules: $enabledRules,
+        config: $config,
       },
       target: runRulesFx,
     })
@@ -105,4 +125,4 @@ export function defineConfig<Rules extends Array<Rule> = Array<Rule>>(config: Co
   return config
 }
 
-export { processConfiguration }
+export { processConfiguration, processScopedConfiguration }
