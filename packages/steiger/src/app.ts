@@ -65,6 +65,7 @@ async function runRules({ vfs, config }: { vfs: Folder; config: ProcessedConfig 
   return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
     const ruleName = rules[ruleResultsIndex].name
     const severities = calculateFinalSeverities(
+      config,
       vfsWithoutGlobalIgnores,
       ruleName,
       diagnostics.map((d) => d.location.path),
