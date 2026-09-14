@@ -9,6 +9,7 @@ import {
   TextDocumentSyncKind,
   DiagnosticSeverity,
   WorkspaceDocumentDiagnosticReport,
+  type WorkspaceFoldersChangeEvent,
   Diagnostic,
 } from 'vscode-languageserver/node'
 import { cosmiconfig } from 'cosmiconfig'
@@ -21,10 +22,11 @@ import packageJson from '../package.json'
 
 const connection = createConnection(process.stdin, process.stdout)
 
-type Watcher = Awaited<ReturnType<typeof linter.watch>>
+const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagnostics: SteigerDiagnostic[] }>()
 
-const workspaces = new Map<string, { sourcePath: string; watcher: Watcher; diagnostics: SteigerDiagnostic[] }>()
 async function addWorkspace(rootPath: string) {
+  await removeWorkspace(rootPath)
+
   const { config, filepath } = (await cosmiconfig('steiger').search(rootPath)) ?? {
     config: null,
     filepath: undefined,
@@ -32,40 +34,72 @@ async function addWorkspace(rootPath: string) {
   const configLocationDirectory = filepath ? dirname(filepath) : null
   processConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
 
-  if (rootPath !== undefined) {
-    const sourcePath = join(rootPath, 'src')
-    const watcher = await linter.watch(sourcePath, {
-      debounceInterval: 100,
-      pollInterval: 50,
-      stabilityThreshold: 100,
-    })
+  const sourcePath = join(rootPath, 'src')
+  const [diagnosticsChanged, dispose] = await linter.watch(sourcePath, {
+    debounceInterval: 100,
+    pollInterval: 50,
+    stabilityThreshold: 100,
+  })
 
-    const diagnostics: SteigerDiagnostic[] = []
-    workspaces.set(rootPath, { sourcePath, watcher, diagnostics })
+  const diagnostics: SteigerDiagnostic[] = []
+  workspaces.set(rootPath, { dispose, diagnostics })
 
-    watcher[0].watch((state) => {
-      diagnostics.splice(0, Infinity, ...state)
+  diagnosticsChanged.watch((state) => {
+    diagnostics.splice(0, Infinity, ...state)
 
-      connection.languages.diagnostics.refresh()
-    })
-  }
+    connection.languages.diagnostics.refresh()
+  })
 }
+
 async function removeWorkspace(rootPath: string) {
   const workspace = workspaces.get(rootPath)
   if (workspace) {
-    workspace.watcher[1]()
+    await workspace.dispose()
     workspaces.delete(rootPath)
   }
 }
-function removeAllWorkspaces() {
+
+async function removeAllWorkspaces() {
   for (const [rootPath] of workspaces) {
-    removeWorkspace(rootPath)
+    await removeWorkspace(rootPath)
   }
 }
 
+async function handleWorkspaceFoldersChange(event: WorkspaceFoldersChangeEvent) {
+  for (const workspace of event.removed) {
+    try {
+      await removeWorkspace(fileURLToPath(workspace.uri))
+    } catch (error) {
+      connection.console.error(`steiger: failed to stop linting ${workspace.uri}: ${String(error)}`)
+    }
+  }
+
+  for (const workspace of event.added) {
+    try {
+      await addWorkspace(fileURLToPath(workspace.uri))
+    } catch (error) {
+      connection.console.error(`steiger: failed to start linting ${workspace.uri}: ${String(error)}`)
+    }
+  }
+
+  if (event.removed.length > 0) {
+    connection.languages.diagnostics.refresh()
+  }
+}
+
+let clientHandlesWorkspaceFolders = false
+
 connection.onInitialize(async (params): Promise<InitializeResult> => {
   for (const workspace of params.workspaceFolders ?? []) {
-    await addWorkspace(fileURLToPath(workspace.uri))
+    try {
+      await addWorkspace(fileURLToPath(workspace.uri))
+    } catch (error) {
+      connection.console.error(`steiger: failed to start linting ${workspace.uri}: ${String(error)}`)
+    }
+  }
+
+  if (params.capabilities.workspace?.workspaceFolders === true) {
+    clientHandlesWorkspaceFolders = true
   }
 
   return {
@@ -86,13 +120,9 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
   }
 })
 
-connection.workspace.onDidChangeWorkspaceFolders(async (event) => {
-  for (const workspace of event.added) {
-    await addWorkspace(fileURLToPath(workspace.uri))
-  }
-
-  for (const workspace of event.removed) {
-    removeWorkspace(fileURLToPath(workspace.uri))
+connection.onInitialized(() => {
+  if (clientHandlesWorkspaceFolders) {
+    connection.workspace.onDidChangeWorkspaceFolders(handleWorkspaceFoldersChange)
   }
 })
 
