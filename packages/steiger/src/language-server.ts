@@ -17,21 +17,14 @@ import type { Diagnostic as SteigerDiagnostic } from '@steiger/types'
 
 import { processConfiguration } from './models/config'
 import { linter } from './app'
+import packageJson from '../package.json'
 
 const connection = createConnection(process.stdin, process.stdout)
 
-let steigerDiagnostic: SteigerDiagnostic[] = []
+type Watcher = Awaited<ReturnType<typeof linter.watch>>
 
-let disposeWatcher: (() => void) | undefined
-function stopWatcher() {
-  disposeWatcher?.()
-  disposeWatcher = undefined
-}
-
-connection.onInitialize(async (params): Promise<InitializeResult> => {
-  const rootUri = params.workspaceFolders?.[0]?.uri ?? ''
-
-  const rootPath = rootUri ? fileURLToPath(rootUri) : undefined
+const workspaces = new Map<string, { sourcePath: string; watcher: Watcher; diagnostics: SteigerDiagnostic[] }>()
+async function addWorkspace(rootPath: string) {
   const { config, filepath } = (await cosmiconfig('steiger').search(rootPath)) ?? {
     config: null,
     filepath: undefined,
@@ -40,32 +33,66 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
   processConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
 
   if (rootPath !== undefined) {
-    // Tear down any watcher from a previous initialization before starting a new one.
-    stopWatcher()
-
-    const targetPath = join(rootPath, 'src')
-    const [diagnosticsChanged, dispose] = await linter.watch(targetPath, {
+    const sourcePath = join(rootPath, 'src')
+    const watcher = await linter.watch(sourcePath, {
       debounceInterval: 100,
       pollInterval: 50,
       stabilityThreshold: 100,
     })
-    disposeWatcher = dispose
 
-    diagnosticsChanged.watch((state) => {
-      steigerDiagnostic = state
+    const diagnostics: SteigerDiagnostic[] = []
+    workspaces.set(rootPath, { sourcePath, watcher, diagnostics })
+
+    watcher[0].watch((state) => {
+      diagnostics.splice(0, Infinity, ...state)
 
       connection.languages.diagnostics.refresh()
     })
   }
+}
+async function removeWorkspace(rootPath: string) {
+  const workspace = workspaces.get(rootPath)
+  if (workspace) {
+    workspace.watcher[1]()
+    workspaces.delete(rootPath)
+  }
+}
+function removeAllWorkspaces() {
+  for (const [rootPath] of workspaces) {
+    removeWorkspace(rootPath)
+  }
+}
+
+connection.onInitialize(async (params): Promise<InitializeResult> => {
+  for (const workspace of params.workspaceFolders ?? []) {
+    await addWorkspace(fileURLToPath(workspace.uri))
+  }
 
   return {
+    serverInfo: { name: 'steiger', version: packageJson.version },
     capabilities: {
+      workspace: {
+        workspaceFolders: {
+          supported: true,
+          changeNotifications: true,
+        },
+      },
       textDocumentSync: TextDocumentSyncKind.None,
       diagnosticProvider: {
         interFileDependencies: true,
         workspaceDiagnostics: true,
       },
     },
+  }
+})
+
+connection.workspace.onDidChangeWorkspaceFolders(async (event) => {
+  for (const workspace of event.added) {
+    await addWorkspace(fileURLToPath(workspace.uri))
+  }
+
+  for (const workspace of event.removed) {
+    removeWorkspace(fileURLToPath(workspace.uri))
   }
 })
 
@@ -130,12 +157,20 @@ function resolveDiagnosticDocumentPath(locationPath: string): string | undefined
   return undefined
 }
 
+function getAllDiagnostics(): SteigerDiagnostic[] {
+  const diagnostics: SteigerDiagnostic[] = []
+  for (const { diagnostics: workspaceDiagnostics } of workspaces.values()) {
+    diagnostics.push(...workspaceDiagnostics)
+  }
+  return diagnostics
+}
+
 connection.languages.diagnostics.on((params) => {
   const path = fileURLToPath(params.textDocument.uri)
 
   const items: Diagnostic[] = []
 
-  for (const d of steigerDiagnostic) {
+  for (const d of getAllDiagnostics()) {
     if (resolveDiagnosticDocumentPath(d.location.path) === path) {
       items.push(toLspDiagnostic(d))
     }
@@ -149,7 +184,7 @@ connection.languages.diagnostics.on((params) => {
 
 connection.languages.diagnostics.onWorkspace(() => {
   const byPath = new Map<string, SteigerDiagnostic[]>()
-  for (const d of steigerDiagnostic) {
+  for (const d of getAllDiagnostics()) {
     const documentPath = resolveDiagnosticDocumentPath(d.location.path)
     if (documentPath === undefined) continue
 
@@ -171,7 +206,7 @@ connection.languages.diagnostics.onWorkspace(() => {
   return { items }
 })
 
-connection.onShutdown(stopWatcher)
-connection.onExit(stopWatcher)
+connection.onShutdown(removeAllWorkspaces)
+connection.onExit(removeAllWorkspaces)
 
 connection.listen()
