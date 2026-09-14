@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from 'vitest'
 import { joinFromRoot, parseIntoFolder } from '@steiger/toolkit/test'
 
 import calculateFinalSeverities from './calculate-final-severity'
-import { GlobGroupWithSeverity } from '../../models/config'
+import { GlobGroupWithSeverity, ProcessedConfig } from '../../models/config'
+
+const mockedConfig: ProcessedConfig = {
+  globalIgnores: [],
+  plugins: [],
+  ruleInstructions: {},
+}
 
 vi.mock('../../models/config', async () => {
   const ruleToGlobs: Record<string, Array<GlobGroupWithSeverity>> = {
@@ -10,7 +16,7 @@ vi.mock('../../models/config', async () => {
   }
 
   return {
-    getGlobsForRule: vi.fn((ruleName: string) => ruleToGlobs[ruleName]),
+    getGlobsForRule: vi.fn((_config: ProcessedConfig, ruleName: string) => ruleToGlobs[ruleName]),
   }
 })
 
@@ -46,7 +52,7 @@ describe('calculateFinalSeverity', () => {
       joinFromRoot('src'),
     )
 
-    const severities = calculateFinalSeverities(vfs, 'rule1', [
+    const severities = calculateFinalSeverities(mockedConfig, vfs, 'rule1', [
       joinFromRoot('src', 'shared', 'ui', 'Button.ts'),
       joinFromRoot('src', 'shared', 'ui'),
       joinFromRoot('src', 'shared'),
