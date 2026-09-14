@@ -10,7 +10,7 @@ import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
-import { processConfiguration, $plugins } from './models/config'
+import { $globalConfig, processConfiguration } from './models/config'
 import { applyAutofixes } from './features/autofix'
 import { chooseRootFolderFromGuesses, chooseRootFolderFromSimilar, ExitException } from './features/choose-root-folder'
 import fsd from '@feature-sliced/steiger-plugin'
@@ -74,9 +74,9 @@ const yargsProgram = yargs(hideBin(process.argv))
   .version(
     [
       packageJson.version,
-      $plugins
-        .getState()
-        .map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
+      $globalConfig
+        .getState()!
+        .plugins.map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
         .join('\n'),
     ]
       .filter(Boolean)
