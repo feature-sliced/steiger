@@ -37,6 +37,16 @@ vi.mock('node:fs', () =>
       "export { default as Baz } from './baz'",
     ].join('\n'),
     '/src/local-exports.ts': ['export const foo = 1', 'export default foo', 'export { foo }'].join('\n'),
+    '/src/re-exports.ts': [
+      "export { foo } from './named'",
+      "export * from './all'",
+      "export * as ns from './namespace'",
+      "export type { Foo } from './named-type'",
+      "export type * from './all-type'",
+      "export type * as Api from './namespace-type'",
+      "export * from 'node:fs'",
+    ].join('\n'),
+    '/src/re-export-first.ts': ["export * from './re-exported'", "import './imported'"].join('\n'),
     '/src/ordering.ts': [
       "const first = require('./first')",
       "import second from './second'",
@@ -167,9 +177,65 @@ it('returns imports and re-exports in source order', async () => {
   expect(analysis.reExports.map((reExport) => reExport.source)).toEqual(['./third'])
 })
 
-it('leaves re-exports out of the imports of a module', async () => {
+it('reports both the imports and the re-exports of a module, in source order', async () => {
   expect((await extractDependencies('/src/ordering.ts')).map((dependency) => dependency.path)).toEqual([
     './first',
     './second',
+    './third',
   ])
+})
+
+it('reports a re-export that precedes an import before that import', async () => {
+  expect((await extractDependencies('/src/re-export-first.ts')).map((dependency) => dependency.path)).toEqual([
+    './re-exported',
+    './imported',
+  ])
+})
+
+it('extracts every form of re-export as a dependency', async () => {
+  expect(await extractDependencies('/src/re-exports.ts')).toEqual([
+    { path: './named', builtIn: false, dynamic: false, start: { line: 1, column: 22 }, end: { line: 1, column: 29 } },
+    { path: './all', builtIn: false, dynamic: false, start: { line: 2, column: 16 }, end: { line: 2, column: 21 } },
+    {
+      path: './namespace',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 3, column: 22 },
+      end: { line: 3, column: 33 },
+    },
+    {
+      path: './named-type',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 4, column: 27 },
+      end: { line: 4, column: 39 },
+    },
+    {
+      path: './all-type',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 5, column: 21 },
+      end: { line: 5, column: 31 },
+    },
+    {
+      path: './namespace-type',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 6, column: 28 },
+      end: { line: 6, column: 44 },
+    },
+  ])
+})
+
+it('leaves a built-in re-export out unless built-ins are asked for', async () => {
+  expect((await extractDependencies('/src/re-exports.ts')).map((dependency) => dependency.path)).not.toContain(
+    'node:fs',
+  )
+  expect(await extractDependencies('/src/re-exports.ts', { includeBuiltIns: true })).toContainEqual({
+    path: 'node:fs',
+    builtIn: true,
+    dynamic: false,
+    start: { line: 7, column: 16 },
+    end: { line: 7, column: 23 },
+  })
 })

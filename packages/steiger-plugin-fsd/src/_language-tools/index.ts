@@ -426,11 +426,24 @@ interface Dependency {
   }
 }
 
+/** A re-export pulls in another module exactly like a static import, so rules see it as one. */
+function reExportAsImport(reExport: ReExportInfo): ImportInfo {
+  return {
+    source: reExport.source,
+    builtIn: isBuiltin(reExport.source),
+    dynamic: false,
+    sourceRange: reExport.sourceRange,
+  }
+}
+
 /**
- * Find the modules that a file imports.
+ * Find the modules that a file depends on, both the ones it imports and the ones it re-exports.
  *
- * Re-exports are left out, since a rule asking what a file uses does not want its public API back.
- * Rules that need re-exports read {@link extractReExports} instead.
+ * Re-exports are among them because a re-export names another module just like an import does, and
+ * the layer and slice boundaries apply to it the same way. Rules that need the shape of a re-export,
+ * such as the names it passes on, read {@link extractReExports} instead.
+ *
+ * The result is in source order.
  */
 export async function extractDependencies(
   path: string,
@@ -442,9 +455,10 @@ export async function extractDependencies(
   const includeBuiltIns = options?.includeBuiltIns ?? false
   const importType = options?.importType
 
-  const { imports } = await analyzeModule(path)
+  const { imports, reExports } = await analyzeModule(path)
 
-  return imports
+  return [...imports, ...reExports.map(reExportAsImport)]
+    .sort((a, b) => comparePositions(a.sourceRange, b.sourceRange))
     .filter((moduleImport) => {
       if (includeBuiltIns === false && moduleImport.builtIn === true) return false
       if (importType === 'dynamic' && moduleImport.dynamic === false) return false

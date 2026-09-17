@@ -42,6 +42,8 @@ vi.mock('node:fs', async (importOriginal) => {
         'import { TextField } from "@/shared/ui"; import { ProductCard } from "@/entities/product/ui/ProductCard.tsx"',
       '/pages/editor/ui/SubmitButton.tsx':
         'import { Button } from "@/shared/ui/Button"; import { translator } from "@/shared/i18n/translator"',
+      '/pages/editor/ui/ReExportedProductCard.tsx':
+        'export { ProductCard } from "@/entities/product/ui/ProductCard.tsx"',
       '/pages/editor/index.ts': '',
       '/pages/settings/index.ts': '',
       '/pages/settings/ui/SettingsPage.tsx':
@@ -116,6 +118,32 @@ it('reports errors on a project with a public API sidestep on entities', async (
         path: joinFromRoot('pages', 'editor', 'ui', 'Editor.tsx'),
         start: { column: 71, line: 1 },
         end: { column: 108, line: 1 },
+      },
+    },
+  ])
+})
+
+it('reports errors on a project where a re-export sidesteps the public API', async () => {
+  const root = parseIntoFsdRoot(`
+    📂 entities
+      📂 product
+        📂 ui
+          📄 ProductCard.tsx
+        📄 index.ts
+    📂 pages
+      📂 editor
+        📂 ui
+          📄 ReExportedProductCard.tsx
+        📄 index.ts
+  `)
+
+  expect((await noPublicApiSidestep.check(root)).diagnostics).toEqual([
+    {
+      message: `Forbidden sidestep of public API when importing from "@/entities/product/ui/ProductCard.tsx".`,
+      location: {
+        path: joinFromRoot('pages', 'editor', 'ui', 'ReExportedProductCard.tsx'),
+        start: { column: 30, line: 1 },
+        end: { column: 67, line: 1 },
       },
     },
   ])
