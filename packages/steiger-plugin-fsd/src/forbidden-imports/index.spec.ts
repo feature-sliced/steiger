@@ -32,9 +32,11 @@ vi.mock('node:fs', async (importOriginal) => {
       '/src/shared/ui/TextField.tsx': 'import styles from "./styles";',
       '/src/shared/ui/index.ts': '',
       '/src/entities/user/ui/UserAvatar.tsx': 'import { Button } from "@/shared/ui"',
+      '/src/entities/user/ui/ReExportedCommentCard.tsx': 'export { CommentCard } from "@/features/comments"',
       '/src/entities/user/index.ts': '',
       '/src/entities/user/@x/product.ts': '',
       '/src/entities/product/ui/ProductCard.tsx': 'import { UserAvatar } from "@/entities/user"',
+      '/src/entities/product/ui/ReExportedUserAvatar.tsx': 'export { UserAvatar } from "@/entities/user"',
       '/src/entities/product/ui/GoodProductCard.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/src/entities/product/index.ts': '',
       '/src/entities/order/ui/OrderBadge.tsx': '',
@@ -322,6 +324,63 @@ it('reports errors on a project with incorrect cross-imports through @x', async 
         path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx'),
         start: { column: 29, line: 1 },
         end: { column: 55, line: 1 },
+      },
+    },
+  ])
+})
+
+it('reports errors on a project where an entity re-exports from a feature', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 entities
+        📂 user
+          📂 ui
+            📄 ReExportedCommentCard.tsx
+          📄 index.ts
+      📂 features
+        📂 comments
+          📂 ui
+            📄 CommentCard.tsx
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
+    {
+      message: `Forbidden import from higher layer "features".`,
+      location: {
+        path: joinFromRoot('src', 'entities', 'user', 'ui', 'ReExportedCommentCard.tsx'),
+        start: { column: 30, line: 1 },
+        end: { column: 49, line: 1 },
+      },
+    },
+  ])
+})
+
+it('reports errors on a project where a slice re-exports from a sibling slice', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 entities
+        📂 user
+          📂 ui
+            📄 UserAvatar.tsx
+          📄 index.ts
+        📂 product
+          📂 ui
+            📄 ReExportedUserAvatar.tsx
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
+    {
+      message: `Forbidden cross-import from slice "user".`,
+      location: {
+        path: joinFromRoot('src', 'entities', 'product', 'ui', 'ReExportedUserAvatar.tsx'),
+        start: { column: 29, line: 1 },
+        end: { column: 44, line: 1 },
       },
     },
   ])

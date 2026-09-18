@@ -7,6 +7,7 @@ vi.mock('node:fs', () =>
     '/src/App.vue': `
     <script>
       import Button from '@shared/ui/Button.vue';
+      export { default as Icon } from '@shared/ui/Icon.vue';
     </script>
 
     <script lang="ts" setup>
@@ -30,6 +31,13 @@ it('extracts esm dependencies from Vue source code', async () => {
       start: { line: 3, column: 27 },
       end: { line: 3, column: 48 },
     },
-    { path: 'vue', builtIn: false, dynamic: false, start: { line: 7, column: 28 }, end: { line: 7, column: 31 } },
+    {
+      path: '@shared/ui/Icon.vue',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 4, column: 40 },
+      end: { line: 4, column: 59 },
+    },
+    { path: 'vue', builtIn: false, dynamic: false, start: { line: 8, column: 28 }, end: { line: 8, column: 31 } },
   ])
 })
