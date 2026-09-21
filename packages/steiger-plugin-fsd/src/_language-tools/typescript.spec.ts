@@ -24,11 +24,18 @@ vi.mock('node:fs', () =>
       "import('./dynamic')",
       "require('./cjs')",
     ].join('\n'),
-    '/src/wildcard-exports.ts': [
-      "export * from './model'",
-      "export type * from './types'",
-      "export * as ui from './ui'",
-      "export type * as api from './api'",
+    '/src/re-exports.ts': [
+      'import { a } from "./a";',
+      '',
+      'export { b } from "./b";',
+      'export { b as c } from "./b";',
+      '',
+      'export * from "./c";',
+      'export * as ns from "./d";',
+      '',
+      'export type { Foo } from "./types";',
+      'export type * from "./types2";',
+      'export type * as Types from "./types3";',
     ].join('\n'),
     '/src/explicit-re-exports.ts': [
       "export { foo } from './foo'",
@@ -86,85 +93,107 @@ it('extracts every form of import', async () => {
   ])
 })
 
-it('extracts wildcard and namespace re-exports', async () => {
-  expect(await extractReExports('/src/wildcard-exports.ts')).toEqual([
+it('extracts every form of re-export with its kind and ranges, in source order', async () => {
+  expect(await extractReExports('/src/re-exports.ts')).toEqual([
     {
-      kind: 'all',
-      source: './model',
-      sourceRange: { start: { line: 1, column: 16 }, end: { line: 1, column: 23 } },
-      statementRange: { start: { line: 1, column: 1 }, end: { line: 1, column: 24 } },
+      type: 're-export',
+      kind: 'named',
+      source: './b',
+      builtIn: false,
+      sourceRange: { start: { line: 3, column: 20 }, end: { line: 3, column: 23 } },
+      statementRange: { start: { line: 3, column: 1 }, end: { line: 3, column: 25 } },
     },
     {
-      kind: 'all',
+      type: 're-export',
+      kind: 'named',
+      source: './b',
+      builtIn: false,
+      sourceRange: { start: { line: 4, column: 25 }, end: { line: 4, column: 28 } },
+      statementRange: { start: { line: 4, column: 1 }, end: { line: 4, column: 30 } },
+    },
+    {
+      type: 're-export',
+      kind: 'wildcard',
+      source: './c',
+      builtIn: false,
+      sourceRange: { start: { line: 6, column: 16 }, end: { line: 6, column: 19 } },
+      statementRange: { start: { line: 6, column: 1 }, end: { line: 6, column: 21 } },
+    },
+    {
+      type: 're-export',
+      kind: 'namespace',
+      source: './d',
+      builtIn: false,
+      sourceRange: { start: { line: 7, column: 22 }, end: { line: 7, column: 25 } },
+      statementRange: { start: { line: 7, column: 1 }, end: { line: 7, column: 27 } },
+    },
+    {
+      type: 're-export',
+      kind: 'named',
       source: './types',
-      sourceRange: { start: { line: 2, column: 21 }, end: { line: 2, column: 28 } },
-      statementRange: { start: { line: 2, column: 1 }, end: { line: 2, column: 29 } },
+      builtIn: false,
+      sourceRange: { start: { line: 9, column: 27 }, end: { line: 9, column: 34 } },
+      statementRange: { start: { line: 9, column: 1 }, end: { line: 9, column: 36 } },
     },
     {
-      kind: 'namespace',
-      source: './ui',
-      exportedName: 'ui',
-      sourceRange: { start: { line: 3, column: 22 }, end: { line: 3, column: 26 } },
-      statementRange: { start: { line: 3, column: 1 }, end: { line: 3, column: 27 } },
+      type: 're-export',
+      kind: 'wildcard',
+      source: './types2',
+      builtIn: false,
+      sourceRange: { start: { line: 10, column: 21 }, end: { line: 10, column: 29 } },
+      statementRange: { start: { line: 10, column: 1 }, end: { line: 10, column: 31 } },
     },
     {
+      type: 're-export',
       kind: 'namespace',
-      source: './api',
-      exportedName: 'api',
-      sourceRange: { start: { line: 4, column: 28 }, end: { line: 4, column: 33 } },
-      statementRange: { start: { line: 4, column: 1 }, end: { line: 4, column: 34 } },
+      source: './types3',
+      builtIn: false,
+      sourceRange: { start: { line: 11, column: 30 }, end: { line: 11, column: 38 } },
+      statementRange: { start: { line: 11, column: 1 }, end: { line: 11, column: 40 } },
     },
   ])
 })
 
-it('extracts explicit re-exports as named exports', async () => {
-  expect(await extractReExports('/src/explicit-re-exports.ts')).toEqual([
-    {
-      kind: 'named',
-      source: './foo',
-      specifiers: [{ name: 'foo' }],
-      sourceRange: { start: { line: 1, column: 22 }, end: { line: 1, column: 27 } },
-      statementRange: { start: { line: 1, column: 1 }, end: { line: 1, column: 28 } },
-    },
-    {
-      kind: 'named',
-      source: './bar',
-      specifiers: [{ name: 'foo', alias: 'bar' }],
-      sourceRange: { start: { line: 2, column: 29 }, end: { line: 2, column: 34 } },
-      statementRange: { start: { line: 2, column: 1 }, end: { line: 2, column: 35 } },
-    },
-    {
-      kind: 'named',
-      source: './types',
-      specifiers: [{ name: 'Foo' }],
-      sourceRange: { start: { line: 3, column: 27 }, end: { line: 3, column: 34 } },
-      statementRange: { start: { line: 3, column: 1 }, end: { line: 3, column: 35 } },
-    },
-    {
-      kind: 'named',
-      source: './baz',
-      specifiers: [{ name: 'default', alias: 'Baz' }],
-      sourceRange: { start: { line: 4, column: 33 }, end: { line: 4, column: 38 } },
-      statementRange: { start: { line: 4, column: 1 }, end: { line: 4, column: 39 } },
-    },
+it('keeps imports and re-exports of one module in a single source-ordered list', async () => {
+  const { statements } = await analyzeModule('/src/re-exports.ts')
+
+  expect(statements.map((statement) => [statement.type, statement.source])).toEqual([
+    ['import', './a'],
+    ['re-export', './b'],
+    ['re-export', './b'],
+    ['re-export', './c'],
+    ['re-export', './d'],
+    ['re-export', './types'],
+    ['re-export', './types2'],
+    ['re-export', './types3'],
   ])
+})
+
+it('extracts explicit re-exports as named re-exports', async () => {
+  expect((await extractReExports('/src/explicit-re-exports.ts')).map(({ kind, source }) => ({ kind, source }))).toEqual(
+    [
+      { kind: 'named', source: './foo' },
+      { kind: 'named', source: './bar' },
+      { kind: 'named', source: './types' },
+      { kind: 'named', source: './baz' },
+    ],
+  )
 })
 
 it('ignores the exports a module declares itself, since they name no other module', async () => {
   expect(await extractReExports('/src/local-exports.ts')).toEqual([])
 })
 
-// The bundled tree-sitter grammar has no rule for `export … with { … }`: such a statement parses as
-// a labeled statement, so it never reaches the re-export queries. Nothing in the extractor works
-// around that, and this should start passing on its own once the grammar gains the rule.
+// The bundled tree-sitter grammar has no rule for `export ... with { ... }`, so the statement parses
+// as a labeled statement and never reaches the re-export query. This should pass once the grammar
+// gains the rule.
 it.todo('extracts a wildcard re-export that carries import attributes')
 
 it('returns imports and re-exports in source order', async () => {
-  const analysis = await analyzeModule('/src/ordering.ts')
+  const { statements } = await analyzeModule('/src/ordering.ts')
 
   // `require` is matched by a later query than `import`, so without sorting `./second` would come first.
-  expect(analysis.imports.map((moduleImport) => moduleImport.source)).toEqual(['./first', './second'])
-  expect(analysis.reExports.map((reExport) => reExport.source)).toEqual(['./third'])
+  expect(statements.map((statement) => statement.source)).toEqual(['./first', './second', './third'])
 })
 
 it('leaves re-exports out of the imports of a module', async () => {

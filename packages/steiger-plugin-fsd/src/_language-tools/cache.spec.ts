@@ -1,31 +1,31 @@
 import { expect, it, vi } from 'vitest'
+import { Parser } from 'web-tree-sitter'
 
 import { createMockedNodeFs } from './mock-node-fs.js'
 
-const readPaths: string[] = []
-
-vi.mock('node:fs', async () => {
-  const mocked = await createMockedNodeFs({
+vi.mock('node:fs', () =>
+  createMockedNodeFs({
     '/src/module.ts': ["import './dependency'", "export * from './re-exported'"].join('\n'),
-  })
+  }),
+)
 
-  return {
-    ...mocked,
-    readFileSync: ((path: string, options: never) => {
-      readPaths.push(path)
-      return mocked.readFileSync(path, options)
-    }) as typeof mocked.readFileSync,
-  }
-})
-
-import { extractDependencies, extractReExports } from './index.js'
+import { analyzeModule, extractDependencies, extractReExports } from './index.js'
 
 it('parses a file once and serves its imports and re-exports from one analysis', async () => {
+  const parse = vi.spyOn(Parser.prototype, 'parse')
+
   expect((await extractDependencies('/src/module.ts')).map((dependency) => dependency.path)).toEqual(['./dependency'])
   expect((await extractReExports('/src/module.ts')).map((reExport) => reExport.source)).toEqual(['./re-exported'])
 
   await extractDependencies('/src/module.ts')
   await extractReExports('/src/module.ts')
 
-  expect(readPaths.filter((path) => path === '/src/module.ts')).toHaveLength(1)
+  expect(parse).toHaveBeenCalledTimes(1)
+})
+
+it('returns the same cached analysis object for the same unchanged file', async () => {
+  const first = await analyzeModule('/src/module.ts')
+  const second = await analyzeModule('/src/module.ts')
+
+  expect(second).toBe(first)
 })

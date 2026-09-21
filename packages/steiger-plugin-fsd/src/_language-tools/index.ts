@@ -43,10 +43,12 @@ interface Extractor {
   extensions: string[]
   language: Language
   injections: Array<{ query: Query; lang: string }>
-  /** Queries for the modules a file pulls in. `static`/`dynamic` describes how the module is loaded. */
-  importQueries: Array<{ query: Query; type: 'static' | 'dynamic' }>
-  /** Queries for the modules a file re-exports. Each one captures `@statement` and `@source`, and produces one `kind`. */
-  reExportQueries: Array<{ query: Query; kind: ReExportInfo['kind'] }>
+  /**
+   * Queries for the statements that name another module. Each one captures the whole statement as
+   * `@statement` and the module specifier as `@source`. `static`/`dynamic` describes how an import
+   * loads the module; `re-export` is an `export ... from` statement.
+   */
+  queries: Array<{ query: Query; type: 'static' | 'dynamic' | 're-export' }>
 }
 
 const extractors: Array<Extractor> = [
@@ -54,9 +56,9 @@ const extractors: Array<Extractor> = [
     type: 'tsx',
     extensions: ['.tsx', '.jsx', '.ts', '.js', '.cjs', '.mjs'],
     language: tsx,
-    importQueries: [
+    queries: [
       {
-        query: new Query(tsx, '(import_statement source: (string (string_fragment) @source))'),
+        query: new Query(tsx, '(import_statement source: (string (string_fragment) @source)) @statement'),
         type: 'static',
       },
       {
@@ -67,7 +69,7 @@ const extractors: Array<Extractor> = [
               (variable_declarator
                 value: (call_expression
                   function: (identifier) @function.name (#eq? @function.name "require")
-                  arguments: (arguments (string (string_fragment) @source))))))`,
+                  arguments: (arguments (string (string_fragment) @source)))) @statement))`,
         ),
         type: 'static',
       },
@@ -76,7 +78,7 @@ const extractors: Array<Extractor> = [
           tsx,
           `(call_expression
            	function: (import)
-            arguments: (arguments (string (string_fragment) @source)))`,
+            arguments: (arguments (string (string_fragment) @source))) @statement`,
         ),
         type: 'dynamic',
       },
@@ -87,39 +89,17 @@ const extractors: Array<Extractor> = [
             (expression_statement
               (call_expression
                 function: (identifier) @function.name (#eq? @function.name "require")
-           			arguments: (arguments (string (string_fragment) @source)))))
+           			arguments: (arguments (string (string_fragment) @source)))) @statement)
           `,
         ),
         type: 'dynamic',
       },
-    ],
-    reExportQueries: [
       {
-        // `export * from '…'`. The `*` is a direct child here, which is what separates this from a
-        // namespace re-export, where the `*` sits inside a `namespace_export` node.
-        query: new Query(tsx, '(export_statement "*" source: (string (string_fragment) @source)) @statement'),
-        kind: 'all',
-      },
-      {
-        // `export * as ns from '…'`
-        query: new Query(
-          tsx,
-          `(export_statement
-            (namespace_export (identifier) @exportedName)
-            source: (string (string_fragment) @source)) @statement`,
-        ),
-        kind: 'namespace',
-      },
-      {
-        // `export { a, b as c } from '…'`. Requiring `source` here is what keeps a local
-        // `export { a }`, which names no other module, out of the results.
-        query: new Query(
-          tsx,
-          `(export_statement
-            (export_clause) @clause
-            source: (string (string_fragment) @source)) @statement`,
-        ),
-        kind: 'named',
+        // Every `export ... from '...'`, whatever it exports. Requiring `source` excludes a local
+        // `export { a }`, which names no other module. `reExportKind` reads the shape of the
+        // statement (`{ a }`, `*`, `* as ns`) off the syntax tree.
+        query: new Query(tsx, '(export_statement source: (string (string_fragment) @source)) @statement'),
+        type: 're-export',
       },
     ],
     injections: [],
@@ -128,8 +108,7 @@ const extractors: Array<Extractor> = [
     type: 'svelte',
     extensions: ['.svelte'],
     language: svelte,
-    importQueries: [],
-    reExportQueries: [],
+    queries: [],
     injections: [
       {
         query: new Query(svelte, '(script_element (raw_text) @tsx)'),
@@ -141,8 +120,7 @@ const extractors: Array<Extractor> = [
     type: 'astro',
     extensions: ['.astro'],
     language: astro,
-    importQueries: [],
-    reExportQueries: [],
+    queries: [],
     injections: [
       {
         query: new Query(astro, '(frontmatter_js_block) @tsx'),
@@ -154,8 +132,7 @@ const extractors: Array<Extractor> = [
     type: 'vue',
     extensions: ['.vue'],
     language: vue,
-    importQueries: [],
-    reExportQueries: [],
+    queries: [],
     injections: [
       {
         query: new Query(vue, '(document (script_element (raw_text) @tsx))'),
@@ -176,86 +153,6 @@ export function getSourceType(sourcePath: string): string | undefined {
   return undefined
 }
 
-function rangeOf(node: Node): SourceRange {
-  return {
-    start: { line: node.startPosition.row + 1, column: node.startPosition.column + 1 },
-    end: { line: node.endPosition.row + 1, column: node.endPosition.column + 1 },
-  }
-}
-
-function readSpecifiers(clause: Node): NamedReExport['specifiers'] {
-  const specifiers: NamedReExport['specifiers'] = []
-
-  for (const child of clause.namedChildren) {
-    if (child.type !== 'export_specifier') continue
-
-    const name = child.childForFieldName('name')
-    if (name === null) continue
-
-    const alias = child.childForFieldName('alias')
-    specifiers.push(alias === null ? { name: name.text } : { name: name.text, alias: alias.text })
-  }
-
-  return specifiers
-}
-
-function collectImports(extractor: Extractor, tree: Tree): ImportInfo[] {
-  const result: ImportInfo[] = []
-
-  for (const { query, type } of extractor.importQueries) {
-    for (const match of query.matches(tree.rootNode)) {
-      for (const capture of match.captures) {
-        if (capture.name === 'source') {
-          result.push({
-            source: capture.node.text,
-            builtIn: isBuiltin(capture.node.text),
-            dynamic: type === 'dynamic',
-            sourceRange: rangeOf(capture.node),
-          })
-        }
-      }
-    }
-  }
-
-  return result
-}
-
-function collectReExports(extractor: Extractor, tree: Tree): ReExportInfo[] {
-  const result: ReExportInfo[] = []
-
-  for (const { query, kind } of extractor.reExportQueries) {
-    for (const match of query.matches(tree.rootNode)) {
-      const captures = new Map(match.captures.map((capture) => [capture.name, capture.node]))
-
-      const statement = captures.get('statement')
-      const source = captures.get('source')
-      if (statement === undefined || source === undefined) continue
-
-      const common = {
-        source: source.text,
-        sourceRange: rangeOf(source),
-        statementRange: rangeOf(statement),
-      }
-
-      if (kind === 'all') {
-        result.push({ kind, ...common })
-      } else if (kind === 'namespace') {
-        const exportedName = captures.get('exportedName')
-        if (exportedName === undefined) continue
-
-        result.push({ kind, exportedName: exportedName.text, ...common })
-      } else {
-        const clause = captures.get('clause')
-        if (clause === undefined) continue
-
-        result.push({ kind, specifiers: readSpecifiers(clause), ...common })
-      }
-    }
-  }
-
-  return result
-}
-
 /** A span in a source file. All indexes are 1-based. */
 export interface SourceRange {
   start: {
@@ -268,55 +165,99 @@ export interface SourceRange {
   }
 }
 
-export interface ImportInfo {
+/** `import ... from '...'`, `require('...')` or `import('...')`. */
+export interface ImportStatement {
+  type: 'import'
   /** The module specifier, exactly as it is written in the source. */
   source: string
   builtIn: boolean
   dynamic: boolean
-  /** The specifier string on its own, which is the part that import diagnostics point at. */
-  sourceRange: SourceRange
-}
-
-/** `export * from '…'`, which passes on an unknown set of names. */
-export interface WildcardReExport {
-  kind: 'all'
-  source: string
+  /** The specifier string alone. Import diagnostics point at this range. */
   sourceRange: SourceRange
   statementRange: SourceRange
 }
 
-/** `export * as ns from '…'`, which passes on an unknown set of names, bound to a single identifier. */
-export interface NamespaceReExport {
-  kind: 'namespace'
+/** `export ... from '...'`. */
+export interface ReExportStatement {
+  type: 're-export'
+  /**
+   * The shape of the statement:
+   * - `named`: `export { a, b as c } from '...'`
+   * - `wildcard`: `export * from '...'`
+   * - `namespace`: `export * as ns from '...'`
+   *
+   * A wildcard or namespace re-export passes on whatever the other module exports. The type-only
+   * forms (`export type { a } from`, `export type * from`, `export type * as ns from`) have the
+   * same kinds as their value counterparts.
+   */
+  kind: 'named' | 'wildcard' | 'namespace'
+  /** The module specifier, exactly as it is written in the source. */
   source: string
-  /** The name the re-exported module is bound to, `ns` in `export * as ns from '…'`. */
-  exportedName: string
+  builtIn: boolean
   sourceRange: SourceRange
   statementRange: SourceRange
 }
 
-/** `export { a, b as c } from '…'`. */
-export interface NamedReExport {
-  kind: 'named'
-  source: string
-  specifiers: Array<{ name: string; alias?: string }>
-  sourceRange: SourceRange
-  statementRange: SourceRange
-}
-
-export type ReExportInfo = WildcardReExport | NamespaceReExport | NamedReExport
+/** A statement that names another module. */
+export type Statement = ImportStatement | ReExportStatement
 
 /**
- * The other modules that a file names, both the ones it imports and the ones it re-exports.
+ * Every statement of a module that names another module, in source order.
  *
- * `reExports` holds the statements that name another module, and only those. The exports a module
- * declares itself (`export const a = 1`, `export default a`, `export { a }`, and whatever a
- * framework adds on top of a component file) are a different question that no rule asks yet, so
- * this does not model them. A field for them can sit beside this one when a rule needs it.
+ * The exports a module declares itself (`export const a = 1`, `export default a`, `export { a }`, and
+ * whatever a framework adds on top of a component file) name no other module, so they are not here.
  */
 export interface ModuleAnalysis {
-  imports: ImportInfo[]
-  reExports: ReExportInfo[]
+  statements: Statement[]
+}
+
+function rangeOf(node: Node): SourceRange {
+  return {
+    start: { line: node.startPosition.row + 1, column: node.startPosition.column + 1 },
+    end: { line: node.endPosition.row + 1, column: node.endPosition.column + 1 },
+  }
+}
+
+function reExportKind(statement: Node): ReExportStatement['kind'] | undefined {
+  for (const child of statement.children) {
+    if (child.type === 'namespace_export') return 'namespace'
+    if (child.type === 'export_clause') return 'named'
+    if (child.type === '*') return 'wildcard'
+  }
+
+  return undefined
+}
+
+function collectStatements(extractor: Extractor, tree: Tree): Statement[] {
+  const result: Statement[] = []
+
+  for (const { query, type } of extractor.queries) {
+    for (const match of query.matches(tree.rootNode)) {
+      const captures = new Map(match.captures.map((capture) => [capture.name, capture.node]))
+
+      const statement = captures.get('statement')
+      const source = captures.get('source')
+      if (statement === undefined || source === undefined) continue
+
+      const common = {
+        source: source.text,
+        builtIn: isBuiltin(source.text),
+        sourceRange: rangeOf(source),
+        statementRange: rangeOf(statement),
+      }
+
+      if (type === 're-export') {
+        const kind = reExportKind(statement)
+        if (kind === undefined) continue
+
+        result.push({ type: 're-export', kind, ...common })
+      } else {
+        result.push({ type: 'import', dynamic: type === 'dynamic', ...common })
+      }
+    }
+  }
+
+  return result
 }
 
 /**
@@ -324,7 +265,7 @@ export interface ModuleAnalysis {
  * languages injected into it (for example, the `<script>` block of a Vue component).
  *
  * Every injected region of a file is parsed into a single tree, so a Vue component that has both a
- * `<script>` and a `<script setup>` block is analyzed as one module rather than two.
+ * `<script>` and a `<script setup>` block is analyzed as one module.
  */
 function forEachSyntaxTree(path: string, visit: (extractor: Extractor, tree: Tree) => void): void {
   const extension = extname(path)
@@ -374,32 +315,28 @@ function comparePositions(a: SourceRange, b: SourceRange): number {
 }
 
 function analyzeSourceFile(path: string): ModuleAnalysis {
-  const imports: ImportInfo[] = []
-  const reExports: ReExportInfo[] = []
+  const statements: Statement[] = []
 
   forEachSyntaxTree(path, (extractor, tree) => {
-    imports.push(...collectImports(extractor, tree))
-    reExports.push(...collectReExports(extractor, tree))
+    statements.push(...collectStatements(extractor, tree))
   })
 
-  // Queries run one after another, and injected trees come after the outer one, so matches arrive
-  // grouped by query rather than in reading order. Sorting keeps diagnostics readable: an index file
-  // that mixes `export *` with `export * as ns` would otherwise report its second line first.
-  imports.sort((a, b) => comparePositions(a.sourceRange, b.sourceRange))
-  reExports.sort((a, b) => comparePositions(a.statementRange, b.statementRange))
+  // Matches arrive grouped by query, and injected trees come after the outer one. Without sorting,
+  // every `require` would follow every `import`, and every re-export would follow every import.
+  // Sorting restores reading order, so diagnostics come out in line order.
+  statements.sort((a, b) => comparePositions(a.statementRange, b.statementRange))
 
-  return { imports, reExports }
+  return { statements }
 }
 
 const moduleAnalysisCache = createFSCache<ModuleAnalysis>()
 
 /**
- * Analyze what a module imports and what it re-exports.
+ * Collect the imports and re-exports of a module.
  *
- * This parses a file once and caches the whole analysis, so rules that need different parts of it
- * share the work. Callers filter what they get back; the cache always holds everything.
- *
- * Both lists are in source order.
+ * This parses the file once and caches the whole analysis, so rules that need different parts of
+ * it share the work. Repeat calls for the same unchanged file return the same object. Callers
+ * filter it as they need.
  */
 export async function analyzeModule(path: string): Promise<ModuleAnalysis> {
   let analysis = moduleAnalysisCache.get(path)
@@ -429,8 +366,7 @@ interface Dependency {
 /**
  * Find the modules that a file imports.
  *
- * Re-exports are left out, since a rule asking what a file uses does not want its public API back.
- * Rules that need re-exports read {@link extractReExports} instead.
+ * Re-exports are left out. {@link extractReExports} returns those.
  */
 export async function extractDependencies(
   path: string,
@@ -442,9 +378,10 @@ export async function extractDependencies(
   const includeBuiltIns = options?.includeBuiltIns ?? false
   const importType = options?.importType
 
-  const { imports } = await analyzeModule(path)
+  const { statements } = await analyzeModule(path)
 
-  return imports
+  return statements
+    .filter((statement): statement is ImportStatement => statement.type === 'import')
     .filter((moduleImport) => {
       if (includeBuiltIns === false && moduleImport.builtIn === true) return false
       if (importType === 'dynamic' && moduleImport.dynamic === false) return false
@@ -462,6 +399,8 @@ export async function extractDependencies(
 }
 
 /** Find the modules that a file re-exports, in source order. */
-export async function extractReExports(path: string): Promise<ReExportInfo[]> {
-  return (await analyzeModule(path)).reExports
+export async function extractReExports(path: string): Promise<ReExportStatement[]> {
+  const { statements } = await analyzeModule(path)
+
+  return statements.filter((statement): statement is ReExportStatement => statement.type === 're-export')
 }

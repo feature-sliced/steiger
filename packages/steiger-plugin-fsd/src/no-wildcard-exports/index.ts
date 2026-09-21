@@ -18,7 +18,7 @@ const noWildcardExports = {
       if (!sourceType) continue
 
       for (const reExport of await extractReExports(sourceFile.file.path)) {
-        if (reExport.kind !== 'all' && reExport.kind !== 'namespace') continue
+        if (reExport.kind !== 'wildcard' && reExport.kind !== 'namespace') continue
 
         diagnostics.push({
           message: `Wildcard re-export from "${reExport.source}" does not define an explicit public API. Prefer explicit named exports.`,

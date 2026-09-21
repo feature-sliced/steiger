@@ -92,6 +92,15 @@ vi.mock('node:fs', async (importOriginal) => {
       '/src/shared/api/rest/index.ts': "export * from './endpoints'",
       '/src/shared/api/rest/endpoints.ts': 'export const endpoints = {}',
 
+      // Type-only re-exports have the same shapes as value re-exports
+      '/src/entities/cart/index.ts': [
+        "export type { Cart } from './model/cart'",
+        "export type * from './model/types'",
+        "export type * as Types from './model/types'",
+      ].join('\n'),
+      '/src/entities/cart/model/cart.ts': 'export interface Cart {}',
+      '/src/entities/cart/model/types.ts': 'export type Item = {}',
+
       // A public API that isn't source code
       '/src/shared/styles/index.css': ':root {\n  color: red;\n}',
     },
@@ -280,6 +289,39 @@ it('reports the wildcard and namespace re-exports of a public API that mixes exp
         path: joinFromRoot('src', 'widgets', 'header', 'index.ts'),
         start: { line: 5, column: 1 },
         end: { line: 5, column: 34 },
+      },
+    },
+  ])
+})
+
+it('reports type-only wildcard and namespace re-exports, but not type-only named re-exports', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 entities
+        📂 cart
+          📂 model
+            📄 cart.ts
+            📄 types.ts
+          📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await noWildcardExports.check(root)).diagnostics).toEqual([
+    {
+      message: `Wildcard re-export from "./model/types" does not define an explicit public API. Prefer explicit named exports.`,
+      location: {
+        path: joinFromRoot('src', 'entities', 'cart', 'index.ts'),
+        start: { line: 2, column: 1 },
+        end: { line: 2, column: 35 },
+      },
+    },
+    {
+      message: `Wildcard re-export from "./model/types" does not define an explicit public API. Prefer explicit named exports.`,
+      location: {
+        path: joinFromRoot('src', 'entities', 'cart', 'index.ts'),
+        start: { line: 3, column: 1 },
+        end: { line: 3, column: 44 },
       },
     },
   ])
