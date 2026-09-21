@@ -44,7 +44,9 @@ vi.mock('node:fs', async (importOriginal) => {
       '/pages/settings/ui/SettingsPage.tsx':
         'import { Button } from "@/shared/ui"; import { CommentCard } from "@/features/comments"',
       '/pages/settings/index.ts': '',
+      '/pages/home/ui/HomePage.tsx': 'export { ProductCard } from "@/entities/product"',
       '/pages/home/index.ts': '',
+      '/pages/category/ui/CategoryPage.tsx': 'export { ProductCard } from "@/entities/product"',
       '/pages/category/index.ts': '',
 
       '/app/layouts/BaseLayout.tsx': 'import { Sidebar } from "@/widgets/sidebar"',
@@ -192,4 +194,25 @@ it('reports errors on a project where the only other reference to a slice is a c
       location: { path: joinFromRoot('entities', 'user') },
     },
   ])
+})
+
+it('reports no errors when two slices reference a slice only through re-exports', async () => {
+  const root = parseIntoFsdRoot(`
+    📂 entities
+      📂 product
+        📂 ui
+          📄 ProductCard.tsx
+        📄 index.ts
+    📂 pages
+      📂 home
+        📂 ui
+          📄 HomePage.tsx
+        📄 index.ts
+      📂 category
+        📂 ui
+          📄 CategoryPage.tsx
+        📄 index.ts
+  `)
+
+  expect((await insignificantSlice.check(root)).diagnostics).toEqual([])
 })
