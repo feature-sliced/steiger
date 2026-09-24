@@ -1,5 +1,19 @@
 # @feature-sliced/steiger-plugin
 
+## 0.8.0
+
+### Minor Changes
+
+- 2d8411e: refactor diagnostic location to use `start` and `end` ranges instead of a single `line`/`column`
+- 2d8411e: add line and column numbers to import-related diagnostics
+- 04e0ae2: add the `no-wildcard-exports` rule, which forbids `export * from` and `export * as ns from` in public APIs. The rule is disabled by default.
+
+### Patch Changes
+
+- 2d8411e: cache the result of `resolveImport` calls to speed up dependency resolution
+- 2bb9afe: Fix stale package versions in the --version output.
+- 4fbedf6: add fall back to sequential parser load
+
 ## 0.7.0
 
 ### Minor Changes
