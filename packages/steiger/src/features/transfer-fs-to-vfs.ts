@@ -14,7 +14,6 @@ import { createVfsRoot } from '../models/vfs'
 export async function createWatcher(path: string, options?: { stabilityThreshold?: number; pollInterval?: number }) {
   const vfs = createVfsRoot(path)
   const gitFolder = find.up('.git', { cwd: path })
-  // @ts-expect-error suppressErrors is missing from the type definition
   const isIgnored = await isGitIgnored({ cwd: gitFolder ? dirname(gitFolder) : path, suppressErrors: true })
 
   const watcher = chokidar.watch(path, {
