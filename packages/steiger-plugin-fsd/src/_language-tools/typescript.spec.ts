@@ -49,6 +49,19 @@ vi.mock('node:fs', () =>
       "import second from './second'",
       "export * from './third'",
     ].join('\n'),
+    '/src/nested-require.js': [
+      "const top = require('./top')",
+      'function load() {',
+      "  return require('./in-function')",
+      '}',
+      'if (condition) {',
+      "  const inBlock = require('./in-block')",
+      '}',
+      "var old = require('./var')",
+      "const { member } = require('./destructured')",
+      "module.exports = require('./re-exported')",
+    ].join('\n'),
+    '/src/not-require.js': ["loader.require('./method')", 'require(dynamicPath)', "requireAll('./other')"].join('\n'),
   }),
 )
 
@@ -201,4 +214,19 @@ it('leaves re-exports out of the imports of a module', async () => {
     './first',
     './second',
   ])
+})
+
+it('extracts `require` calls wherever they are in a module, each one once', async () => {
+  expect((await extractDependencies('/src/nested-require.js')).map((dependency) => dependency.path)).toEqual([
+    './top',
+    './in-function',
+    './in-block',
+    './var',
+    './destructured',
+    './re-exported',
+  ])
+})
+
+it('does not mistake other calls for `require`', async () => {
+  expect(await extractDependencies('/src/not-require.js')).toEqual([])
 })

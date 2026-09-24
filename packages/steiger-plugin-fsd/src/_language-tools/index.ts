@@ -95,6 +95,17 @@ const extractors: Array<Extractor> = [
         type: 'dynamic',
       },
       {
+        // Every other `require('...')`, wherever it is: inside a function or a block, in a `var`, in an
+        // assignment. The top-level forms above match first and keep their type.
+        query: new Query(
+          tsx,
+          `(call_expression
+            function: (identifier) @function.name (#eq? @function.name "require")
+            arguments: (arguments (string (string_fragment) @source))) @statement`,
+        ),
+        type: 'dynamic',
+      },
+      {
         // Every `export ... from '...'`, whatever it exports. Requiring `source` excludes a local
         // `export { a }`, which names no other module. `reExportKind` reads the shape of the
         // statement (`{ a }`, `*`, `* as ns`) off the syntax tree.
@@ -230,6 +241,9 @@ function reExportKind(statement: Node): ReExportStatement['kind'] | undefined {
 
 function collectStatements(extractor: Extractor, tree: Tree): Statement[] {
   const result: Statement[] = []
+  // A module specifier can be matched by more than one query (a top-level `require` also matches the
+  // catch-all one). The first query to match it decides how it is reported.
+  const seenSources = new Set<number>()
 
   for (const { query, type } of extractor.queries) {
     for (const match of query.matches(tree.rootNode)) {
@@ -238,6 +252,8 @@ function collectStatements(extractor: Extractor, tree: Tree): Statement[] {
       const statement = captures.get('statement')
       const source = captures.get('source')
       if (statement === undefined || source === undefined) continue
+      if (seenSources.has(source.startIndex)) continue
+      seenSources.add(source.startIndex)
 
       const common = {
         source: source.text,
