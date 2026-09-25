@@ -1,5 +1,27 @@
 # steiger
 
+## 0.7.0
+
+### Minor Changes
+
+- 5d698c3: watch file changes in watch mode
+- 2d8411e: expose file system watcher options (`stabilityThreshold`, `pollInterval`, `debounceInterval`) for `linter.watch`
+- 2d8411e: add language server implementation, exposed via the `steiger-language-server` binary
+- 2941d88: update minimal nodejs version, fix typescript 7 support
+- 16cba3a: Add a --ignore-warnings CLI option to report errors only.
+
+### Patch Changes
+
+- 2bb9afe: Fix stale package versions in the --version output.
+- 0ed7ae1: prevent EACCES errors for ignored files
+- Updated dependencies [2d8411e]
+- Updated dependencies [2bb9afe]
+- Updated dependencies [2d8411e]
+- Updated dependencies [2d8411e]
+- Updated dependencies [04e0ae2]
+- Updated dependencies [4fbedf6]
+  - @feature-sliced/steiger-plugin@0.8.0
+
 ## 0.6.0
 
 ### Minor Changes
