@@ -16,6 +16,7 @@ jobs:
   print:
     name: Print the sizes
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Download the sizes
         uses: actions/download-artifact@v4
