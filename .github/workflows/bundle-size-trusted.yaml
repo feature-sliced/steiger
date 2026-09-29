@@ -42,21 +42,31 @@ jobs:
             function formatSize(sizeInBytes) {
               if (sizeInBytes < 1000) {
                 return `${sizeInBytes} B`;
+              } else if (sizeInBytes < 1000000) {
+                return `${(sizeInBytes / 1000).toFixed(2)} KB`;
               } else {
-                const sizeInKb = sizeInBytes / 1000;
-                return `${sizeInKb.toFixed(2)} KB`;
+                return `${(sizeInBytes / 1000000).toFixed(2)} MB`;
               }
+            }
+            function formatChange(base, pr) {
+              const diff = pr - base;
+              if (diff === 0) {
+                return '0 B';
+              }
+              const sign = diff > 0 ? '+' : '-';
+              const percent = (Math.abs(diff) / base * 100).toFixed(2);
+              return `${sign}${formatSize(Math.abs(diff))} (${sign}${percent}%)`;
             }
             const fs = require('fs');
             const sizes = parseDuOutput(fs.readFileSync('sizes-base.txt', 'utf8'));
             const sizesPR = parseDuOutput(fs.readFileSync('sizes-head.txt', 'utf8'));
             core.summary.addHeading('📊 Package size report', '3');
             core.summary.addTable([
-              ['Package', 'Before', 'After'].map((data) => ({ data, header: true })),
+              ['Package', 'Base', 'PR', 'Change'].map((data) => ({ data, header: true })),
               ...Object.keys(sizes).map((packageName) => {
                 const size = sizes[packageName];
                 const sizePR = sizesPR[packageName];
-                return [packageName, formatSize(size), sizePR === size ? 'No change' : formatSize(sizePR)];
+                return [packageName, formatSize(size), formatSize(sizePR), formatChange(size, sizePR)];
               }),
             ]);
             const report = core.summary.stringify();
