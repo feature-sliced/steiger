@@ -21,6 +21,7 @@ import noCrossImports from './no-cross-imports/index.js'
 import noHigherLevelImports from './no-higher-level-imports/index.js'
 import importLocality from './import-locality/index.js'
 import noWildcardExports from './no-wildcard-exports/index.js'
+import noDirectCodeInSliceGroups from './no-direct-code-in-slice-groups/index.js'
 
 const enabledRules = [
   ambiguousSliceNames,
@@ -40,6 +41,7 @@ const enabledRules = [
   sharedLibGrouping,
   typoInLayerName,
   noProcesses,
+  noDirectCodeInSliceGroups,
 ]
 const disabledRules = [noCrossImports, noHigherLevelImports, importLocality, noWildcardExports]
 
