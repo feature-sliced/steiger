@@ -3,7 +3,7 @@ import z from 'zod'
 import { BaseRuleOptions, Config, Plugin, Rule } from '@steiger/types'
 
 import { getOptions, isConfigObject, isPlugin } from './raw-config'
-import { isEqual } from '../../shared/objects'
+import { isDeepStrictEqual } from 'node:util'
 
 const OLD_CONFIG_ERROR_MESSAGE =
   'Old configuration format detected. We are evolving!\nPlease follow this short guide to migrate to the new one:\nhttps://github.com/feature-sliced/steiger/blob/master/MIGRATION_GUIDE.md'
@@ -56,7 +56,7 @@ function validateRuleOptions(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
           return
         }
 
-        if (ruleOptions && prevOptions && !isEqual(ruleOptions, prevOptions)) {
+        if (ruleOptions && prevOptions && !isDeepStrictEqual(ruleOptions, prevOptions)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `
