@@ -16,7 +16,7 @@ import { cosmiconfig } from 'cosmiconfig'
 import fsd from '@feature-sliced/steiger-plugin'
 import type { Diagnostic as SteigerDiagnostic } from '@steiger/types'
 
-import { processConfiguration } from './models/config'
+import { processScopedConfiguration } from './models/config'
 import { linter } from './app'
 import packageJson from '../package.json'
 
@@ -32,13 +32,14 @@ async function addWorkspace(rootPath: string) {
     filepath: undefined,
   }
   const configLocationDirectory = filepath ? dirname(filepath) : null
-  processConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
+  const processedConfig = processScopedConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
 
   const sourcePath = join(rootPath, 'src')
   const [diagnosticsChanged, dispose] = await linter.watch(sourcePath, {
     debounceInterval: 100,
     pollInterval: 50,
     stabilityThreshold: 100,
+    config: processedConfig,
   })
 
   const diagnostics: SteigerDiagnostic[] = []

@@ -1,6 +1,6 @@
 import { performance } from 'node:perf_hooks'
 import { Console } from 'node:console'
-import { createEffect, merge, sample } from 'effector'
+import { createEffect, createStore, merge, sample } from 'effector'
 import { debounce, not } from 'patronum'
 import type { Config, Folder, Rule } from '@steiger/types'
 
@@ -17,7 +17,6 @@ import {
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
-import { combine } from 'effector/effector.mjs'
 
 // TODO: make this part of a plugin
 function getRuleDescriptionUrl(ruleName: string) {
@@ -99,18 +98,21 @@ export const linter = {
       config?: ProcessedConfig
     },
   ) => {
+    const config = options?.config ?? $globalConfig.getState()
+    if (config === null) {
+      throw new Error(
+        'Cannot start watching without a configuration. Call processConfiguration first or pass options.config.',
+      )
+    }
     const { vfs, watcher } = await createWatcher(path, options)
 
     const treeChanged = debounce(merge([vfs.$tree, vfs.fileChanged]), options?.debounceInterval ?? 500)
     const runRulesFx = createEffect(runRules)
 
-    const $config = combine($globalConfig, (c) => {
-      if (options?.config) return options.config
-      return c!
-    })
+    const $config = createStore(config)
 
     sample({
-      clock: defer({ clock: [treeChanged, $config], until: not(runRulesFx.pending) }),
+      clock: defer({ clock: [treeChanged], until: not(runRulesFx.pending) }),
       source: {
         vfs: vfs.$tree,
         config: $config,
