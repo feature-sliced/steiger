@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { partition } from 'lodash-es'
 import pluralize from 'pluralize'
 const { isPlural, plural, singular } = pluralize
 import { getLayers, getSlices } from '@feature-sliced/filesystem'
@@ -24,8 +23,16 @@ const inconsistentNaming = {
     const slices = getSlices(entities)
     const sliceNames = groupSlices(Object.keys(slices))
     for (const [groupPrefix, group] of Object.entries(sliceNames)) {
-      const [, namesToCheck] = partition(group, isNeutralWord)
-      const [pluralNames, singularNames] = partition(namesToCheck, isPlural)
+      const namesToCheck = group.filter((g) => !isNeutralWord(g))
+      const pluralNames: string[] = []
+      const singularNames: string[] = []
+      for (const name of namesToCheck) {
+        if (isPlural(name)) {
+          pluralNames.push(name)
+        } else {
+          singularNames.push(name)
+        }
+      }
 
       if (pluralNames.length > 0 && singularNames.length > 0) {
         const message = 'Inconsistent pluralization of slice names'
