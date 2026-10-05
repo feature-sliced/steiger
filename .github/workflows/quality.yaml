@@ -48,3 +48,19 @@ jobs:
 
       - name: Try building
         run: turbo run build
+
+  package-smoke-test:
+    name: Package smoke test
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build the packages
+        run: turbo run build
+
+      - name: Use the packed packages in a clean project
+        run: node package-smoke/run.mjs

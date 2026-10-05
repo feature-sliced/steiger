@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "steiger-consumer",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "^5.9.2"
+  }
+}
