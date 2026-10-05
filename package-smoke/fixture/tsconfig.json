@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "target": "es2022",
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["steiger.config.ts"]
+}
