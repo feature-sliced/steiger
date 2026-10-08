@@ -76,6 +76,28 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@22.19.17)(tsx@4.20.3)(yaml@2.8.1)
 
+  packages/language-server:
+    dependencies:
+      cosmiconfig:
+        specifier: ^10.0.1
+        version: 10.0.1
+      vscode-languageserver:
+        specifier: ^10.1.0
+        version: 10.1.0
+    devDependencies:
+      '@steiger/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint-config
+      '@steiger/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
+      '@types/node':
+        specifier: ^22.19.17
+        version: 22.19.17
+      tsup:
+        specifier: ^8.5.0
+        version: 8.5.0(@microsoft/api-extractor@7.47.7(@types/node@22.19.17))(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.1)
+
   packages/pretty-reporter:
     dependencies:
       figures:
@@ -1482,6 +1504,7 @@ packages:
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globals@14.0.0:
@@ -4606,7 +4629,7 @@ snapshots:
       source-map: 0.8.0-beta.0
       sucrase: 3.35.0
       tinyexec: 0.3.2
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.16
       tree-kill: 1.2.2
     optionalDependencies:
       '@microsoft/api-extractor': 7.47.7(@types/node@22.19.17)

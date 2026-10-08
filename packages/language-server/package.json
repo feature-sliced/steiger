@@ -1,0 +1,45 @@
+{
+  "name": "@feature-sliced/language-server",
+  "version": "0.1.0",
+  "description": "steiger language server",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "bin": {
+    "steiger-language-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "check-formatting": "prettier --check . --cache",
+    "dev": "tsup --watch",
+    "format": "prettier --write . --cache",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "language-server"
+  ],
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/feature-sliced/steiger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feature-sliced/steiger.git",
+    "directory": "packages/language-server"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "@steiger/eslint-config": "workspace:*",
+    "@steiger/tsconfig": "workspace:*",
+    "@types/node": "^22.19.17",
+    "tsup": "^8.5.0"
+  },
+  "dependencies": {
+    "cosmiconfig": "^10.0.1",
+    "vscode-languageserver": "^10.1.0"
+  }
+}
