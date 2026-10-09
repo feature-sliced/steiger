@@ -202,6 +202,16 @@ function getRelevantPublicApiPath(path: string): string | undefined {
     return result
   }
 
+  result = join(path, 'index.tsx')
+  if (fileExists(result)) {
+    return result
+  }
+
+  result = join(path, 'index.jsx')
+  if (fileExists(result)) {
+    return result
+  }
+
   return undefined
 }
 
