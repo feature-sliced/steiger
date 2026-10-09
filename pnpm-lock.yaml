@@ -91,9 +91,15 @@ importers:
       '@steiger/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
+      '@steiger/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^22.19.17
         version: 22.19.17
+      steiger:
+        specifier: workspace:*
+        version: link:../steiger
       tsup:
         specifier: ^8.5.0
         version: 8.5.0(@microsoft/api-extractor@7.47.7(@types/node@22.19.17))(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.1)

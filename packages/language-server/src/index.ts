@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, join, sep } from 'node:path'
 import { statSync } from 'node:fs'
 import {
   createConnection,
@@ -13,12 +13,16 @@ import {
   Diagnostic,
 } from 'vscode-languageserver/node'
 import { cosmiconfig } from 'cosmiconfig'
-import fsd from '@feature-sliced/steiger-plugin'
 import type { Diagnostic as SteigerDiagnostic } from '@steiger/types'
+import type * as Steiger from 'steiger'
 
-import { processScopedConfiguration } from './models/config'
-import { linter } from './app'
-import packageJson from '../package.json'
+import { findSteigerModule } from './find-steiger'
+import { findProjectRoots } from './find-project-root'
+import { findSourceDirectory } from './find-source-directory'
+
+let steigerModule:
+  | { linter: typeof Steiger.linter; processScopedConfiguration: typeof Steiger.processScopedConfiguration }
+  | undefined = undefined
 
 const connection = createConnection(process.stdin, process.stdout)
 
@@ -27,43 +31,51 @@ const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagno
 async function addWorkspace(rootPath: string) {
   await removeWorkspace(rootPath)
 
-  const { config, filepath } = (await cosmiconfig('steiger').search(rootPath)) ?? {
-    config: null,
-    filepath: undefined,
+  const projectRoots = await findProjectRoots(rootPath)
+  for (const projectRoot of projectRoots) {
+    const { config, filepath } = (await cosmiconfig('steiger').search(projectRoot)) ?? {
+      config: null,
+      filepath: undefined,
+    }
+    const configLocationDirectory = filepath ? dirname(filepath) : null
+    const processedConfig = steigerModule!.processScopedConfiguration(config, configLocationDirectory)
+
+    const sourcePath = await findSourceDirectory(projectRoot)
+    if (!sourcePath) continue
+
+    const [diagnosticsChanged, dispose] = await steigerModule!.linter.watch(sourcePath, {
+      debounceInterval: 100,
+      pollInterval: 50,
+      stabilityThreshold: 100,
+      config: processedConfig,
+    })
+
+    const diagnostics: SteigerDiagnostic[] = []
+    workspaces.set(rootPath, { dispose, diagnostics })
+
+    diagnosticsChanged.watch((state) => {
+      diagnostics.splice(0, Infinity, ...state)
+
+      connection.languages.diagnostics.refresh()
+    })
   }
-  const configLocationDirectory = filepath ? dirname(filepath) : null
-  const processedConfig = processScopedConfiguration(config ?? fsd.configs.recommended, configLocationDirectory)
-
-  const sourcePath = join(rootPath, 'src')
-  const [diagnosticsChanged, dispose] = await linter.watch(sourcePath, {
-    debounceInterval: 100,
-    pollInterval: 50,
-    stabilityThreshold: 100,
-    config: processedConfig,
-  })
-
-  const diagnostics: SteigerDiagnostic[] = []
-  workspaces.set(rootPath, { dispose, diagnostics })
-
-  diagnosticsChanged.watch((state) => {
-    diagnostics.splice(0, Infinity, ...state)
-
-    connection.languages.diagnostics.refresh()
-  })
 }
 
 async function removeWorkspace(rootPath: string) {
-  const workspace = workspaces.get(rootPath)
-  if (workspace) {
-    await workspace.dispose()
-    workspaces.delete(rootPath)
+  for (const [path, workspace] of workspaces) {
+    if (path === rootPath || path.startsWith(`${rootPath}${sep}`)) {
+      await workspace.dispose()
+      workspaces.delete(path)
+    }
   }
 }
 
 async function removeAllWorkspaces() {
-  for (const [rootPath] of workspaces) {
-    await removeWorkspace(rootPath)
+  for (const [, workspace] of workspaces) {
+    await workspace.dispose()
   }
+
+  workspaces.clear()
 }
 
 async function handleWorkspaceFoldersChange(event: WorkspaceFoldersChangeEvent) {
@@ -92,6 +104,18 @@ let clientHandlesWorkspaceFolders = false
 
 connection.onInitialize(async (params): Promise<InitializeResult> => {
   for (const workspace of params.workspaceFolders ?? []) {
+    if (steigerModule) {
+      break
+    }
+
+    const result = await findSteigerModule(fileURLToPath(workspace.uri))
+    if (result.path) {
+      steigerModule = await import(result.path)
+    }
+  }
+  // TODO: report error about missing steiger module
+
+  for (const workspace of params.workspaceFolders ?? []) {
     try {
       await addWorkspace(fileURLToPath(workspace.uri))
     } catch (error) {
@@ -104,7 +128,7 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
   }
 
   return {
-    serverInfo: { name: 'steiger', version: packageJson.version },
+    serverInfo: { name: 'steiger' },
     capabilities: {
       workspace: {
         workspaceFolders: {

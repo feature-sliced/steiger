@@ -35,7 +35,9 @@
   "devDependencies": {
     "@steiger/eslint-config": "workspace:*",
     "@steiger/tsconfig": "workspace:*",
+    "@steiger/types": "workspace:*",
     "@types/node": "^22.19.17",
+    "steiger": "workspace:*",
     "tsup": "^8.5.0"
   },
   "dependencies": {
