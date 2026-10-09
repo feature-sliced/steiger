@@ -1,12 +1,18 @@
 import { glob } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 
-const configFilePatterns = ['steiger.config.ts', 'steiger.config.js', 'steiger.config.mjs', 'steiger.config.cjs']
+const configFilePatterns = [
+  '**/steiger.config.ts',
+  '**/steiger.config.js',
+  '**/steiger.config.mjs',
+  '**/steiger.config.cjs',
+]
 
 export async function findProjectRoots(cwd: string): Promise<string[]> {
   const result: string[] = []
 
   for await (const configFile of glob(configFilePatterns, { cwd })) {
-    result.push(configFile)
+    result.push(join(cwd, dirname(configFile)))
   }
 
   return result
