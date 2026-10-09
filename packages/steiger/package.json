@@ -35,8 +35,7 @@
   },
   "type": "module",
   "bin": {
-    "steiger": "dist/cli.mjs",
-    "steiger-language-server": "dist/language-server.mjs"
+    "steiger": "dist/cli.mjs"
   },
   "sideEffects": false,
   "exports": {
