@@ -1,7 +1,7 @@
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const LAYER_REGEX = /[0-9]?_?(app|widgets|features|entities|shared)/
+const LAYER_REGEX = /[0-9]?_?(app|pages|widgets|features|entities|shared)/
 
 async function getDirectoryScore(dir: string): Promise<number> {
   let score = 0
