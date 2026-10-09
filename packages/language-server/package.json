@@ -13,7 +13,6 @@
     "dev": "tsup --watch",
     "format": "prettier --write . --cache",
     "lint": "eslint .",
-    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
