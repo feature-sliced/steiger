@@ -51,7 +51,7 @@ async function addWorkspace(rootPath: string) {
     })
 
     const diagnostics: SteigerDiagnostic[] = []
-    workspaces.set(rootPath, { dispose, diagnostics })
+    workspaces.set(projectRoot, { dispose, diagnostics })
 
     diagnosticsChanged.watch((state) => {
       diagnostics.splice(0, Infinity, ...state)
