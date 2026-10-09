@@ -15,12 +15,12 @@ async function getVersion(packageJsonPath: string): Promise<string | undefined> 
  * @returns
  */
 export async function findSteigerModule(cwd: string): Promise<{ path?: string; version?: string }> {
-  const result = glob('node_modules/steiger/dist/app.mjs', { cwd })
+  const result = glob('**/node_modules/steiger/dist/app.mjs', { cwd })
 
   let current: string | undefined = undefined
   let version: string | undefined = undefined
   for await (const file of result) {
-    current = file
+    current = resolve(cwd, file)
     version = await getVersion(resolve(cwd, file, '..', '..', 'package.json'))
 
     // TODO: read export from package.json
