@@ -1,5 +1,17 @@
 import { glob, readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { resolve, sep } from 'node:path'
+
+function countSegments(path: string): number {
+  let count = 0
+  let index = 0
+
+  do {
+    index = path.indexOf(sep, index) + 1
+    if (index !== 0) count++
+  } while (index !== 0)
+
+  return count
+}
 
 async function getVersion(packageJsonPath: string): Promise<string | undefined> {
   try {
@@ -19,9 +31,16 @@ export async function findSteigerModule(cwd: string): Promise<{ path?: string; v
 
   let current: string | undefined = undefined
   let version: string | undefined = undefined
+
+  const candidates: string[] = []
   for await (const file of result) {
-    current = resolve(cwd, file)
-    version = await getVersion(resolve(cwd, file, '..', '..', 'package.json'))
+    candidates.push(file)
+  }
+  candidates.sort((a, b) => countSegments(a) - countSegments(b))
+
+  for (const candidate of candidates) {
+    current = resolve(cwd, candidate)
+    version = await getVersion(resolve(current, '..', '..', 'package.json'))
 
     // TODO: read export from package.json
     // TODO: add check for latest version
