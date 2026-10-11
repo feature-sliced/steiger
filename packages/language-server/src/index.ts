@@ -110,7 +110,7 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
 
     const result = await findSteigerModule(fileURLToPath(workspace.uri))
     if (result.path) {
-      steigerModule = await import(result.path)
+      steigerModule = await import(pathToFileURL(result.path).href)
     }
   }
   // TODO: report error about missing steiger module
