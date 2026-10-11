@@ -30,5 +30,5 @@ export async function findSourceDirectory(dir: string): Promise<string | undefin
     }
   }
 
-  return bestDir
+  return bestScore === 0 ? undefined : bestDir
 }

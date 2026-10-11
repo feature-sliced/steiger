@@ -38,6 +38,8 @@ async function addWorkspace(rootPath: string) {
       config: null,
       filepath: undefined,
     }
+    if (config == null) continue
+
     const configLocationDirectory = filepath ? dirname(filepath) : null
     const processedConfig = steigerModule.processScopedConfiguration(config, configLocationDirectory)
 
