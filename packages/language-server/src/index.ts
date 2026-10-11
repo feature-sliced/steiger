@@ -30,6 +30,7 @@ const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagno
 
 async function addWorkspace(rootPath: string) {
   await removeWorkspace(rootPath)
+  if (!steigerModule) return
 
   const projectRoots = await findProjectRoots(rootPath)
   for (const projectRoot of projectRoots) {
@@ -38,12 +39,12 @@ async function addWorkspace(rootPath: string) {
       filepath: undefined,
     }
     const configLocationDirectory = filepath ? dirname(filepath) : null
-    const processedConfig = steigerModule!.processScopedConfiguration(config, configLocationDirectory)
+    const processedConfig = steigerModule.processScopedConfiguration(config, configLocationDirectory)
 
     const sourcePath = await findSourceDirectory(projectRoot)
     if (!sourcePath) continue
 
-    const [diagnosticsChanged, dispose] = await steigerModule!.linter.watch(sourcePath, {
+    const [diagnosticsChanged, dispose] = await steigerModule.linter.watch(sourcePath, {
       debounceInterval: 100,
       pollInterval: 50,
       stabilityThreshold: 100,
