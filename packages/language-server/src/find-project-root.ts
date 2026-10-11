@@ -1,20 +1,36 @@
 import { getDefaultSearchPlaces } from 'cosmiconfig'
-import { glob } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { glob, readFile } from 'node:fs/promises'
+import { basename, dirname, join } from 'node:path'
 
-const configFilePatterns = getDefaultSearchPlaces('steiger').reduce((acc, cur) => {
-  if (cur !== 'package.json') {
-    acc.push(`**/${cur}`)
+type PackageJson = {
+  [key: string]: unknown
+} | null
+
+async function readPackageJson(filePath: string): Promise<PackageJson> {
+  try {
+    return JSON.parse(await readFile(filePath, 'utf8'))
+  } catch {
+    return null
   }
+}
 
-  return acc
-}, [] as string[])
+const configFilePatterns = getDefaultSearchPlaces('steiger').map((place) => `**/${place}`)
 
 export async function findProjectRoots(cwd: string): Promise<string[]> {
   const result: string[] = []
 
   for await (const configFile of glob(configFilePatterns, { cwd })) {
-    result.push(join(cwd, dirname(configFile)))
+    const filePath = join(cwd, dirname(configFile))
+
+    // check if package.json has a steiger field for cosmiconfig
+    if (basename(filePath) === 'package.json') {
+      const packageJson = await readPackageJson(filePath)
+      if (packageJson?.steiger == null) {
+        continue
+      }
+    }
+
+    result.push(filePath)
   }
 
   return result
