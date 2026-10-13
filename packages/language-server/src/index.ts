@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join, sep } from 'node:path'
 import { statSync } from 'node:fs'
@@ -34,11 +32,18 @@ async function addWorkspace(rootPath: string) {
 
   const projectRoots = await findProjectRoots(rootPath)
   for (const projectRoot of projectRoots) {
-    const { config, filepath } = (await cosmiconfig('steiger').search(projectRoot)) ?? {
-      config: null,
-      filepath: undefined,
+    let config: Parameters<typeof Steiger.processScopedConfiguration>[0]
+    let filepath: string | undefined = undefined
+    try {
+      const result = await cosmiconfig('steiger').search(projectRoot)
+      if (result == null) continue
+
+      config = result.config
+      filepath = result.filepath
+    } catch (error) {
+      connection.console.error(`steiger: failed to add workspace: ${String(error)}`)
+      continue
     }
-    if (config == null) continue
 
     const configLocationDirectory = filepath ? dirname(filepath) : null
     const processedConfig = steigerModule.processScopedConfiguration(config, configLocationDirectory)
@@ -111,9 +116,13 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
       break
     }
 
-    const result = await findSteigerModule(fileURLToPath(workspace.uri))
-    if (result.path) {
-      steigerModule = await import(pathToFileURL(result.path).href)
+    try {
+      const result = await findSteigerModule(fileURLToPath(workspace.uri))
+      if (result.path) {
+        steigerModule = await import(pathToFileURL(result.path).href)
+      }
+    } catch (error) {
+      connection.console.error(`steiger: failed to find steiger module: ${String(error)}`)
     }
   }
   // TODO: report error about missing steiger module
@@ -277,4 +286,4 @@ connection.languages.diagnostics.onWorkspace(() => {
 connection.onShutdown(removeAllWorkspaces)
 connection.onExit(removeAllWorkspaces)
 
-connection.listen()
+export default connection
