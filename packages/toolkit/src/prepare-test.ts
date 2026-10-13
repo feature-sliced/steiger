@@ -54,7 +54,7 @@ export function createFsMocks(mockedFiles: Record<string, string>, original: typ
 
   return {
     ...original,
-    readFileSync: vi.fn(((path, options) => {
+    readFileSync: vi.fn(((path: string, options: Record<string, unknown>) => {
       const normalizedPath = typeof path === 'string' ? path.replace(/\//g, sep) : path
       if (typeof normalizedPath === 'string' && normalizedPath in normalizedMockedFiles) {
         return normalizedMockedFiles[normalizedPath as keyof typeof normalizedMockedFiles]
