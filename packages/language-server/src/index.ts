@@ -26,8 +26,9 @@ let steigerModule:
 
 const connection = createConnection(process.stdin, process.stdout)
 
-// const projectRootToFolderRoot = new Map<string, string>()
 const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagnostics: SteigerDiagnostic[] }>()
+
+let diagnosticsVersion = 0
 
 function formatCosmiconfigError(error: unknown): string {
   if (!(error instanceof Error)) return String(error)
@@ -119,6 +120,7 @@ async function addWorkspace(rootPath: string) {
 
     diagnosticsChanged.watch((state) => {
       diagnostics.splice(0, Infinity, ...state)
+      diagnosticsVersion += 1
 
       connection.languages.diagnostics.refresh()
     })
@@ -130,6 +132,7 @@ async function removeWorkspace(rootPath: string) {
     if (path === rootPath || path.startsWith(`${rootPath}${sep}`)) {
       await workspace.dispose()
       workspaces.delete(path)
+      diagnosticsVersion += 1
       connection.console.log(`steiger: "${path}": stopped linting`)
     }
   }
@@ -138,6 +141,7 @@ async function removeWorkspace(rootPath: string) {
 async function removeAllWorkspaces() {
   for (const [path, workspace] of workspaces) {
     await workspace.dispose()
+    diagnosticsVersion += 1
     connection.console.log(`steiger: "${path}": stopped linting`)
   }
 
@@ -333,6 +337,7 @@ connection.languages.diagnostics.on((params) => {
 
   return {
     kind: 'full',
+    resultId: String(diagnosticsVersion),
     items,
   }
 })
@@ -358,6 +363,7 @@ connection.languages.diagnostics.onWorkspace((params) => {
       kind: 'full' as const,
       uri,
       version: null,
+      resultId: String(diagnosticsVersion),
       items: diagnostics.map(toLspDiagnostic),
     })
   }
