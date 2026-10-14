@@ -1,6 +1,7 @@
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join, sep } from 'node:path'
 import { statSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import {
   createConnection,
   InitializeResult,
@@ -9,13 +10,14 @@ import {
   WorkspaceDocumentDiagnosticReport,
   type WorkspaceFoldersChangeEvent,
   Diagnostic,
+  DidChangeWatchedFilesNotification,
 } from 'vscode-languageserver/node'
 import { cosmiconfig } from 'cosmiconfig'
 import type { Diagnostic as SteigerDiagnostic } from '@steiger/types'
 import type * as Steiger from 'steiger'
 
 import { findSteigerModule } from './find-steiger'
-import { findProjectRoots } from './find-project-root'
+import { configFilePatterns, findProjectRoots } from './find-project-root'
 import { findSourceDirectory } from './find-source-directory'
 
 let steigerModule:
@@ -24,6 +26,7 @@ let steigerModule:
 
 const connection = createConnection(process.stdin, process.stdout)
 
+// const projectRootToFolderRoot = new Map<string, string>()
 const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagnostics: SteigerDiagnostic[] }>()
 
 function formatCosmiconfigError(error: unknown): string {
@@ -40,6 +43,27 @@ function formatCosmiconfigError(error: unknown): string {
   return `${error.name}: ${error.message}`
 }
 
+const freshLoadEsm = async (filepath: string) => {
+  const mtime = statSync(filepath).mtimeMs
+  return (await import(`${pathToFileURL(filepath).href}?v=${mtime}`)).default
+}
+
+const freshLoadCjs = (filepath: string) => {
+  const require = createRequire(filepath)
+  delete require.cache[require.resolve(filepath)]
+  const mod = require(filepath)
+  return mod?.default ?? mod
+}
+
+const configLoaders = {
+  '.js': freshLoadEsm,
+  '.mjs': freshLoadEsm,
+  '.ts': freshLoadEsm,
+  '.mts': freshLoadEsm,
+  '.cjs': freshLoadCjs,
+  '.cts': freshLoadCjs,
+}
+
 async function addWorkspace(rootPath: string) {
   await removeWorkspace(rootPath)
   if (!steigerModule) return
@@ -50,7 +74,7 @@ async function addWorkspace(rootPath: string) {
     let config: Parameters<typeof Steiger.processScopedConfiguration>[0]
     let filepath: string | undefined = undefined
     try {
-      const result = await cosmiconfig('steiger').search(projectRoot)
+      const result = await cosmiconfig('steiger', { loaders: configLoaders }).search(projectRoot)
       if (result == null) {
         connection.console.log(`steiger: "${projectRoot}": skipped (no configuration found)`)
         continue
@@ -143,6 +167,7 @@ async function handleWorkspaceFoldersChange(event: WorkspaceFoldersChangeEvent) 
 }
 
 let clientHandlesWorkspaceFolders = false
+let clientHandlesWatchedFiles = false
 
 connection.onInitialize(async (params): Promise<InitializeResult> => {
   for (const workspace of params.workspaceFolders ?? []) {
@@ -173,6 +198,10 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
     clientHandlesWorkspaceFolders = true
   }
 
+  if (params.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration === true) {
+    clientHandlesWatchedFiles = true
+  }
+
   return {
     serverInfo: { name: 'steiger' },
     capabilities: {
@@ -195,6 +224,21 @@ connection.onInitialized(() => {
   if (clientHandlesWorkspaceFolders) {
     connection.workspace.onDidChangeWorkspaceFolders(handleWorkspaceFoldersChange)
   }
+
+  if (clientHandlesWatchedFiles) {
+    connection.client.register(DidChangeWatchedFilesNotification.type, {
+      watchers: configFilePatterns.map((pattern) => ({ globPattern: pattern })),
+    })
+  }
+})
+
+connection.onDidChangeWatchedFiles(async (params) => {
+  for (const change of params.changes) {
+    const projectRoot = dirname(fileURLToPath(change.uri))
+    await addWorkspace(projectRoot)
+  }
+
+  connection.languages.diagnostics.refresh()
 })
 
 function toLspDiagnostic(d: SteigerDiagnostic): Diagnostic {
@@ -293,7 +337,7 @@ connection.languages.diagnostics.on((params) => {
   }
 })
 
-connection.languages.diagnostics.onWorkspace(() => {
+connection.languages.diagnostics.onWorkspace((params) => {
   const byPath = new Map<string, SteigerDiagnostic[]>()
   for (const d of getAllDiagnostics()) {
     const documentPath = resolveDiagnosticDocumentPath(d.location.path)
@@ -305,13 +349,23 @@ connection.languages.diagnostics.onWorkspace(() => {
   }
 
   const items: WorkspaceDocumentDiagnosticReport[] = []
+  const reportedUris = new Set<string>()
+
   for (const [path, diagnostics] of byPath) {
+    const uri = pathToFileURL(path).toString()
+    reportedUris.add(uri)
     items.push({
       kind: 'full' as const,
-      uri: pathToFileURL(path).toString(),
+      uri,
       version: null,
       items: diagnostics.map(toLspDiagnostic),
     })
+  }
+
+  for (const { uri } of params.previousResultIds ?? []) {
+    if (!reportedUris.has(uri)) {
+      items.push({ kind: 'full' as const, uri, version: null, items: [] })
+    }
   }
 
   return { items }

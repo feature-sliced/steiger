@@ -14,7 +14,7 @@ async function readPackageJson(filePath: string): Promise<PackageJson> {
   }
 }
 
-const configFilePatterns = getDefaultSearchPlaces('steiger').map((place) => `**/${place}`)
+export const configFilePatterns = getDefaultSearchPlaces('steiger').map((place) => `**/${place}`)
 const exclude = (p: string) => p.split(sep).includes('node_modules')
 
 export async function findProjectRoots(cwd: string): Promise<string[]> {
