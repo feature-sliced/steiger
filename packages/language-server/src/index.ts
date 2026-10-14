@@ -26,22 +26,50 @@ const connection = createConnection(process.stdin, process.stdout)
 
 const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagnostics: SteigerDiagnostic[] }>()
 
+function formatCosmiconfigError(error: unknown): string {
+  if (!(error instanceof Error)) return String(error)
+
+  let filepath = ''
+  if ('filepath' in error && typeof error.filepath === 'string') filepath = error.filepath
+
+  let reason = ''
+  if ('reason' in error && typeof error.reason === 'string') reason = error.reason
+
+  if (filepath !== '' && reason !== '') return `${error.name} while loading config at "${filepath}": ${reason}`
+  if (filepath !== '') return `${error.name} while loading config at "${filepath}": ${error.message}`
+  return `${error.name}: ${error.message}`
+}
+
 async function addWorkspace(rootPath: string) {
   await removeWorkspace(rootPath)
   if (!steigerModule) return
 
   const projectRoots = await findProjectRoots(rootPath)
+  connection.console.log(`steiger: found ${projectRoots.length} project root(s) in "${rootPath}"`)
   for (const projectRoot of projectRoots) {
     let config: Parameters<typeof Steiger.processScopedConfiguration>[0]
     let filepath: string | undefined = undefined
     try {
       const result = await cosmiconfig('steiger').search(projectRoot)
-      if (result == null) continue
+      if (result == null) {
+        connection.console.log(`steiger: "${projectRoot}": skipped (no configuration found)`)
+        continue
+      }
+
+      if (result.isEmpty) {
+        connection.console.warn(`steiger: "${projectRoot}": skipped (configuration file "${result.filepath}" is empty)`)
+        continue
+      }
 
       config = result.config
       filepath = result.filepath
     } catch (error) {
-      connection.console.error(`steiger: failed to add workspace: ${String(error)}`)
+      const message = formatCosmiconfigError(error).replaceAll('\n', ' ')
+
+      connection.window.showErrorMessage(`steiger: ${message}`)
+
+      connection.console.error(`steiger: "${projectRoot}": failed to load configuration: ${message}`)
+      if (error instanceof Error && error.stack) connection.console.error(error.stack)
       continue
     }
 
@@ -49,7 +77,10 @@ async function addWorkspace(rootPath: string) {
     const processedConfig = steigerModule.processScopedConfiguration(config, configLocationDirectory)
 
     const sourcePath = await findSourceDirectory(projectRoot)
-    if (!sourcePath) continue
+    if (!sourcePath) {
+      connection.console.log(`steiger: "${projectRoot}": skipped (no source directory found)`)
+      continue
+    }
 
     const [diagnosticsChanged, dispose] = await steigerModule.linter.watch(sourcePath, {
       debounceInterval: 100,
@@ -60,6 +91,7 @@ async function addWorkspace(rootPath: string) {
 
     const diagnostics: SteigerDiagnostic[] = []
     workspaces.set(projectRoot, { dispose, diagnostics })
+    connection.console.log(`steiger: "${projectRoot}": started linting "${sourcePath}" (config: "${filepath}")`)
 
     diagnosticsChanged.watch((state) => {
       diagnostics.splice(0, Infinity, ...state)
@@ -74,13 +106,15 @@ async function removeWorkspace(rootPath: string) {
     if (path === rootPath || path.startsWith(`${rootPath}${sep}`)) {
       await workspace.dispose()
       workspaces.delete(path)
+      connection.console.log(`steiger: "${path}": stopped linting`)
     }
   }
 }
 
 async function removeAllWorkspaces() {
-  for (const [, workspace] of workspaces) {
+  for (const [path, workspace] of workspaces) {
     await workspace.dispose()
+    connection.console.log(`steiger: "${path}": stopped linting`)
   }
 
   workspaces.clear()
