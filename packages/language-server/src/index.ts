@@ -99,7 +99,16 @@ async function addWorkspace(rootPath: string) {
     }
 
     const configLocationDirectory = filepath ? dirname(filepath) : null
-    const processedConfig = steigerModule.processScopedConfiguration(config, configLocationDirectory)
+    let processedConfig: ReturnType<typeof steigerModule.processScopedConfiguration>
+    try {
+      processedConfig = steigerModule.processScopedConfiguration(config, configLocationDirectory)
+    } catch (error) {
+      connection.console.error(
+        `steiger: "${projectRoot}": failed to process configuration: ${error instanceof Error ? error.message : String(error)}`,
+      )
+      if (error instanceof Error && error.stack) connection.console.error(error.stack)
+      continue
+    }
 
     const sourcePath = await findSourceDirectory(projectRoot)
     if (!sourcePath) {
