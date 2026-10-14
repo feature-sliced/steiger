@@ -28,11 +28,15 @@ const connection = createConnection(process.stdin, process.stdout)
 
 const workspaces = new Map<string, { dispose: () => void | Promise<void>; diagnostics: SteigerDiagnostic[] }>()
 
+/**
+ * Incremental counter used as `resultId`, to make client send `previousResultIds` back to the server
+ */
 let diagnosticsVersion = 0
 
 function formatCosmiconfigError(error: unknown): string {
   if (!(error instanceof Error)) return String(error)
 
+  // `filepath` is a special property on some cosmiconfig errors
   let filepath = ''
   if ('filepath' in error && typeof error.filepath === 'string') filepath = error.filepath
 
@@ -56,6 +60,7 @@ const freshLoadCjs = (filepath: string) => {
   return mod?.default ?? mod
 }
 
+// cosmiconfig hits node import cache, so we need a way to import/require latest version of the config file
 const configLoaders = {
   '.js': freshLoadEsm,
   '.mjs': freshLoadEsm,
@@ -346,6 +351,7 @@ connection.languages.diagnostics.on((params) => {
 
   return {
     kind: 'full',
+    // must be sent to the client so we can clear this later
     resultId: String(diagnosticsVersion),
     items,
   }
@@ -372,11 +378,13 @@ connection.languages.diagnostics.onWorkspace((params) => {
       kind: 'full' as const,
       uri,
       version: null,
+      // must be sent to the client so we can clear this later
       resultId: String(diagnosticsVersion),
       items: diagnostics.map(toLspDiagnostic),
     })
   }
 
+  // steiger sends all diagnostics at once, this makes sure any previous diagnostics are cleared
   for (const { uri } of params.previousResultIds ?? []) {
     if (!reportedUris.has(uri)) {
       items.push({ kind: 'full' as const, uri, version: null, items: [] })
