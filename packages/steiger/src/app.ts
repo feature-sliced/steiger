@@ -54,20 +54,20 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
 
   return ruleResults.flatMap(({ diagnostics }, ruleResultsIndex) => {
     const ruleName = rules[ruleResultsIndex].name
+    diagnostics.sort((a, b) => a.location.path.localeCompare(b.location.path))
+
     const severities = calculateFinalSeverities(
       vfsWithoutGlobalIgnores,
       ruleName,
       diagnostics.map((d) => d.location.path),
     )
 
-    return diagnostics
-      .sort((a, b) => a.location.path.localeCompare(b.location.path))
-      .map((d, index) => ({
-        ...d,
-        ruleName,
-        getRuleDescriptionUrl,
-        severity: severities[index],
-      }))
+    return diagnostics.map((d, index) => ({
+      ...d,
+      ruleName,
+      getRuleDescriptionUrl,
+      severity: severities[index],
+    }))
   })
 }
 

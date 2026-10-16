@@ -42,6 +42,9 @@ importers:
         specifier: workspace:*
         version: link:../packages/steiger
     devDependencies:
+      '@feature-sliced/steiger-plugin':
+        specifier: workspace:*
+        version: link:../packages/steiger-plugin-fsd
       '@steiger/eslint-config':
         specifier: workspace:*
         version: link:../tooling/eslint-config
