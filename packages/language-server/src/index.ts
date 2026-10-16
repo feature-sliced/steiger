@@ -136,7 +136,7 @@ async function addWorkspace(rootPath: string) {
       diagnostics.splice(0, Infinity, ...state)
       diagnosticsVersion += 1
 
-      connection.languages.diagnostics.refresh()
+      refreshDiagnostics()
     })
   }
 }
@@ -180,14 +180,21 @@ async function handleWorkspaceFoldersChange(event: WorkspaceFoldersChangeEvent) 
   }
 
   if (event.removed.length > 0) {
-    connection.languages.diagnostics.refresh()
+    refreshDiagnostics()
   }
 }
 
 let clientHandlesWorkspaceFolders = false
 let clientHandlesWatchedFiles = false
+let clientSupportsPullDiagnostics = false
 
 connection.onInitialize(async (params): Promise<InitializeResult> => {
+  clientHandlesWorkspaceFolders = params.capabilities.workspace?.workspaceFolders === true
+  clientHandlesWatchedFiles = params.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration === true
+  clientSupportsPullDiagnostics =
+    params.capabilities.textDocument?.diagnostic !== undefined &&
+    params.capabilities.workspace?.diagnostics?.refreshSupport === true
+
   for (const workspace of params.workspaceFolders ?? []) {
     if (steigerModule) {
       break
@@ -212,14 +219,6 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
     }
   }
 
-  if (params.capabilities.workspace?.workspaceFolders === true) {
-    clientHandlesWorkspaceFolders = true
-  }
-
-  if (params.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration === true) {
-    clientHandlesWatchedFiles = true
-  }
-
   return {
     serverInfo: { name: 'steiger' },
     capabilities: {
@@ -230,10 +229,9 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
         },
       },
       textDocumentSync: TextDocumentSyncKind.None,
-      diagnosticProvider: {
-        interFileDependencies: true,
-        workspaceDiagnostics: true,
-      },
+      ...(clientSupportsPullDiagnostics
+        ? { diagnosticProvider: { interFileDependencies: true, workspaceDiagnostics: true } }
+        : {}),
     },
   }
 })
@@ -256,7 +254,7 @@ connection.onDidChangeWatchedFiles(async (params) => {
     await addWorkspace(projectRoot)
   }
 
-  connection.languages.diagnostics.refresh()
+  refreshDiagnostics()
 })
 
 function toLspDiagnostic(d: SteigerDiagnostic): Diagnostic {
@@ -336,6 +334,38 @@ function getAllDiagnostics(): SteigerDiagnostic[] {
     diagnostics.push(...workspaceDiagnostics)
   }
   return diagnostics
+}
+
+const lastPublishedUris = new Set<string>()
+
+function refreshDiagnostics() {
+  if (clientSupportsPullDiagnostics) {
+    connection.languages.diagnostics.refresh()
+    return
+  }
+
+  const diagnosticsByUri = new Map<string, Diagnostic[]>()
+  for (const d of getAllDiagnostics()) {
+    const documentPath = resolveDiagnosticDocumentPath(d.location.path)
+    if (documentPath === undefined) continue
+
+    const uri = pathToFileURL(documentPath).toString()
+    const group = diagnosticsByUri.get(uri) ?? []
+    group.push(toLspDiagnostic(d))
+    diagnosticsByUri.set(uri, group)
+  }
+
+  for (const uri of lastPublishedUris) {
+    if (!diagnosticsByUri.has(uri)) {
+      connection.sendDiagnostics({ uri, diagnostics: [] })
+    }
+  }
+  lastPublishedUris.clear()
+
+  for (const [uri, diagnostics] of diagnosticsByUri) {
+    connection.sendDiagnostics({ uri, diagnostics })
+    lastPublishedUris.add(uri)
+  }
 }
 
 connection.languages.diagnostics.on((params) => {
