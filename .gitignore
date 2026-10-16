@@ -3,6 +3,7 @@
 
 node_modules/
 dist/
+dist-bundle/
 
 # Output of 'npm pack'
 *.tgz

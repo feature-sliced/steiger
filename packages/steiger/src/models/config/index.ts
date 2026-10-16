@@ -1,4 +1,4 @@
-import { combine, createEvent, createStore } from 'effector'
+import { createEvent, createStore } from 'effector'
 import type { Config, GlobalIgnore, Plugin, Rule } from '@steiger/types'
 
 import createRuleInstructions from './create-rule-instructions'
@@ -11,51 +11,53 @@ type RuleInstructionsPerRule = Record<string, RuleInstructions>
 
 export type { GlobGroupWithSeverity } from './types'
 
-const $ruleInstructions = createStore<RuleInstructionsPerRule | null>(null)
-const setRuleInstructions = createEvent<RuleInstructionsPerRule>()
-$ruleInstructions.on(setRuleInstructions, (_state, payload) => payload)
+export interface ProcessedConfig {
+  globalIgnores: GlobalIgnore[]
+  plugins: Plugin[]
+  ruleInstructions: RuleInstructionsPerRule
+}
 
-const $globalIgnores = createStore<Array<GlobalIgnore>>([])
-const setGlobalIgnores = createEvent<Array<GlobalIgnore>>()
-$globalIgnores.on(setGlobalIgnores, (_state, payload) => payload)
+export const $globalConfig = createStore<ProcessedConfig | null>(null)
+const setGlobalConfig = createEvent<ProcessedConfig>()
+$globalConfig.on(setGlobalConfig, (_state, payload) => payload)
 
-export const $plugins = createStore<Array<Plugin>>([])
-const setPlugins = createEvent<Array<Plugin>>()
-$plugins.on(setPlugins, (_state, payload) => payload)
-
-// Rules that are configured in the config file
-export const $enabledRules = combine($ruleInstructions, $plugins, (ruleInstructions, plugins) => {
-  const rulesThatHaveInstructions = ruleInstructions ? Object.keys(ruleInstructions) : []
-  const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
-
-  return allRules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
-})
-
-export function processConfiguration(rawConfig: Config<Array<Rule>>, configLocationFolder: string | null) {
+export function processScopedConfiguration(
+  rawConfig: Config<Array<Rule>>,
+  configLocationFolder: string | null,
+): ProcessedConfig {
   const validatedConfig = validateConfig(rawConfig)
   const plugins = rawConfig.filter(isPlugin)
   const configTransformedGlobs = transformGlobs(validatedConfig, configLocationFolder)
   const ruleInstructions = createRuleInstructions(configTransformedGlobs)
 
-  setPlugins(plugins)
-  setGlobalIgnores(configTransformedGlobs.filter(isGlobalIgnore))
-  setRuleInstructions(ruleInstructions)
-
-  return validatedConfig
+  return {
+    globalIgnores: configTransformedGlobs.filter(isGlobalIgnore),
+    plugins,
+    ruleInstructions,
+  }
 }
 
-export function getEnabledRules() {
-  return $enabledRules.getState()
+export function processConfiguration(rawConfig: Config<Array<Rule>>, configLocationFolder: string | null) {
+  const processedConfig = processScopedConfiguration(rawConfig, configLocationFolder)
+  setGlobalConfig(processedConfig)
 }
 
-export function getRuleOptions(ruleName: string) {
-  return $ruleInstructions.getState()?.[ruleName].options || null
+export function getEnabledRules(config: ProcessedConfig): Rule[] {
+  const { plugins, ruleInstructions } = config
+  const rulesThatHaveInstructions = ruleInstructions ? Object.keys(ruleInstructions) : []
+  const allRules = plugins.flatMap((plugin) => plugin.ruleDefinitions)
+
+  return allRules.filter((rule) => rulesThatHaveInstructions.includes(rule.name))
 }
 
-export function getGlobalIgnores() {
-  return $globalIgnores.getState()
+export function getRuleOptions(config: ProcessedConfig, ruleName: string) {
+  return config.ruleInstructions?.[ruleName].options || null
 }
 
-export function getGlobsForRule(ruleName: string) {
-  return $ruleInstructions.getState()?.[ruleName].globGroups || []
+export function getGlobalIgnores(config: ProcessedConfig) {
+  return config.globalIgnores
+}
+
+export function getGlobsForRule(config: ProcessedConfig, ruleName: string) {
+  return config.ruleInstructions?.[ruleName].globGroups || []
 }

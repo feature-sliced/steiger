@@ -1,10 +1,10 @@
 import { Folder, Rule } from '@steiger/types'
 
-import { getGlobsForRule, getRuleOptions } from '../../models/config'
+import { getGlobsForRule, getRuleOptions, type ProcessedConfig } from '../../models/config'
 import { prepareVfsForRuleRun } from './prepare-vfs-for-rule-run'
 
-export async function runRule(vfs: Folder, rule: Rule) {
-  const globsForRule = getGlobsForRule(rule.name)
+export async function runRule(config: ProcessedConfig, vfs: Folder, rule: Rule) {
+  const globsForRule = getGlobsForRule(config, rule.name)
 
   const finalVfs = prepareVfsForRuleRun(vfs, globsForRule)
 
@@ -12,5 +12,5 @@ export async function runRule(vfs: Folder, rule: Rule) {
     return Promise.resolve({ diagnostics: [] })
   }
 
-  return Promise.resolve(rule.check(finalVfs, getRuleOptions(rule.name) ?? {}))
+  return Promise.resolve(rule.check(finalVfs, getRuleOptions(config, rule.name) ?? {}))
 }

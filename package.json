@@ -8,6 +8,11 @@
     "check-monorepo": "manypkg check",
     "prepare": "husky"
   },
+  "manypkg": {
+    "ignoredRules": [
+      "EXTERNAL_MISMATCH"
+    ]
+  },
   "engines": {
     "node": ">=22.18.0"
   },
