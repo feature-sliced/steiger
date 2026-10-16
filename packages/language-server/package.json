@@ -13,6 +13,7 @@
   "sideEffects": true,
   "scripts": {
     "build": "tsup",
+    "build:bundle": "tsup --config tsup-bundle.config.ts",
     "check-formatting": "prettier --check . --cache",
     "dev": "tsup --watch",
     "format": "prettier --write . --cache",
