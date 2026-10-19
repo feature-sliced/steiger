@@ -10,11 +10,11 @@ export function isPathInTree(vfs: Folder, paths: string | Array<string>) {
 
   while (stack.length > 0) {
     const node = stack.pop()!
-    const currentPathIndex = pathsToCheck.indexOf(node.path)
-
-    if (currentPathIndex !== -1) {
-      results[currentPathIndex] = true
-      found++
+    for (let i = 0; i < pathsToCheck.length; i++) {
+      if (pathsToCheck[i] === node.path) {
+        results[i] = true
+        found++
+      }
     }
 
     if (found === pathsToCheck.length) {
