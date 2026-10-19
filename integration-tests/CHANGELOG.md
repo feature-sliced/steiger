@@ -1,5 +1,13 @@
 # @steiger/integration-tests
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [a483f5a]
+- Updated dependencies [98751d8]
+  - steiger@0.8.0
+
 ## 0.2.0
 
 ### Minor Changes
