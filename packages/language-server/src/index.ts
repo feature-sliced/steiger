@@ -19,7 +19,7 @@ import type * as Steiger from 'steiger'
 import { findSteigerModule } from './find-steiger'
 import { configFilePatterns, findProjectRoots } from './find-project-root'
 import { findSourceDirectory } from './find-source-directory'
-import { semverToNumber } from './semver'
+import { parseSemverOrThrow, semverToNumber } from './semver'
 
 let steigerModule:
   | { linter: typeof Steiger.linter; processScopedConfiguration: typeof Steiger.processScopedConfiguration }
@@ -190,12 +190,27 @@ let clientHandlesWatchedFiles = false
 let clientSupportsPullDiagnostics = false
 
 const STEIGER_MIN_VERSION = '0.8.0'
-const STEIGER_MIN_VERSION_NUMBER = semverToNumber(STEIGER_MIN_VERSION)
-if (STEIGER_MIN_VERSION_NUMBER === undefined) {
-  throw new Error(`STEIGER_MIN_VERSION "${STEIGER_MIN_VERSION}" is invalid`)
-}
+const STEIGER_MIN_VERSION_NUMBER = parseSemverOrThrow(STEIGER_MIN_VERSION)
+
+const NODE_MIN_VERSION = '22.0.0'
+const NODE_MIN_VERSION_NUMBER = parseSemverOrThrow(NODE_MIN_VERSION)
+const NODE_RECOMMENDED_VERSION = '24.13.1'
+const NODE_RECOMMENDED_VERSION_NUMBER = parseSemverOrThrow(NODE_RECOMMENDED_VERSION)
 
 connection.onInitialize(async (params): Promise<InitializeResult> => {
+  const nodeVersionNumber = semverToNumber(process.versions.node)
+  if (nodeVersionNumber != null) {
+    if (nodeVersionNumber < NODE_MIN_VERSION_NUMBER) {
+      const message = `steiger: node version is too old: ${process.version}, please update to ${NODE_RECOMMENDED_VERSION} or newer`
+      connection.console.error(message)
+      connection.window.showErrorMessage(message)
+    } else if (nodeVersionNumber < NODE_RECOMMENDED_VERSION_NUMBER) {
+      const message = `steiger: node version ${process.version} has known issues with symlinks and pnpm: please update to ${NODE_RECOMMENDED_VERSION} or newer`
+      connection.console.warn(message)
+      connection.window.showWarningMessage(message)
+    }
+  }
+
   clientHandlesWorkspaceFolders = params.capabilities.workspace?.workspaceFolders === true
   clientHandlesWatchedFiles = params.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration === true
   clientSupportsPullDiagnostics =
