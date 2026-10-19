@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/cli.ts', 'src/app.ts', 'src/language-server.ts'],
+  entry: ['src/cli.ts', 'src/app.ts'],
   format: ['esm'],
   outExtension: () => ({ js: '.mjs' }),
   dts: {

@@ -21,7 +21,7 @@ export async function createMockedNodeFs(files: Record<string, string>, importOr
   return {
     ...actual,
     // Add other mocked fs methods here if needed
-    readFileSync: ((path: string, options) => {
+    readFileSync: ((path: string, options: Record<string, unknown>) => {
       if (path in files) return files[path]
 
       if (!actual) throw new Error(`File "${path}" is not mocked`)

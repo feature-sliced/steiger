@@ -1,0 +1,9 @@
+{
+  "extends": "@steiger/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+  },
+  "include": ["./src", "./tsup.config.ts"]
+}

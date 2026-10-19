@@ -1,0 +1,56 @@
+{
+  "name": "@feature-sliced/language-server",
+  "version": "0.1.0",
+  "description": "steiger language server",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "bin": {
+    "steiger-language-server": "bin/server.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "sideEffects": true,
+  "scripts": {
+    "build": "tsup",
+    "build:bundle": "tsup --config tsup-bundle.config.ts",
+    "check-formatting": "prettier --check . --cache",
+    "dev": "tsup --watch",
+    "format": "prettier --write . --cache",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "language-server"
+  ],
+  "author": {
+    "name": "Victor Sidorov (https://solant.me)"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/feature-sliced/steiger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feature-sliced/steiger.git",
+    "directory": "packages/language-server"
+  },
+  "engines": {
+    "node": ">=24.13.1"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "@steiger/eslint-config": "workspace:*",
+    "@steiger/tsconfig": "workspace:*",
+    "@steiger/types": "workspace:*",
+    "@types/node": "^24.19.0",
+    "steiger": "workspace:*",
+    "tsup": "^8.5.0"
+  },
+  "dependencies": {
+    "cosmiconfig": "^10.0.1",
+    "vscode-languageserver": "^10.1.0"
+  }
+}

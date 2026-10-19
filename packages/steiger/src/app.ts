@@ -1,12 +1,19 @@
 import { performance } from 'node:perf_hooks'
 import { Console } from 'node:console'
-import { createEffect, merge, sample } from 'effector'
+import { createEffect, createStore, merge, sample } from 'effector'
 import { debounce, not } from 'patronum'
 import type { Config, Folder, Rule } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
-import { $enabledRules, getEnabledRules, getGlobalIgnores, processConfiguration } from './models/config'
+import {
+  $globalConfig,
+  getEnabledRules,
+  getGlobalIgnores,
+  ProcessedConfig,
+  processConfiguration,
+  processScopedConfiguration,
+} from './models/config'
 import { runRule } from './features/run-rule'
 import { removeGlobalIgnoreFromVfs } from './features/remove-global-ignores-from-vfs'
 import { calculateFinalSeverities } from './features/calculate-diagnostic-severities'
@@ -24,17 +31,19 @@ function isTimingEnabled() {
   return timing && timing !== '0' && timing !== 'false'
 }
 
-async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
-  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores())
+async function runRules({ vfs, config }: { vfs: Folder; config: ProcessedConfig }) {
+  const vfsWithoutGlobalIgnores = removeGlobalIgnoreFromVfs(vfs, getGlobalIgnores(config))
 
   const timingEnabled = isTimingEnabled()
   const measurements: Array<{ rule: string; duration: number }> = []
+
+  const rules = getEnabledRules(config)
 
   const ruleResults = await Promise.all(
     rules.map(async (rule) => {
       const start = performance.now()
       try {
-        return await runRule(vfsWithoutGlobalIgnores, rule)
+        return await runRule(config, vfsWithoutGlobalIgnores, rule)
       } finally {
         const end = performance.now()
         if (timingEnabled) {
@@ -57,6 +66,7 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
     diagnostics.sort((a, b) => a.location.path.localeCompare(b.location.path))
 
     const severities = calculateFinalSeverities(
+      config,
       vfsWithoutGlobalIgnores,
       ruleName,
       diagnostics.map((d) => d.location.path),
@@ -73,26 +83,44 @@ async function runRules({ vfs, rules }: { vfs: Folder; rules: Array<Rule> }) {
 
 export const linter = {
   run: (path: string) =>
-    scan(path).then((vfs) =>
-      runRules({
+    scan(path).then((vfs) => {
+      const config = $globalConfig.getState()
+      if (config === null) {
+        throw new Error('Cannot start watching without a configuration. Call processConfiguration first.')
+      }
+
+      return runRules({
         vfs,
-        rules: getEnabledRules(),
-      }),
-    ),
+        config,
+      })
+    }),
   watch: async (
     path: string,
-    options?: { stabilityThreshold?: number; pollInterval?: number; debounceInterval?: number },
+    options?: {
+      stabilityThreshold?: number
+      pollInterval?: number
+      debounceInterval?: number
+      config?: ProcessedConfig
+    },
   ) => {
+    const config = options?.config ?? $globalConfig.getState()
+    if (config === null) {
+      throw new Error(
+        'Cannot start watching without a configuration. Call processConfiguration first or pass options.config.',
+      )
+    }
     const { vfs, watcher } = await createWatcher(path, options)
 
     const treeChanged = debounce(merge([vfs.$tree, vfs.fileChanged]), options?.debounceInterval ?? 500)
     const runRulesFx = createEffect(runRules)
 
+    const $config = createStore(config)
+
     sample({
-      clock: defer({ clock: [treeChanged, $enabledRules], until: not(runRulesFx.pending) }),
+      clock: defer({ clock: [treeChanged], until: not(runRulesFx.pending) }),
       source: {
         vfs: vfs.$tree,
-        rules: $enabledRules,
+        config: $config,
       },
       target: runRulesFx,
     })
@@ -105,4 +133,4 @@ export function defineConfig<Rules extends Array<Rule> = Array<Rule>>(config: Co
   return config
 }
 
-export { processConfiguration }
+export { processConfiguration, processScopedConfiguration }
