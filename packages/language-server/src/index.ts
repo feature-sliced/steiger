@@ -19,6 +19,7 @@ import type * as Steiger from 'steiger'
 import { findSteigerModule } from './find-steiger'
 import { configFilePatterns, findProjectRoots } from './find-project-root'
 import { findSourceDirectory } from './find-source-directory'
+import { semverToNumber } from './semver'
 
 let steigerModule:
   | { linter: typeof Steiger.linter; processScopedConfiguration: typeof Steiger.processScopedConfiguration }
@@ -188,6 +189,12 @@ let clientHandlesWorkspaceFolders = false
 let clientHandlesWatchedFiles = false
 let clientSupportsPullDiagnostics = false
 
+const STEIGER_MIN_VERSION = '0.8.0'
+const STEIGER_MIN_VERSION_NUMBER = semverToNumber(STEIGER_MIN_VERSION)
+if (STEIGER_MIN_VERSION_NUMBER === undefined) {
+  throw new Error(`STEIGER_MIN_VERSION "${STEIGER_MIN_VERSION}" is invalid`)
+}
+
 connection.onInitialize(async (params): Promise<InitializeResult> => {
   clientHandlesWorkspaceFolders = params.capabilities.workspace?.workspaceFolders === true
   clientHandlesWatchedFiles = params.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration === true
@@ -195,6 +202,7 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
     params.capabilities.textDocument?.diagnostic !== undefined &&
     params.capabilities.workspace?.diagnostics?.refreshSupport === true
 
+  let error = ''
   for (const workspace of params.workspaceFolders ?? []) {
     if (steigerModule) {
       break
@@ -202,6 +210,12 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
 
     try {
       const result = await findSteigerModule(fileURLToPath(workspace.uri))
+      const version = semverToNumber(result.version)
+      if (version !== undefined && version < STEIGER_MIN_VERSION_NUMBER) {
+        error = `found steiger module but version is too old: ${result.version}, minimum version is ${STEIGER_MIN_VERSION}`
+        continue
+      }
+
       if (result.path) {
         steigerModule = await import(pathToFileURL(result.path).href)
       }
@@ -209,7 +223,10 @@ connection.onInitialize(async (params): Promise<InitializeResult> => {
       connection.console.error(`steiger: failed to find steiger module: ${String(error)}`)
     }
   }
-  // TODO: report error about missing steiger module
+  if (!steigerModule && error !== '') {
+    connection.console.error(`steiger: ${error}`)
+    connection.window.showErrorMessage(`steiger: ${error}`)
+  }
 
   for (const workspace of params.workspaceFolders ?? []) {
     try {
