@@ -1,20 +1,18 @@
-import { join, extname, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join, extname } from 'node:path'
 import { isBuiltin } from 'node:module'
 import { readFileSync } from 'node:fs'
 import { Parser, Query, Language, Range, type Node, type Tree } from 'web-tree-sitter'
 import { createFSCache } from '../_lib/fs-cache.js'
 
-// TODO: replace with import.meta.dirname when upgrading to nodejs 20/22
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const parserDirectory = import.meta.dirname
 
 await Parser.init()
 
 const parserPaths = [
-  join(__dirname, 'parsers', 'tree-sitter-tsx.wasm'),
-  join(__dirname, 'parsers', 'tree-sitter-svelte.wasm'),
-  join(__dirname, 'parsers', 'tree-sitter-astro.wasm'),
-  join(__dirname, 'parsers', 'tree-sitter-vue.wasm'),
+  join(parserDirectory, 'parsers', 'tree-sitter-tsx.wasm'),
+  join(parserDirectory, 'parsers', 'tree-sitter-svelte.wasm'),
+  join(parserDirectory, 'parsers', 'tree-sitter-astro.wasm'),
+  join(parserDirectory, 'parsers', 'tree-sitter-vue.wasm'),
 ]
 let tsx: Language
 let svelte: Language
