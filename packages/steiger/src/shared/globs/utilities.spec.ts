@@ -29,7 +29,7 @@ describe('replaceGlobPath', () => {
     )
   })
 
-  it('should replace the path without changing an unnegated glob', () => {
+  it('should replace the path with the provided one', () => {
     expect(replaceGlobPath('src/shared/ui/**', '/projects/project-1/src/shared/ui/**')).toBe(
       '/projects/project-1/src/shared/ui/**',
     )
