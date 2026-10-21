@@ -1,5 +1,11 @@
 # @steiger/toolkit
 
+## 0.2.4
+
+### Patch Changes
+
+- 750e546: Fix importing `@steiger/toolkit` without Vitest installed.
+
 ## 0.2.3
 
 ### Patch Changes

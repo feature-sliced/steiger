@@ -1,5 +1,16 @@
 # steiger
 
+## 0.8.0
+
+### Minor Changes
+
+- 98751d8: move the language server implementation into a separate package, `@feature-sliced/language-server`
+
+### Patch Changes
+
+- a483f5a: fix severity of diagnostics in case of multiple issues per file
+  - @feature-sliced/steiger-plugin@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes
