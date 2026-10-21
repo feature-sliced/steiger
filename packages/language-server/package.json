@@ -3,12 +3,17 @@
   "version": "0.2.0",
   "description": "steiger language server",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "commonjs",
   "bin": {
     "steiger-language-server": "bin/server.js"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
   },
   "sideEffects": true,
   "scripts": {
