@@ -118,21 +118,25 @@ const yargsProgram = yargs(rawArgs)
   .alias('version', 'v')
   .showHelpOnFail(true)
 
-let hasParseError = false
-let hasOutput = false
+let parseError: Error | undefined
+let parseOutput = ''
 const consoleArgs = yargsProgram.parseSync(rawArgs, {}, (error, _argv, output) => {
-  hasParseError = Boolean(error)
-  hasOutput = output.length > 0
+  parseError = error
+  parseOutput = output
 })
 
-if (hasParseError) {
-  yargsProgram.parseSync()
+if (parseError && !consoleArgs.help) {
+  console.error(parseOutput)
   process.exit(1)
 }
 
-if (hasOutput) {
-  await loadConfiguration(process.cwd())
-  yargsProgram.version(createVersionString()).alias('version', 'v').parseSync()
+if (parseOutput) {
+  if (consoleArgs.version) {
+    await loadConfiguration(process.cwd())
+    console.log(createVersionString())
+  } else {
+    console.log(parseOutput)
+  }
   process.exit(0)
 }
 
@@ -140,13 +144,11 @@ const inputPaths = consoleArgs._
 
 let targetPath: string | undefined
 if (inputPaths.length > 0) {
-  const inputPath = String(inputPaths[0])
-
-  if (await existsAndIsFolder(inputPath)) {
-    targetPath = resolve(inputPath)
+  if (await existsAndIsFolder(inputPaths[0])) {
+    targetPath = resolve(inputPaths[0])
   } else {
     try {
-      targetPath = resolve(await chooseRootFolderFromSimilar(inputPath))
+      targetPath = resolve(await chooseRootFolderFromSimilar(inputPaths[0]))
     } catch (e) {
       if (e instanceof ExitException) {
         process.exit(0)
@@ -165,10 +167,6 @@ if (inputPaths.length > 0) {
       throw e
     }
   }
-}
-
-if (targetPath === undefined) {
-  process.exit(0)
 }
 
 await loadConfiguration(targetPath)

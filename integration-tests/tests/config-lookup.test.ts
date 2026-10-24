@@ -78,12 +78,7 @@ function expectProcessesDiagnostic(result: Awaited<ReturnType<typeof runSteiger>
   )
 }
 
-test('finds configuration above the target when invoked from a sibling directory', async () => {
-  const { cwd, project, target } = await createWorkspace()
-  await writeConfig(project, 'warn')
-
-  const result = await runSteiger(cwd, [target, '--reporter=json'])
-
+function expectProcessesWarning(result: Awaited<ReturnType<typeof runSteiger>>, target: string) {
   expect(result.exitCode).toBe(0)
   expect(JSON.parse(result.stdout)).toEqual([
     expect.objectContaining({
@@ -92,6 +87,21 @@ test('finds configuration above the target when invoked from a sibling directory
       location: expect.objectContaining({ path: join(target, 'processes') }),
     }),
   ])
+}
+
+function expectHelp(result: Awaited<ReturnType<typeof runSteiger>>) {
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout).toContain('steiger [options] <path>')
+  expect(result.stdout).toContain('--ignore-warnings')
+}
+
+test('finds configuration above the target when invoked from a sibling directory', async () => {
+  const { cwd, project, target } = await createWorkspace()
+  await writeConfig(project, 'warn')
+
+  const result = await runSteiger(cwd, [target, '--reporter=json'])
+
+  expectProcessesWarning(result, target)
 })
 
 test('does not apply configuration from the working directory to a sibling target', async () => {
@@ -107,14 +117,7 @@ test.each([true, false])('inherits configuration through package boundaries with
 
   const result = await runSteiger(project, [target, '--reporter=json'])
 
-  expect(result.exitCode).toBe(0)
-  expect(JSON.parse(result.stdout)).toEqual([
-    expect.objectContaining({
-      ruleName: 'fsd/no-processes',
-      severity: 'warn',
-      location: expect.objectContaining({ path: join(target, 'processes') }),
-    }),
-  ])
+  expectProcessesWarning(result, target)
 })
 
 test('uses the nearest package configuration instead of the monorepo configuration', async () => {
@@ -141,9 +144,7 @@ test.each(['--help', '-h', '-wh'])('prints help for %s without selecting a targe
 
   const result = await runSteiger(cwd, [flag])
 
-  expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain('steiger [options] <path>')
-  expect(result.stdout).toContain('--ignore-warnings')
+  expectHelp(result)
 })
 
 test.each(['--version', '-v', '-wv'])('prints version for %s using configuration from cwd', async (flag) => {
@@ -191,8 +192,7 @@ test.each(invalidArguments)('prints help despite invalid arguments: $args', asyn
 
   const result = await runSteiger(cwd, [...args, '--help'])
 
-  expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain('steiger [options] <path>')
+  expectHelp(result)
 })
 
 test.each([
@@ -204,7 +204,5 @@ test.each([
 
   const result = await runSteiger(cwd, args)
 
-  expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain('steiger [options] <path>')
-  expect(result.stdout).toContain('--ignore-warnings')
+  expectHelp(result)
 })
