@@ -8,6 +8,7 @@ import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
+import * as find from 'empathic/find'
 
 import { linter } from './app'
 import { $globalConfig, processConfiguration } from './models/config'
@@ -19,10 +20,10 @@ import packageJson from '../package.json'
 import { existsAndIsFolder } from './shared/file-system'
 
 const defaultConfig = fsd.configs.recommended
-const configExplorer = cosmiconfig('steiger', { searchStrategy: 'project' })
+const configExplorer = cosmiconfig('steiger', { searchStrategy: 'none' })
 const rawArgs = hideBin(process.argv)
 
-function createYargsProgram() {
+function createYargsProgram(version = packageJson.version) {
   return yargs(rawArgs)
     .scriptName('steiger')
     .usage('$0 [options] <path>')
@@ -58,7 +59,7 @@ function createYargsProgram() {
     .string('_')
     .check((argv) => {
       const filePaths = argv._
-      if (!argv.help && !argv.version && filePaths.length > 1) {
+      if (filePaths.length > 1) {
         throw new Error('Pass only one path to watch')
       } else {
         return true
@@ -66,6 +67,8 @@ function createYargsProgram() {
     })
     .help('help', 'display help message')
     .alias('help', 'h')
+    .version(version)
+    .alias('version', 'v')
     .showHelpOnFail(true)
 }
 
@@ -81,8 +84,27 @@ function createVersionString() {
     .join('\n\n')
 }
 
+async function searchConfiguration(searchFrom: string) {
+  let directory = resolve(searchFrom)
+  const gitFolder = find.up('.git', { cwd: directory })
+  const gitRoot = gitFolder ? dirname(gitFolder) : undefined
+
+  while (true) {
+    const result = await configExplorer.search(directory)
+    if (result) {
+      return result
+    }
+
+    const parent = dirname(directory)
+    if (directory === gitRoot || parent === directory) {
+      return null
+    }
+    directory = parent
+  }
+}
+
 async function loadConfiguration(searchFrom: string) {
-  const { config, filepath } = (await configExplorer.search(searchFrom)) ?? { config: null, filepath: undefined }
+  const { config, filepath } = (await searchConfiguration(searchFrom)) ?? { config: null, filepath: undefined }
 
   try {
     const configLocationDirectory = filepath ? dirname(filepath) : null
@@ -128,16 +150,21 @@ async function resolveTargetPath(inputPaths: Array<string | number>) {
   }
 }
 
-const consoleArgs = createYargsProgram()
-  .help(false)
-  .version(false)
-  .option('help', { alias: 'h', type: 'boolean', skipValidation: true })
-  .option('version', { alias: 'v', type: 'boolean', skipValidation: true })
-  .parseSync()
+let hasParseError = false
+let hasOutput = false
+const consoleArgs = createYargsProgram().parseSync(rawArgs, {}, (error, _argv, output) => {
+  hasParseError = Boolean(error)
+  hasOutput = output.length > 0
+})
 
-if (consoleArgs.version || consoleArgs.help) {
+if (hasParseError) {
+  createYargsProgram().parseSync()
+  process.exit(1)
+}
+
+if (hasOutput) {
   await loadConfiguration(process.cwd())
-  createYargsProgram().version(createVersionString()).alias('version', 'v').parseSync()
+  createYargsProgram(createVersionString()).parseSync()
   process.exit(0)
 }
 

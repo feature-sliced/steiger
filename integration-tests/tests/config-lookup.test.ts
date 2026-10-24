@@ -28,7 +28,22 @@ async function createWorkspace() {
   await fs.mkdir(join(target, 'processes'), { recursive: true })
   await fs.writeFile(join(target, 'processes', 'file.ts'), 'export {}\n')
 
-  return { cwd, project, target }
+  return { workspace, cwd, project, target }
+}
+
+async function createMonorepo(initializeGit = true) {
+  const { workspace, project } = await createWorkspace()
+  const packageDirectory = join(project, 'packages', 'app')
+  const target = join(packageDirectory, 'src')
+  await fs.mkdir(join(target, 'processes'), { recursive: true })
+  await fs.writeFile(join(target, 'processes', 'file.ts'), 'export {}\n')
+  await fs.writeFile(join(packageDirectory, 'package.json'), '{"private":true}')
+
+  if (initializeGit) {
+    await exec('git', ['init', '--quiet', project], { timeout: 5000, throwOnError: true })
+  }
+
+  return { workspace, project, packageDirectory, target }
 }
 
 async function writeConfig(directory: string, severity: 'off' | 'warn' = 'off') {
@@ -86,6 +101,40 @@ test('does not apply configuration from the working directory to a sibling targe
   expectProcessesDiagnostic(await runSteiger(cwd, [target, '--reporter=json']), target)
 })
 
+test.each([true, false])('inherits configuration through package boundaries with Git: %s', async (initializeGit) => {
+  const { project, target } = await createMonorepo(initializeGit)
+  await writeConfig(project, 'warn')
+
+  const result = await runSteiger(project, [target, '--reporter=json'])
+
+  expect(result.exitCode).toBe(0)
+  expect(JSON.parse(result.stdout)).toEqual([
+    expect.objectContaining({
+      ruleName: 'fsd/no-processes',
+      severity: 'warn',
+      location: expect.objectContaining({ path: join(target, 'processes') }),
+    }),
+  ])
+})
+
+test('uses the nearest package configuration instead of the monorepo configuration', async () => {
+  const { project, packageDirectory, target } = await createMonorepo()
+  await writeConfig(project, 'warn')
+  await writeConfig(packageDirectory)
+
+  const result = await runSteiger(project, [target, '--reporter=json'])
+
+  expect(result.exitCode).toBe(0)
+  expect(JSON.parse(result.stdout)).toEqual([])
+})
+
+test('does not inherit configuration from above the Git repository', async () => {
+  const { workspace, project, target } = await createMonorepo()
+  await writeConfig(workspace)
+
+  expectProcessesDiagnostic(await runSteiger(project, [target, '--reporter=json']), target)
+})
+
 test.each(['--help', '-h', '-wh'])('prints help for %s without selecting a target', async (flag) => {
   const { cwd } = await createWorkspace()
   await writeConfig(cwd)
@@ -108,7 +157,7 @@ test.each(['--version', '-v', '-wv'])('prints version for %s using configuration
   expect(result.stdout).toContain(`@feature-sliced/steiger-plugin\t${configPluginVersion}`)
 })
 
-test.each(['-something', '-archive'])('lints the path %s after the argument separator', async (name) => {
+test.each(['-something', '-archive', 'help'])('lints the path %s after the argument separator', async (name) => {
   const { cwd } = await createWorkspace()
   const target = join(cwd, name)
   await fs.mkdir(join(target, 'processes'), { recursive: true })
@@ -144,4 +193,18 @@ test.each(invalidArguments)('prints help despite invalid arguments: $args', asyn
 
   expect(result.exitCode).toBe(0)
   expect(result.stdout).toContain('steiger [options] <path>')
+})
+
+test.each([
+  { args: ['anything', 'help'] },
+  { args: ['help'] },
+  { args: ['--ignore-warnings', '--fail-on-warnings', 'help'] },
+])('prints positional help for $args without selecting a target', async ({ args }) => {
+  const { cwd } = await createWorkspace()
+
+  const result = await runSteiger(cwd, args)
+
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout).toContain('steiger [options] <path>')
+  expect(result.stdout).toContain('--ignore-warnings')
 })
