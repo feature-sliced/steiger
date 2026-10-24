@@ -10,7 +10,7 @@ import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 
 import { linter } from './app'
-import { processConfiguration, $plugins } from './models/config'
+import { $globalConfig, processConfiguration } from './models/config'
 import { applyAutofixes } from './features/autofix'
 import { chooseRootFolderFromGuesses, chooseRootFolderFromSimilar, ExitException } from './features/choose-root-folder'
 import fsd from '@feature-sliced/steiger-plugin'
@@ -42,6 +42,12 @@ function createYargsProgram() {
       describe: 'exit with an error code if there are warnings',
       type: 'boolean',
     })
+    .option('ignore-warnings', {
+      demandOption: false,
+      describe: 'report errors only',
+      type: 'boolean',
+    })
+    .conflicts('ignore-warnings', 'fail-on-warnings')
     .option('reporter', {
       demandOption: false,
       describe: 'specify output format (pretty or json)',
@@ -66,9 +72,9 @@ function createYargsProgram() {
 function createVersionString() {
   return [
     packageJson.version,
-    $plugins
-      .getState()
-      .map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
+    $globalConfig
+      .getState()!
+      .plugins.map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
       .join('\n'),
   ]
     .filter(Boolean)
@@ -142,10 +148,14 @@ if (targetPath === undefined) {
 await loadConfiguration(targetPath)
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
+  const diagnosticsToReport = consoleArgs['ignore-warnings']
+    ? diagnostics.filter((diagnostic) => diagnostic.severity === 'error')
+    : diagnostics
+
   if (consoleArgs.reporter === 'json') {
-    console.log(JSON.stringify(diagnostics, null, 2))
+    console.log(JSON.stringify(diagnosticsToReport, null, 2))
   } else {
-    reportPretty(diagnostics, process.cwd())
+    reportPretty(diagnosticsToReport, process.cwd())
   }
 }
 

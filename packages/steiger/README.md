@@ -8,11 +8,11 @@ Universal file structure and project architecture linter.
 > The project is in beta and in active development. Some APIs may change.
 
 > [!NOTE]
-> Version 0.5.0 introduced a new config file format. We have a codemod to automatically update your config, see the [migration guide](./MIGRATION_GUIDE.md).
+> Version 0.5.0 introduced a new config file format. We have a codemod to automatically update your config, see the [migration guide](https://github.com/feature-sliced/steiger/blob/master/MIGRATION_GUIDE.md).
 
 ## Features
 
-- Built-in set of rules to validate adherence to [Feature-Sliced Design](https://feature-sliced.design/)
+- Built-in set of rules to validate adherence to [Feature-Sliced Design](https://fsd.how/)
 - Watch mode
 - Rule configurability
 
@@ -33,6 +33,37 @@ To run in watch mode, add `-w`/`--watch` to the command:
 ```bash
 npx steiger ./src --watch
 ```
+
+## Performance profiling
+
+If Steiger feels slow, you can find out which rules take the most time by enabling timing output with the `TIMING` environment variable.
+
+```bash
+TIMING=1 npx steiger ./src
+```
+
+Steiger prints a table to **stderr** that shows how long each rule took to run, sorted from slowest to fastest. Durations are in milliseconds. In watch mode (`--watch`), Steiger prints a fresh table on every re-run after the project files change.
+
+```
+┌─────────┬───────────────────────────┬──────────┐
+│ (index) │           Rule            │ Duration │
+├─────────┼───────────────────────────┼──────────┤
+│    0    │   'fsd/forbidden-imports' │  340.12  │
+│    1    │   'fsd/public-api'        │  120.45  │
+│    2    │   'fsd/import-locality'   │   85.30  │
+└─────────┴───────────────────────────┴──────────┘
+```
+
+`TIMING` accepts any value to enable timing, except `0`, `false`, and an empty value. Unsetting it disables timing.
+
+```bash
+TIMING=1 npx steiger ./src       # enabled
+TIMING=0 npx steiger ./src       # disabled
+TIMING=false npx steiger ./src   # disabled
+```
+
+> [!NOTE]
+> Rules run concurrently, so each rule's duration is an independent measurement that can overlap with others in wall-clock time. Compare rules against each other, but do not sum the durations to estimate total runtime.
 
 ## Configuration
 
@@ -110,7 +141,7 @@ Version 0.5.0 introduced a new config file format. Follow the [instructions](../
 
 ## Rules
 
-Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://feature-sliced.design/).
+Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://fsd.how/).
 
 <table>
 <thead>
@@ -120,26 +151,27 @@ Currently, Steiger is not extendable with more rules, though that will change in
   </tr>
 </thead>
 <tbody>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/ambiguous-slice-names/README.md"><code>ambiguous-slice-names</code></a></td> <td>Forbid slice names that that match some segment’s name in the Shared layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/excessive-slicing/README.md"><code>excessive-slicing</code></a></td> <td>Forbid having too many ungrouped slices or too many slices in a group.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/forbidden-imports/README.md"><code>forbidden-imports</code></a></td> <td>Forbid imports from higher layers and cross-imports between slices on the same layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-cross-imports/README.md"><code>fsd/no-cross-imports</code></a></td> <td>[disabled] Forbid cross-imports between slices on the same layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-higher-level-imports/README.md"><code>fsd/no-higher-level-imports</code></a></td> <td>[disabled] Forbid imports from higher layers.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/inconsistent-naming/README.md"><code>inconsistent-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/insignificant-slice/README.md"><code>insignificant-slice</code></a></td> <td>Detect slices that have just one reference or no references to them at all.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-layer-public-api/README.md"><code>no-layer-public-api</code></a></td> <td>Forbid index files on the layer level.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-public-api-sidestep/README.md"><code>no-public-api-sidestep</code></a></td> <td>Forbid going around the public API of a slice to import directly from an internal module in a slice.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-reserved-folder-names/README.md"><code>no-reserved-folder-names</code></a></td> <td>Forbid subfolders in segments that have the same name as other conventional segments.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-segmentless-slices/README.md"><code>no-segmentless-slices</code></a></td> <td>Forbid slices that don't have any segments.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-segments-on-sliced-layers/README.md"><code>no-segments-on-sliced-layers</code></a></td> <td>Forbid segments (like ui, lib, api ...) that appear directly in sliced layer folders (entities, features, ...)</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-ui-in-app/README.md"><code>no-ui-in-app</code></a></td> <td>Forbid having the <code>ui</code> segment on the App layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/public-api/README.md"><code>public-api</code></a></td> <td>Require slices (and segments on sliceless layers like Shared) to have a public API definition.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/repetitive-naming/README.md"><code>repetitive-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/segments-by-purpose/README.md"><code>segments-by-purpose</code></a></td> <td>Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/shared-lib-grouping/README.md"><code>shared-lib-grouping</code></a></td> <td>Forbid having too many ungrouped modules in <code>shared/lib</code>.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/typo-in-layer-name/README.md"><code>typo-in-layer-name</code></a></td> <td>Ensure that all layers are named without any typos.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-processes/README.md"><code>no-processes</code></a></td> <td>Discourage the use of the deprecated Processes layer.</td> </tr>
-  <tr> <td><a href="./packages/steiger-plugin-fsd/src/import-locality/README.md"><code>import-locality</code></a></td> <td>[disabled] Require that imports from the same slice be relative and imports from one slice to another be absolute.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/ambiguous-slice-names/README.md"><code>ambiguous-slice-names</code></a></td> <td>Forbid slice names that that match some segment’s name in the Shared layer.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/excessive-slicing/README.md"><code>excessive-slicing</code></a></td> <td>Forbid having too many ungrouped slices or too many slices in a group.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/forbidden-imports/README.md"><code>forbidden-imports</code></a></td> <td>Forbid imports from higher layers and cross-imports between slices on the same layer.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-cross-imports/README.md"><code>fsd/no-cross-imports</code></a></td> <td>[disabled] Forbid cross-imports between slices on the same layer.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-higher-level-imports/README.md"><code>fsd/no-higher-level-imports</code></a></td> <td>[disabled] Forbid imports from higher layers.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/inconsistent-naming/README.md"><code>inconsistent-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/insignificant-slice/README.md"><code>insignificant-slice</code></a></td> <td>Detect slices that have just one reference or no references to them at all.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-layer-public-api/README.md"><code>no-layer-public-api</code></a></td> <td>Forbid index files on the layer level.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-public-api-sidestep/README.md"><code>no-public-api-sidestep</code></a></td> <td>Forbid going around the public API of a slice to import directly from an internal module in a slice.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-reserved-folder-names/README.md"><code>no-reserved-folder-names</code></a></td> <td>Forbid subfolders in segments that have the same name as other conventional segments.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-segmentless-slices/README.md"><code>no-segmentless-slices</code></a></td> <td>Forbid slices that don't have any segments.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-segments-on-sliced-layers/README.md"><code>no-segments-on-sliced-layers</code></a></td> <td>Forbid segments (like ui, lib, api ...) that appear directly in sliced layer folders (entities, features, ...)</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-ui-in-app/README.md"><code>no-ui-in-app</code></a></td> <td>Forbid having the <code>ui</code> segment on the App layer.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/public-api/README.md"><code>public-api</code></a></td> <td>Require slices (and segments on sliceless layers like Shared) to have a public API definition.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/repetitive-naming/README.md"><code>repetitive-naming</code></a></td> <td>Ensure that all entities are named consistently in terms of pluralization.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/segments-by-purpose/README.md"><code>segments-by-purpose</code></a></td> <td>Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/shared-lib-grouping/README.md"><code>shared-lib-grouping</code></a></td> <td>Forbid having too many ungrouped modules in <code>shared/lib</code>.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/typo-in-layer-name/README.md"><code>typo-in-layer-name</code></a></td> <td>Ensure that all layers are named without any typos.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-processes/README.md"><code>no-processes</code></a></td> <td>Discourage the use of the deprecated Processes layer.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/import-locality/README.md"><code>import-locality</code></a></td> <td>[disabled] Require that imports from the same slice be relative and imports from one slice to another be absolute.</td> </tr>
+  <tr> <td><a href="https://github.com/feature-sliced/steiger/blob/master/packages/steiger-plugin-fsd/src/no-wildcard-exports/README.md"><code>no-wildcard-exports</code></a></td> <td>[disabled] Forbid wildcard re-exports (<code>export * from</code>) in public APIs.</td> </tr>
 </tbody>
 </table>
 

@@ -114,7 +114,11 @@ it('reports errors on a project with cross-imports in entities', async () => {
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx') },
+      location: {
+        path: joinFromRoot('src', 'entities', 'product', 'ui', 'ProductCard.tsx'),
+        start: { column: 29, line: 1 },
+        end: { column: 44, line: 1 },
+      },
     },
   ])
 })
@@ -147,7 +151,11 @@ it('reports errors on a project where a feature imports from a page', async () =
   expect((await forbiddenImports.check(root)).diagnostics.sort()).toEqual([
     {
       message: `Forbidden import from higher layer "pages".`,
-      location: { path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx') },
+      location: {
+        path: joinFromRoot('src', 'features', 'comments', 'ui', 'CommentCard.tsx'),
+        start: { column: 25, line: 1 },
+        end: { column: 39, line: 1 },
+      },
     },
   ])
 })
@@ -189,11 +197,19 @@ it('reports errors on a project where a lower level imports from files that are 
   expect(diagnostics).toEqual([
     {
       message: `Forbidden import from higher layer "app".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'lib', 'count-cart-items.ts') },
+      location: {
+        path: joinFromRoot('src', 'entities', 'cart', 'lib', 'count-cart-items.ts'),
+        start: { column: 19, line: 1 },
+        end: { column: 32, line: 1 },
+      },
     },
     {
       message: `Forbidden import from higher layer "app".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'SmallCart.tsx') },
+      location: {
+        path: joinFromRoot('src', 'entities', 'cart', 'ui', 'SmallCart.tsx'),
+        start: { column: 22, line: 1 },
+        end: { column: 27, line: 1 },
+      },
     },
   ])
 })
@@ -302,7 +318,11 @@ it('reports errors on a project with incorrect cross-imports through @x', async 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([
     {
       message: `Forbidden cross-import from slice "user".`,
-      location: { path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx') },
+      location: {
+        path: joinFromRoot('src', 'entities', 'cart', 'ui', 'BadSmallCart.tsx'),
+        start: { column: 29, line: 1 },
+        end: { column: 55, line: 1 },
+      },
     },
   ])
 })

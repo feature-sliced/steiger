@@ -12,7 +12,7 @@ import { ExitException } from './exit-exception'
 /** The maximum Levenshtein distance between the input and the reference for the input to be considered a typo. */
 const typoThreshold = 5
 const gitFolder = find.up('.git')
-const isIgnored = await isGitIgnored({ cwd: gitFolder ? dirname(gitFolder) : undefined })
+const isIgnored = await isGitIgnored({ cwd: gitFolder ? dirname(gitFolder) : undefined, suppressErrors: true })
 
 /** Present the user with a choice of folders based on similarity to a given input. */
 export async function chooseFromSimilar(input: string): Promise<string> {

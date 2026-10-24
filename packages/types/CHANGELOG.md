@@ -1,5 +1,12 @@
 # @steiger/types
 
+## 0.4.0
+
+### Minor Changes
+
+- 2d8411e: refactor diagnostic location to use `start` and `end` ranges instead of a single `line`/`column`
+- 2941d88: update minimal nodejs version, fix typescript 7 support
+
 ## 0.3.0
 
 ### Minor Changes

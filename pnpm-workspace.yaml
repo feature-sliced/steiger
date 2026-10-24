@@ -1,4 +1,7 @@
+minimumReleaseAge: 4320
 packages:
   - 'packages/*'
   - 'tooling/*'
   - 'integration-tests'
+onlyBuiltDependencies:
+  - esbuild

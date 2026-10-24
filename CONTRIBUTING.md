@@ -1,6 +1,6 @@
 # Contributing
 
-To start with this project, you will need [pnpm 9](https://pnpm.io). Install the dependencies with `pnpm i` in the root.
+To start with this project, you will need [pnpm 10](https://pnpm.io). Install the dependencies with `pnpm i` in the root.
 
 This project is a monorepo of the following packages:
 
@@ -39,11 +39,11 @@ This project uses Changesets for versioning. When you made changes, run `pnpm ch
 When it's time to release new versions of packages to npm, run the following commands:
 
 ```bash
-turbo build
-
 pnpm changeset version
 
 # -- Commit the changelog and the version bump --
+
+turbo build
 
 pnpm changeset publish
 

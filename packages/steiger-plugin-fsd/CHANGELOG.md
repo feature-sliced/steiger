@@ -1,5 +1,48 @@
 # @feature-sliced/steiger-plugin
 
+## 0.8.0
+
+### Minor Changes
+
+- 2d8411e: refactor diagnostic location to use `start` and `end` ranges instead of a single `line`/`column`
+- 2d8411e: add line and column numbers to import-related diagnostics
+- 04e0ae2: add the `no-wildcard-exports` rule, which forbids `export * from` and `export * as ns from` in public APIs. The rule is disabled by default.
+
+### Patch Changes
+
+- 2d8411e: cache the result of `resolveImport` calls to speed up dependency resolution
+- 2bb9afe: Fix stale package versions in the --version output.
+- 4fbedf6: add fall back to sequential parser load
+
+## 0.7.0
+
+### Minor Changes
+
+- fe45525: add fs cache for import rules
+- 3bdcb95: extend segments-by-purpose rule to forbid more essence-based and framework-specific segment names
+
+### Patch Changes
+
+- 4fbedf6: add fall back to sequential parser load
+
+## 0.6.0
+
+### Minor Changes
+
+- 12bb1a2: replace dependency extraction algorithm with tree-sitter, add support for astro and svelte files
+
+### Patch Changes
+
+- ac8320b: Cleanup package.json
+
+## 0.5.8
+
+### Patch Changes
+
+- 26e2f71: Add support for prefixed layers
+- 5f1cf86: Ignore neutral words like k8s, kubernetes, and media in fsd/inconsistent-naming
+- f618107: Add `import-locality` rule
+
 ## 0.5.7
 
 ### Patch Changes

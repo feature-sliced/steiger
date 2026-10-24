@@ -28,11 +28,12 @@ ${e} ${ruleName}
 
 function formatLocation(location: Diagnostic['location'], cwd: string) {
   let path = relative(cwd, location.path)
-  if (location.line !== undefined) {
-    path += `:${location.line}`
+  const start = location.start
+  if (start?.line !== undefined) {
+    path += `:${start.line}`
 
-    if (location.column !== undefined) {
-      path += `:${location.column}`
+    if (start.column !== undefined) {
+      path += `:${start.column}`
     }
   }
 

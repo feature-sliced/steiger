@@ -1,14 +1,13 @@
 import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { layerSequence, isCrossImportPublicApi } from '@feature-sliced/filesystem'
-import precinct from 'precinct'
-const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
+import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 import { NAMESPACE } from '../constants.js'
 
 const forbiddenImports = {
@@ -20,10 +19,13 @@ const forbiddenImports = {
     const sourceFileIndex = indexSourceFiles(root)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
-      const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
+      const sourceType = getSourceType(sourceFile.file.path)
+      if (!sourceType) continue
+
+      const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
-          dependency,
+          dependency.path,
           sourceFile.file.path,
           tsConfigs,
           fs.existsSync,
@@ -54,7 +56,11 @@ const forbiddenImports = {
           ) {
             diagnostics.push({
               message: `Forbidden cross-import from slice "${dependencyLocation.sliceName}".`,
-              location: { path: sourceFile.file.path },
+              location: {
+                path: sourceFile.file.path,
+                start: dependency.start,
+                end: dependency.end,
+              },
             })
           }
         } else {
@@ -64,7 +70,11 @@ const forbiddenImports = {
           if (thisLayerIndex < dependencyLayerIndex) {
             diagnostics.push({
               message: `Forbidden import from higher layer "${dependencyLocation.layerName}".`,
-              location: { path: sourceFile.file.path },
+              location: {
+                path: sourceFile.file.path,
+                start: dependency.start,
+                end: dependency.end,
+              },
             })
           }
         }

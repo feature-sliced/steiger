@@ -2,7 +2,7 @@
   "private": true,
   "name": "@steiger/integration-tests",
   "description": "Integration tests for Steiger",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "scripts": {
     "test": "vitest run",
     "update-windows-snapshots": "node ./scripts/update-windows-snapshots.mjs"
@@ -19,10 +19,11 @@
     }
   ],
   "devDependencies": {
+    "@feature-sliced/steiger-plugin": "workspace:*",
     "@steiger/eslint-config": "workspace:*",
     "@steiger/tsconfig": "workspace:*",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^18.19.121",
+    "@types/node": "^22.18.0",
     "eslint": "^9.32.0",
     "figures": "^6.1.0",
     "get-bin-path": "^11.0.1",

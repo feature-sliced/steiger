@@ -1,4 +1,4 @@
-// Source: https://github.com/evanw/esbuild/issues/1921#issuecomment-1898197331
+// Work around esbuild's ESM dynamic require limitation: https://github.com/evanw/esbuild/issues/1921#issuecomment-1898197331
 
 import module from 'node:module'
 import path from 'node:path'

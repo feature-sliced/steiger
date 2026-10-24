@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { partition } from 'lodash-es'
 import pluralize from 'pluralize'
 const { isPlural, plural, singular } = pluralize
 import { getLayers, getSlices } from '@feature-sliced/filesystem'
@@ -7,6 +6,8 @@ import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
 import { NAMESPACE } from '../constants.js'
+
+const neutralWords = new Set(['k8s', 'kubernetes', 'media'])
 
 /** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
@@ -22,7 +23,16 @@ const inconsistentNaming = {
     const slices = getSlices(entities)
     const sliceNames = groupSlices(Object.keys(slices))
     for (const [groupPrefix, group] of Object.entries(sliceNames)) {
-      const [pluralNames, singularNames] = partition(group, isPlural)
+      const namesToCheck = group.filter((g) => !isNeutralWord(g))
+      const pluralNames: string[] = []
+      const singularNames: string[] = []
+      for (const name of namesToCheck) {
+        if (isPlural(name)) {
+          pluralNames.push(name)
+        } else {
+          singularNames.push(name)
+        }
+      }
 
       if (pluralNames.length > 0 && singularNames.length > 0) {
         const message = 'Inconsistent pluralization of slice names'
@@ -56,3 +66,7 @@ const inconsistentNaming = {
 } satisfies Rule
 
 export default inconsistentNaming
+
+function isNeutralWord(name: string) {
+  return neutralWords.has(name.toLowerCase())
+}

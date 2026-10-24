@@ -4,7 +4,7 @@ This rule forbids imports from higher layers and cross-imports between slices on
 
 > A module in a slice can only import other slices when they are located on layers strictly below.
 >
-> https://feature-sliced.design/docs/reference/layers#import-rule-on-layers
+> https://fsd.how/docs/reference/layers#import-rule-on-layers
 
 > [!NOTE]
 > If you need more granular control, this rule's functionality is split into two separate rules that you can use independently:

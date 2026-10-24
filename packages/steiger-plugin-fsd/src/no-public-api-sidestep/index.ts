@@ -1,7 +1,5 @@
 import * as fs from 'node:fs'
 import { basename, relative, sep } from 'node:path'
-import precinct from 'precinct'
-const { paperwork } = precinct
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import { getIndexes, getLayers, getSegments, isSliced, crossReferenceToken } from '@feature-sliced/filesystem'
 import type { Folder, File, PartialDiagnostic, Rule } from '@steiger/toolkit'
@@ -10,6 +8,7 @@ import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
 import { NAMESPACE } from '../constants.js'
+import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {
@@ -21,10 +20,13 @@ const noPublicApiSidestep = {
     const sourceFileIndex = indexSourceFiles(root)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
-      const dependencies = paperwork(sourceFile.file.path, { includeCore: false, fileSystem: fs })
+      const sourceType = getSourceType(sourceFile.file.path)
+      if (!sourceType) continue
+
+      const dependencies = await extractDependencies(sourceFile.file.path)
       for (const dependency of dependencies) {
         const resolvedDependency = resolveDependency(
-          dependency,
+          dependency.path,
           sourceFile.file.path,
           tsConfigs,
           fs.existsSync,
@@ -50,8 +52,12 @@ const noPublicApiSidestep = {
         if (isSliced(dependencyLocation.layerName)) {
           if (dependencyLocation.segmentName !== null && dependencyLocation.segmentName !== crossReferenceToken) {
             diagnostics.push({
-              message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-              location: { path: sourceFile.file.path },
+              message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
+              location: {
+                path: sourceFile.file.path,
+                start: dependency.start,
+                end: dependency.end,
+              },
             })
           }
         } else if (dependencyLocation.segmentName !== null) {
@@ -84,15 +90,23 @@ const noPublicApiSidestep = {
 
                 if (!topLevelFolderIndexes.map((topLevelFolder) => topLevelFolder.path).includes(resolvedDependency)) {
                   diagnostics.push({
-                    message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-                    location: { path: sourceFile.file.path },
+                    message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
+                    location: {
+                      path: sourceFile.file.path,
+                      start: dependency.start,
+                      end: dependency.end,
+                    },
                   })
                 }
               }
             } else {
               diagnostics.push({
-                message: `Forbidden sidestep of public API when importing from "${dependency}".`,
-                location: { path: sourceFile.file.path },
+                message: `Forbidden sidestep of public API when importing from "${dependency.path}".`,
+                location: {
+                  path: sourceFile.file.path,
+                  start: dependency.start,
+                  end: dependency.end,
+                },
               })
             }
           }

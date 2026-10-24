@@ -37,6 +37,12 @@ To run in watch mode, add `-w`/`--watch` to the command:
 npx steiger ./src --watch
 ```
 
+To report errors only and hide warnings, use `--ignore-warnings`. `--ignore-warnings` cannot be used together with `--fail-on-warnings`.
+
+```bash
+npx steiger ./src --ignore-warnings
+```
+
 ## Configuration
 
 Steiger is zero-config! If you don't want to disable certain rules, you can safely skip this section.
@@ -111,7 +117,7 @@ Version 0.5.0 introduced a new config file format. Follow the [instructions](MIG
 
 ## Rules
 
-Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://feature-sliced.design/).
+Currently, Steiger is not extendable with more rules, though that will change in the near future. The built-in rules check for the project's adherence to [Feature-Sliced Design](https://fsd.how/).
 
 <table>
 <thead>
@@ -141,6 +147,7 @@ Currently, Steiger is not extendable with more rules, though that will change in
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/typo-in-layer-name/README.md"><code>fsd/typo-in-layer-name</code></a></td> <td>Ensure that all layers are named without any typos.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-processes/README.md"><code>fsd/no-processes</code></a></td> <td>Discourage the use of the deprecated Processes layer.</td> </tr>
   <tr> <td><a href="./packages/steiger-plugin-fsd/src/import-locality/README.md"><code>fsd/import-locality</code></a></td> <td>[disabled] Require that imports from the same slice be relative and imports from one slice to another be absolute.</td> </tr>
+  <tr> <td><a href="./packages/steiger-plugin-fsd/src/no-wildcard-exports/README.md"><code>fsd/no-wildcard-exports</code></a></td> <td>[disabled] Forbid wildcard re-exports (<code>export * from</code>) in public APIs.</td> </tr>
 </tbody>
 </table>
 

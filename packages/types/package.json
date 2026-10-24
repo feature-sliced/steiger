@@ -2,7 +2,7 @@
   "name": "@steiger/types",
   "private": true,
   "description": "Type definitions for Steiger",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {
     "format": "prettier --write . --cache",
     "check-formatting": "prettier --check . --cache",
@@ -27,7 +27,7 @@
   ],
   "devDependencies": {
     "@steiger/tsconfig": "workspace:*",
-    "@types/node": "^18.19.121",
+    "@types/node": "^22.18.0",
     "typescript": "^5.9.2"
   }
 }
