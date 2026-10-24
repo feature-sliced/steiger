@@ -23,55 +23,6 @@ const defaultConfig = fsd.configs.recommended
 const configExplorer = cosmiconfig('steiger', { searchStrategy: 'none' })
 const rawArgs = hideBin(process.argv)
 
-function createYargsProgram(version = packageJson.version) {
-  return yargs(rawArgs)
-    .scriptName('steiger')
-    .usage('$0 [options] <path>')
-    .option('watch', {
-      alias: 'w',
-      demandOption: false,
-      describe: 'watch filesystem changes',
-      type: 'boolean',
-    })
-    .option('fix', {
-      demandOption: false,
-      describe: 'apply auto-fixes',
-      type: 'boolean',
-    })
-    .option('fail-on-warnings', {
-      demandOption: false,
-      describe: 'exit with an error code if there are warnings',
-      type: 'boolean',
-    })
-    .option('ignore-warnings', {
-      demandOption: false,
-      describe: 'report errors only',
-      type: 'boolean',
-    })
-    .conflicts('ignore-warnings', 'fail-on-warnings')
-    .option('reporter', {
-      demandOption: false,
-      describe: 'specify output format (pretty or json)',
-      type: 'string',
-      choices: ['pretty', 'json'],
-      default: 'pretty',
-    })
-    .string('_')
-    .check((argv) => {
-      const filePaths = argv._
-      if (filePaths.length > 1) {
-        throw new Error('Pass only one path to watch')
-      } else {
-        return true
-      }
-    })
-    .help('help', 'display help message')
-    .alias('help', 'h')
-    .version(version)
-    .alias('version', 'v')
-    .showHelpOnFail(true)
-}
-
 function createVersionString() {
   return [
     packageJson.version,
@@ -120,26 +71,82 @@ async function loadConfiguration(searchFrom: string) {
   }
 }
 
-async function resolveTargetPath(inputPaths: Array<string | number>) {
-  if (inputPaths.length > 0) {
-    const inputPath = String(inputPaths[0])
-
-    if (await existsAndIsFolder(inputPath)) {
-      return resolve(inputPath)
+const yargsProgram = yargs(rawArgs)
+  .scriptName('steiger')
+  .usage('$0 [options] <path>')
+  .option('watch', {
+    alias: 'w',
+    demandOption: false,
+    describe: 'watch filesystem changes',
+    type: 'boolean',
+  })
+  .option('fix', {
+    demandOption: false,
+    describe: 'apply auto-fixes',
+    type: 'boolean',
+  })
+  .option('fail-on-warnings', {
+    demandOption: false,
+    describe: 'exit with an error code if there are warnings',
+    type: 'boolean',
+  })
+  .option('ignore-warnings', {
+    demandOption: false,
+    describe: 'report errors only',
+    type: 'boolean',
+  })
+  .conflicts('ignore-warnings', 'fail-on-warnings')
+  .option('reporter', {
+    demandOption: false,
+    describe: 'specify output format (pretty or json)',
+    type: 'string',
+    choices: ['pretty', 'json'],
+    default: 'pretty',
+  })
+  .string('_')
+  .check((argv) => {
+    const filePaths = argv._
+    if (filePaths.length > 1) {
+      throw new Error('Pass only one path to watch')
     } else {
-      try {
-        return resolve(await chooseRootFolderFromSimilar(inputPath))
-      } catch (e) {
-        if (e instanceof ExitException) {
-          process.exit(0)
-        } else {
-          throw e
-        }
-      }
+      return true
     }
+  })
+  .help('help', 'display help message')
+  .alias('help', 'h')
+  .version(packageJson.version)
+  .alias('version', 'v')
+  .showHelpOnFail(true)
+
+let hasParseError = false
+let hasOutput = false
+const consoleArgs = yargsProgram.parseSync(rawArgs, {}, (error, _argv, output) => {
+  hasParseError = Boolean(error)
+  hasOutput = output.length > 0
+})
+
+if (hasParseError) {
+  yargsProgram.parseSync()
+  process.exit(1)
+}
+
+if (hasOutput) {
+  await loadConfiguration(process.cwd())
+  yargsProgram.version(createVersionString()).alias('version', 'v').parseSync()
+  process.exit(0)
+}
+
+const inputPaths = consoleArgs._
+
+let targetPath: string | undefined
+if (inputPaths.length > 0) {
+  const inputPath = String(inputPaths[0])
+
+  if (await existsAndIsFolder(inputPath)) {
+    targetPath = resolve(inputPath)
   } else {
     try {
-      return resolve(await chooseRootFolderFromGuesses())
+      targetPath = resolve(await chooseRootFolderFromSimilar(inputPath))
     } catch (e) {
       if (e instanceof ExitException) {
         process.exit(0)
@@ -148,27 +155,17 @@ async function resolveTargetPath(inputPaths: Array<string | number>) {
       }
     }
   }
+} else {
+  try {
+    targetPath = resolve(await chooseRootFolderFromGuesses())
+  } catch (e) {
+    if (e instanceof ExitException) {
+      process.exit(0)
+    } else {
+      throw e
+    }
+  }
 }
-
-let hasParseError = false
-let hasOutput = false
-const consoleArgs = createYargsProgram().parseSync(rawArgs, {}, (error, _argv, output) => {
-  hasParseError = Boolean(error)
-  hasOutput = output.length > 0
-})
-
-if (hasParseError) {
-  createYargsProgram().parseSync()
-  process.exit(1)
-}
-
-if (hasOutput) {
-  await loadConfiguration(process.cwd())
-  createYargsProgram(createVersionString()).parseSync()
-  process.exit(0)
-}
-
-const targetPath = await resolveTargetPath(consoleArgs._)
 
 if (targetPath === undefined) {
   process.exit(0)
