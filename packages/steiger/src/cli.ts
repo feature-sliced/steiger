@@ -58,7 +58,7 @@ function createYargsProgram() {
     .string('_')
     .check((argv) => {
       const filePaths = argv._
-      if (filePaths.length > 1) {
+      if (!argv.help && !argv.version && filePaths.length > 1) {
         throw new Error('Pass only one path to watch')
       } else {
         return true
@@ -79,10 +79,6 @@ function createVersionString() {
   ]
     .filter(Boolean)
     .join('\n\n')
-}
-
-function includesCliFlag(flag: string) {
-  return rawArgs.some((arg) => arg === `--${flag}` || (/^-[^-]+$/.test(arg) && arg.includes(flag[0])))
 }
 
 async function loadConfiguration(searchFrom: string) {
@@ -132,13 +128,19 @@ async function resolveTargetPath(inputPaths: Array<string | number>) {
   }
 }
 
-if (includesCliFlag('version') || includesCliFlag('help')) {
+const consoleArgs = createYargsProgram()
+  .help(false)
+  .version(false)
+  .option('help', { alias: 'h', type: 'boolean', skipValidation: true })
+  .option('version', { alias: 'v', type: 'boolean', skipValidation: true })
+  .parseSync()
+
+if (consoleArgs.version || consoleArgs.help) {
   await loadConfiguration(process.cwd())
   createYargsProgram().version(createVersionString()).alias('version', 'v').parseSync()
   process.exit(0)
 }
 
-const consoleArgs = createYargsProgram().help(false).version(false).parseSync()
 const targetPath = await resolveTargetPath(consoleArgs._)
 
 if (targetPath === undefined) {
