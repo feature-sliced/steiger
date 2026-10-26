@@ -75,7 +75,7 @@ function validateRuleOptions(value: Config<Array<Rule>>, ctx: z.RefinementCtx) {
 /**
  * Dynamically build a validation scheme based on the rules provided by plugins.
  * */
-export function buildValidationScheme(rawConfig: Config<Array<Rule>>) {
+export function buildValidationScheme(rawConfig: Config<Array<Rule>>): z.ZodType<Config<Array<Rule>>> {
   const allRuleNames = getAllRuleNames(rawConfig.filter(isPlugin))
 
   // Make sure there's at least one rule registered by plugins
@@ -89,43 +89,45 @@ export function buildValidationScheme(rawConfig: Config<Array<Rule>>) {
     diagnostics: z.array(z.any()),
   })
 
-  return z
-    .array(
-      z.union([
-        z
-          .object({
-            ignores: z.array(z.string()),
-          })
-          .passthrough(),
-        z.object({
-          files: z.optional(z.array(z.string())),
-          ignores: z.optional(z.array(z.string())),
-          // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
-          rules: z.record(
-            z.enum(allRuleNames as [string, ...string[]]),
-            z.union([
-              z.enum(['off', 'error', 'warn']),
-              z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()]),
-            ]),
-          ),
+  const baseScheme = z.array(
+    z.union([
+      z
+        .object({
+          ignores: z.array(z.string()),
+        })
+        .passthrough(),
+      z.object({
+        files: z.optional(z.array(z.string())),
+        ignores: z.optional(z.array(z.string())),
+        // A config lists only the rules it configures, so the record must allow a subset
+        // of the rule names: `z.record` requires every key of an enum in zod 4.
+        // The enum needs at least one element, hence the "as [string, ...string[]]".
+        rules: z.partialRecord(
+          z.enum(allRuleNames as [string, ...string[]]),
+          z.union([z.enum(['off', 'error', 'warn']), z.tuple([z.enum(['error', 'warn']), z.object({}).passthrough()])]),
+        ),
+      }),
+      z.object({
+        meta: z.object({
+          name: z.string(),
+          version: z.string(),
         }),
-        z.object({
-          meta: z.object({
+        ruleDefinitions: z.array(
+          z.object({
             name: z.string(),
-            version: z.string(),
-          }),
-          ruleDefinitions: z.array(
-            z.object({
-              name: z.string(),
-              check: z
-                .function()
-                .args()
-                .returns(z.union([z.promise(ruleResultScheme), ruleResultScheme])),
+            check: z.function({
+              input: [],
+              output: z.union([z.promise(ruleResultScheme), ruleResultScheme]),
             }),
-          ),
-        }),
-      ]),
-    )
+          }),
+        ),
+      }),
+    ]),
+  )
+
+  // The rule names come from the plugins at runtime, so the inferred union is wider than
+  // `Config`; the refinements below are what actually validate it.
+  return (baseScheme as unknown as z.ZodType<Config<Array<Rule>>>)
     .superRefine(validateConfigObjectsNumber)
     .superRefine(validateRuleOptions)
     .superRefine(validateRuleUniqueness)
