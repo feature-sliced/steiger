@@ -1,11 +1,17 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.1/schema.json",
-  "changelog": "@changesets/cli/changelog",
+  "changelog": ["@changesets/changelog-github", { "repo": "feature-sliced/steiger" }],
   "commit": false,
   "fixed": [],
   "linked": [],
   "access": "public",
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [
+    "@steiger/types",
+    "@steiger/pretty-reporter",
+    "@steiger/integration-tests",
+    "@steiger/eslint-config",
+    "@steiger/tsconfig"
+  ]
 }

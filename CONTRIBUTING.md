@@ -4,16 +4,17 @@ To start with this project, you will need [pnpm 10](https://pnpm.io). Install th
 
 This project is a monorepo of the following packages:
 
-- `packages/steiger` — the linter itself
-- `packages/steiger-plugin-fsd` — a set of rules for checking FSD compliance
-- `packages/pretty-reporter` — a reporter for the linter to print diagnostics
+- `packages/steiger` — the linter itself, published to npm as `steiger`
+- `packages/steiger-plugin-fsd` — a set of rules for checking FSD compliance, published to npm as `@feature-sliced/steiger-plugin`
+- `packages/language-server` — the language server, published to npm as `@feature-sliced/language-server`
+- `packages/toolkit` — a toolkit for writing rules for Steiger, published to npm as `@steiger/toolkit`
+- `packages/pretty-reporter` — an internal reporter for the linter to print diagnostics
+- `packages/types` — internal type definitions
+- `integration-tests` — integration tests for the linter
 - `tooling/eslint-config` — a shared ESLint configuration
 - `tooling/tsconfig` — a shared TypeScript configuration
 
-Packages `steiger` and `steiger-plugin-fsd` are published to npm, the rest are internal.
-
-> [!NOTE]
-> The package `steiger-plugin-fsd` is published as `@feature-sliced/steiger-plugin`.
+All packages not mentioned above as published are internal.
 
 The tasks in this monorepo are managed with [Turborepo 2](https://turbo.build/repo). It is available in this project as `pnpm turbo`, but you should also consider installing it globally for easier use:
 
@@ -36,18 +37,10 @@ This project uses Changesets for versioning. When you made changes, run `pnpm ch
 <details>
   <summary>For maintainers</summary>
 
-When it's time to release new versions of packages to npm, run the following commands:
+Releases are automated with the `Release` workflow (see `.github/workflows/release.yml`):
 
-```bash
-pnpm changeset version
+- Merges to `master` that contain changesets update an always-open `Version Packages` pull request, which accumulates all pending releases.
 
-# -- Commit the changelog and the version bump --
-
-turbo build
-
-pnpm changeset publish
-
-git push --follow-tags
-```
+- Whenever you want to release (in bulk or per change), merge that pull request: every package with pending changesets is published to npm (together with patch releases of their internal dependents), tagged as `name@version`, and given its own GitHub Release with its changelog.
 
 </details>
