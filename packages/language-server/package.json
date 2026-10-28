@@ -1,6 +1,6 @@
 {
   "name": "@feature-sliced/language-server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "steiger language server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

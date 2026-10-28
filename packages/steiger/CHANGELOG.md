@@ -1,5 +1,16 @@
 # steiger
 
+## 0.8.1
+
+### Patch Changes
+
+- [#286](https://github.com/feature-sliced/steiger/pull/286) [`63501ae`](https://github.com/feature-sliced/steiger/commit/63501ae71dac69d31fb7ab3dda2ae55c12824a1e) Thanks [@shubhambaghel34](https://github.com/shubhambaghel34)! - Replace legacy `__dirname` usage with `import.meta.dirname` and remove the obsolete CommonJS shim injection so the packages work cleanly in modern ESM runtimes.
+
+- [#290](https://github.com/feature-sliced/steiger/pull/290) [`7d67ae6`](https://github.com/feature-sliced/steiger/commit/7d67ae62f03883680a154eb05b3d775aa8073ce5) Thanks [@paoValle](https://github.com/paoValle)! - Upgrade `zod` from 3 to 4, which fixes [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5) (high severity) in zod 3, and `zod-validation-error` from 3 to 5 to match. Configuration validation accepts the same configs as before; the messages printed for an invalid configuration are now formatted from zod 4 issues.
+
+- Updated dependencies [[`63501ae`](https://github.com/feature-sliced/steiger/commit/63501ae71dac69d31fb7ab3dda2ae55c12824a1e)]:
+  - @feature-sliced/steiger-plugin@0.8.1
+
 ## 0.8.0
 
 ### Minor Changes
