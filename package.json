@@ -18,6 +18,7 @@
   },
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^2.31.0",
     "@manypkg/cli": "^0.23.0",
     "@steiger/eslint-config": "workspace:*",
