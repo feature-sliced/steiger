@@ -1,5 +1,11 @@
 # @feature-sliced/steiger-plugin
 
+## 0.8.1
+
+### Patch Changes
+
+- [#286](https://github.com/feature-sliced/steiger/pull/286) [`63501ae`](https://github.com/feature-sliced/steiger/commit/63501ae71dac69d31fb7ab3dda2ae55c12824a1e) Thanks [@shubhambaghel34](https://github.com/shubhambaghel34)! - Replace legacy `__dirname` usage with `import.meta.dirname` and remove the obsolete CommonJS shim injection so the packages work cleanly in modern ESM runtimes.
+
 ## 0.8.0
 
 ### Minor Changes
