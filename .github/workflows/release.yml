@@ -30,7 +30,7 @@ jobs:
         uses: changesets/action@v1
         with:
           version: pnpm changeset version
-          publish: pnpm turbo run build && pnpm changeset publish
+          publish: pnpm release
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
