@@ -6,6 +6,7 @@
     "format": "prettier --cache --write . \"!packages/**\" \"!tooling/**\"",
     "check-formatting": "prettier --cache --check . \"!packages/**\" \"!tooling/**\"",
     "check-monorepo": "manypkg check",
+    "release": "turbo run build && changeset publish",
     "prepare": "husky"
   },
   "manypkg": {
