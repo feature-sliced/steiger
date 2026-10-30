@@ -60,7 +60,6 @@ export default [
 
 function runSteiger(cwd: string, args: Array<string>) {
   return exec('node', [steiger, ...args], {
-    timeout: 5000,
     nodeOptions: { cwd, env: { NO_COLOR: '1' } },
   })
 }
