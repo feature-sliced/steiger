@@ -27,6 +27,7 @@
     "eslint-plugin-package-json": "^1.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
+    "pkg-pr-new": "0.0.92",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5"
   },

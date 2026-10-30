@@ -25,33 +25,40 @@ jobs:
     steps:
       - name: Set checkout parameters
         id: vars
+        env:
+          BRANCH: ${{ matrix.branch }}
+          BASE_REF: ${{ github.base_ref }}
+          BASE_REPO: ${{ github.repository }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         run: |
-          if [[ "${{ matrix.branch }}" == "base" ]]; then
-            echo "ref=${{ github.base_ref }}" >> $GITHUB_OUTPUT
-            echo "repo=${{ github.repository }}" >> $GITHUB_OUTPUT
+          if [[ "$BRANCH" == "base" ]]; then
+            echo "ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+            echo "repo=$BASE_REPO" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-            echo "repo=${{ github.event.pull_request.head.repo.full_name }}" >> $GITHUB_OUTPUT
+            echo "ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+            echo "repo=$HEAD_REPO" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout ${{ matrix.branch }} branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ steps.vars.outputs.ref }}
           repository: ${{ steps.vars.outputs.repo }}
+          persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: Build the packages
-        run: turbo run build
+        run: pnpm exec turbo run build
 
       - name: Collect sizes in bytes
         id: sizes
         run: du -sb packages/*/dist > sizes-${{ matrix.branch }}.txt
 
       - name: Upload the sizes
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sizes-${{ matrix.branch }}
           path: sizes-${{ matrix.branch }}.txt
