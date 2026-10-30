@@ -60,7 +60,6 @@
     "immer": "^10.1.1",
     "micromatch": "^4.0.8",
     "patronum": "^2.3.0",
-    "picocolors": "^1.1.1",
     "prexit": "^2.3.0",
     "yargs": "^17.7.2",
     "zod": "^4.6.7",

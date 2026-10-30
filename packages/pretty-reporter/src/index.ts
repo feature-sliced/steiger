@@ -1,4 +1,4 @@
-import pc from 'picocolors'
+import { styleText } from 'node:util'
 import figures from 'figures'
 import type { Diagnostic } from '@steiger/types'
 
@@ -7,7 +7,7 @@ import { s } from './pluralization.js'
 
 export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   if (diagnostics.length === 0) {
-    return pc.green(`${figures.tick} No problems found!`)
+    return styleText('green', `${figures.tick} No problems found!`, { stream: process.stderr })
   }
 
   const errors = diagnostics.filter((d) => d.severity === 'error')
@@ -16,17 +16,19 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
   let footer =
     'Found ' +
     [
-      errors.length > 0 && pc.bold(pc.red(`${errors.length} error${s(errors.length)}`)),
-      warnings.length > 0 && pc.bold(pc.yellow(`${warnings.length} warning${s(warnings.length)}`)),
+      errors.length > 0 &&
+        styleText(['bold', 'red'], `${errors.length} error${s(errors.length)}`, { stream: process.stderr }),
+      warnings.length > 0 &&
+        styleText(['bold', 'yellow'], `${warnings.length} warning${s(warnings.length)}`, { stream: process.stderr }),
     ]
       .filter(Boolean)
       .join(' and ')
 
   const autofixable = diagnostics.filter((d) => (d.fixes?.length ?? 0) > 0)
   if (autofixable.length === diagnostics.length) {
-    footer += ` (all can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
+    footer += ` (all can be fixed automatically with ${styleText(['bold', 'green'], '--fix', { stream: process.stderr })})`
   } else if (autofixable.length > 0) {
-    footer += ` (${autofixable.length} can be fixed automatically with ${pc.bold(pc.green('--fix'))})`
+    footer += ` (${autofixable.length} can be fixed automatically with ${styleText(['bold', 'green'], '--fix', { stream: process.stderr })})`
   } else {
     footer += ' (none can be fixed automatically)'
   }
@@ -36,7 +38,7 @@ export function formatPretty(diagnostics: Array<Diagnostic>, cwd: string) {
     diagnostics.map((d) => formatSingleDiagnostic(d, cwd)).join('\n\n') +
     '\n\n' +
     // Due to formatting characters, it won't be exactly the size of the footer, that is okay
-    pc.gray(figures.line.repeat(footer.length)) +
+    styleText('gray', figures.line.repeat(footer.length), { stream: process.stderr }) +
     '\n ' +
     footer +
     '\n'

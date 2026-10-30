@@ -1,5 +1,5 @@
-import pc from 'picocolors'
+import { styleText } from 'node:util'
 
 export function formatCommand(command: string): string {
-  return pc.green(`\`${command}\``)
+  return styleText('green', `\`${command}\``)
 }

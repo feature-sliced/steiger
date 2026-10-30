@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises'
 import { parse, relative, sep, join, dirname } from 'node:path'
-import pc from 'picocolors'
+import { styleText } from 'node:util'
 import { isGitIgnored } from 'globby'
 import * as find from 'empathic/find'
 
@@ -31,7 +31,7 @@ export async function chooseFromSimilar(input: string): Promise<string> {
   let answer: string | undefined
   if (suggestions.length === 1) {
     const confirmation = await confirm({
-      message: `${pc.red(input)} is not a folder. Did you mean ${pc.green(`.${sep}${join(existingDir, suggestions[0][0])}`)}?`,
+      message: `${styleText('red', input)} is not a folder. Did you mean ${styleText('green', `.${sep}${join(existingDir, suggestions[0][0])}`)}?`,
       inactive: 'No, exit',
     })
 
@@ -42,7 +42,7 @@ export async function chooseFromSimilar(input: string): Promise<string> {
     }
   } else {
     const selection = await select({
-      message: `${pc.red(input)} is not a folder. Did you mean one of the following?`,
+      message: `${styleText('red', input)} is not a folder. Did you mean one of the following?`,
       options: suggestions
         .map(([candidate, _distance]) => ({ value: candidate, label: `.${sep}${join(existingDir, candidate)}` }))
         .concat({ value: '', label: 'No, exit' }),
