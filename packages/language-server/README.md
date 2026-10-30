@@ -2,9 +2,13 @@
 
 You probably don't need to use this package directly, just install editor extension instead :)
 
-## Editors
+## Editor extensions
 
-### [VSCode](https://github.com/feature-sliced/steiger-vscode)
+### [VS Code](https://marketplace.visualstudio.com/items?itemName=feature-sliced.steiger-vscode)
+
+### [VS Code-based editors](https://open-vsx.org/extension/feature-sliced/steiger-vscode)
+
+### [JetBrains IDEs](https://plugins.jetbrains.com/plugin/35319-steiger)
 
 ### Zed
 
