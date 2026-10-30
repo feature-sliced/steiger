@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 import { resolve, relative, dirname } from 'node:path'
-import * as process from 'node:process'
+import process from 'node:process'
 import yargs from 'yargs'
-import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
@@ -142,10 +141,25 @@ if (consoleArgs.watch) {
       applyAutofixes(state)
     }
   })
-  prexit(() => {
-    stopWatching()
-    unsubscribe()
+  let cleanupPromise: Promise<void> | undefined
+  const cleanup = () => (cleanupPromise ??= (unsubscribe(), stopWatching()))
+  const shutdown = () =>
+    cleanup().then(
+      () => process.exit(),
+      (error) => {
+        console.error(error)
+        process.exit(1)
+      },
+    )
+
+  process.once('exit', () => {
+    // Only synchronous cleanup can run during exit, including after a fatal error.
+    void cleanup().catch(console.error)
   })
+  process.once('beforeExit', shutdown)
+  for (const signal of ['SIGTSTP', 'SIGQUIT', 'SIGHUP', 'SIGTERM', 'SIGINT'] as const) {
+    process.once(signal, shutdown)
+  }
 } else {
   const diagnostics = await linter.run(targetPath)
   let stillRelevantDiagnostics = diagnostics
