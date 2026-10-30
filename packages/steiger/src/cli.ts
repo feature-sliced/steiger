@@ -8,6 +8,7 @@ import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
 import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
+import * as find from 'empathic/find'
 
 import { linter } from './app'
 import { $globalConfig, processConfiguration } from './models/config'
@@ -18,23 +19,59 @@ import type { Diagnostic } from '@steiger/types'
 import packageJson from '../package.json'
 import { existsAndIsFolder } from './shared/file-system'
 
-const { config, filepath } = (await cosmiconfig('steiger').search()) ?? { config: null, filepath: undefined }
 const defaultConfig = fsd.configs.recommended
+const configExplorer = cosmiconfig('steiger', { searchStrategy: 'none' })
+const rawArgs = hideBin(process.argv)
 
-try {
-  const configLocationDirectory = filepath ? dirname(filepath) : null
-  // use FSD recommended config as a default
-  processConfiguration(config || defaultConfig, configLocationDirectory)
-} catch (err) {
-  if (filepath !== undefined) {
-    console.error(
-      fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
-    )
-    process.exit(100)
+function createVersionString() {
+  return [
+    packageJson.version,
+    $globalConfig
+      .getState()!
+      .plugins.map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
+      .join('\n'),
+  ]
+    .filter(Boolean)
+    .join('\n\n')
+}
+
+async function searchConfiguration(searchFrom: string) {
+  let directory = resolve(searchFrom)
+  const gitFolder = find.up('.git', { cwd: directory })
+  const gitRoot = gitFolder ? dirname(gitFolder) : undefined
+
+  while (true) {
+    const result = await configExplorer.search(directory)
+    if (result) {
+      return result
+    }
+
+    const parent = dirname(directory)
+    if (directory === gitRoot || parent === directory) {
+      return null
+    }
+    directory = parent
   }
 }
 
-const yargsProgram = yargs(hideBin(process.argv))
+async function loadConfiguration(searchFrom: string) {
+  const { config, filepath } = (await searchConfiguration(searchFrom)) ?? { config: null, filepath: undefined }
+
+  try {
+    const configLocationDirectory = filepath ? dirname(filepath) : null
+    // use FSD recommended config as a default
+    processConfiguration(config || defaultConfig, configLocationDirectory)
+  } catch (err) {
+    if (filepath !== undefined) {
+      console.error(
+        fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
+      )
+      process.exit(100)
+    }
+  }
+}
+
+const yargsProgram = yargs(rawArgs)
   .scriptName('steiger')
   .usage('$0 [options] <path>')
   .option('watch', {
@@ -77,21 +114,32 @@ const yargsProgram = yargs(hideBin(process.argv))
   })
   .help('help', 'display help message')
   .alias('help', 'h')
-  .version(
-    [
-      packageJson.version,
-      $globalConfig
-        .getState()!
-        .plugins.map((plugin) => `${plugin.meta.name}\t${plugin.meta.version}`)
-        .join('\n'),
-    ]
-      .filter(Boolean)
-      .join('\n\n'),
-  )
+  .version(packageJson.version)
   .alias('version', 'v')
   .showHelpOnFail(true)
 
-const consoleArgs = yargsProgram.parseSync()
+let parseError: Error | undefined
+let parseOutput = ''
+const consoleArgs = yargsProgram.parseSync(rawArgs, {}, (error, _argv, output) => {
+  parseError = error
+  parseOutput = output
+})
+
+if (parseError && !consoleArgs.help) {
+  console.error(parseOutput)
+  process.exit(1)
+}
+
+if (parseOutput) {
+  if (consoleArgs.version) {
+    await loadConfiguration(process.cwd())
+    console.log(createVersionString())
+  } else {
+    console.log(parseOutput)
+  }
+  process.exit(0)
+}
+
 const inputPaths = consoleArgs._
 
 let targetPath: string | undefined
@@ -120,6 +168,8 @@ if (inputPaths.length > 0) {
     }
   }
 }
+
+await loadConfiguration(targetPath)
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
   const diagnosticsToReport = consoleArgs['ignore-warnings']
