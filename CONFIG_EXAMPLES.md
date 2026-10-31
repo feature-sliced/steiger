@@ -70,7 +70,7 @@ export default defineConfig([
   {
     files: ['./src/shared/**'],
     rules: {
-      'fsd/no-public-api': 'off',
+      'fsd/public-api': 'off',
     },
   },
 ])
@@ -88,7 +88,7 @@ export default defineConfig([
     files: ['./src/shared/**'],
     ignores: ['./src/shared/lib/**', './src/shared/ui/**'],
     rules: {
-      'fsd/no-public-api': 'off', // Disable the rule for the shared folder, but not for the lib and ui folders
+      'fsd/public-api': 'off', // Disable the rule for the shared folder, but not for the lib and ui folders
     },
   },
 ])
@@ -104,14 +104,14 @@ export default defineConfig([
   ...fsd.configs.recommended,
   {
     rules: {
-      'fsd/no-public-api': ['warn', { someOptions: true }],
+      'fsd/public-api': ['warn', { someOptions: true }],
     },
   },
   {
     files: ['./src/shared/**'],
     rules: {
-      'fsd/no-public-api': 'error',
-      // 'fsd/no-public-api': ['error', { someOptions: false }], // Would throw an error as you can't override the options
+      'fsd/public-api': 'error',
+      // 'fsd/public-api': ['error', { someOptions: false }], // Would throw an error as you can't override the options
     },
   },
 ])
