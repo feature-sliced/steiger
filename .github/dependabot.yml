@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    cooldown:
+      default-days: 3
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - 'version-update:semver-major'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: 'ci'
+
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    # Disable routine version updates; security updates have a separate PR limit.
+    open-pull-requests-limit: 0
+    # Enable dependency graph, Dependabot alerts, and security updates in repository settings.
+    # https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configure-security-updates
+    allow:
+      - dependency-type: 'production'
+    groups:
+      production-security:
+        applies-to: security-updates
+        patterns:
+          - '*'
+    commit-message:
+      prefix: 'chore'
