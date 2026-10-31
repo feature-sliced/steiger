@@ -14,7 +14,9 @@ import { analyzeModule, extractDependencies, extractReExports } from './index.js
 it('parses a file once and serves its imports and re-exports from one analysis', async () => {
   const parse = vi.spyOn(Parser.prototype, 'parse')
 
-  expect((await extractDependencies('/src/module.ts')).map((dependency) => dependency.path)).toEqual(['./dependency'])
+  expect(
+    (await extractDependencies('/src/module.ts', { includeReExports: false })).map((dependency) => dependency.path),
+  ).toEqual(['./dependency'])
   expect((await extractReExports('/src/module.ts')).map((reExport) => reExport.source)).toEqual(['./re-exported'])
 
   await extractDependencies('/src/module.ts')
