@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { join } from 'node:path'
 import { layerSequence, isCrossImportPublicApi } from '@feature-sliced/filesystem'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
@@ -51,7 +50,7 @@ const forbiddenImports = {
             !isCrossImportPublicApi(dependencyLocation.file, {
               inSlice: dependencyLocation.sliceName,
               forSlice: sourceFile.sliceName,
-              layerPath: join(root.path, dependencyLocation.layerName),
+              layerPath: dependencyLocation.layerPath,
             })
           ) {
             diagnostics.push({

@@ -46,6 +46,16 @@ vi.mock('node:fs', async (importOriginal) => {
       '/src/entities/cart/lib/count-cart-items.ts': 'import root from "@/app/root.ts"',
       '/src/entities/cart/lib/index.ts': '',
       '/src/entities/cart/index.ts': '',
+      '/src/_entities/user/ui/UserAvatar.tsx': '',
+      '/src/_entities/user/@x/product.ts': '',
+      '/src/_entities/user/index.ts': '',
+      '/src/_entities/product/ui/GoodProductCard.tsx': 'import { UserAvatar } from "@/_entities/user/@x/product"',
+      '/src/_entities/product/index.ts': '',
+      '/src/1_entities/user/ui/UserAvatar.tsx': '',
+      '/src/1_entities/user/@x/product.ts': '',
+      '/src/1_entities/user/index.ts': '',
+      '/src/1_entities/product/ui/GoodProductCard.tsx': 'import { UserAvatar } from "@/1_entities/user/@x/product"',
+      '/src/1_entities/product/index.ts': '',
       '/src/features/comments/ui/CommentCard.tsx': 'import { styles } from "@/pages/editor"',
       '/src/features/comments/index.ts': '',
       '/src/pages/editor/ui/styles.ts': '',
@@ -246,6 +256,30 @@ it('reports no errors on a project with cross-imports through @x', async () => {
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
 })
+
+it.each(['_entities', '1_entities'])(
+  'reports no errors on cross-imports through @x in a prefixed layer %s',
+  async (layer) => {
+    const root = parseIntoFsdRoot(
+      `
+      📂 ${layer}
+        📂 user
+          📂 @x
+            📄 product.ts
+          📂 ui
+            📄 UserAvatar.tsx
+          📄 index.ts
+        📂 product
+          📂 ui
+            📄 GoodProductCard.tsx
+          📄 index.ts
+    `,
+      joinFromRoot('src'),
+    )
+
+    expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+  },
+)
 
 it('reports no errors on a project with cross-imports through @x index files', async () => {
   const root = parseIntoFsdRoot(
