@@ -17,17 +17,19 @@ jobs:
       pull-requests: write # maintain the Version Packages pull request
       id-token: write # OIDC token for npm trusted publishing
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Setup
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@^11.5.1
 
       - name: Create Release Pull Request or publish
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           version: pnpm changeset version
           publish: pnpm release
