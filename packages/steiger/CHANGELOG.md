@@ -1,5 +1,11 @@
 # steiger
 
+## 0.9.0
+
+### Minor Changes
+
+- [#231](https://github.com/feature-sliced/steiger/pull/231) [`4f0dbbc`](https://github.com/feature-sliced/steiger/commit/4f0dbbc4ebdf680a8b0764a47ca30a70e1f6e729) Thanks [@yslpn](https://github.com/yslpn)! - Resolve configuration from the lint target path instead of the working directory.
+
 ## 0.8.1
 
 ### Patch Changes
