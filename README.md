@@ -4,6 +4,8 @@
 
 Universal file structure and project architecture linter.
 
+_It's pronounced "STY-kh-er" — like **tiger** with an S up front and the "ch" of **loch** for the G. ("Steiger" is Dutch for "scaffold".)_
+
 > [!NOTE]
 > The project is in beta and in active development. Some APIs may change.
 
@@ -15,6 +17,8 @@ Universal file structure and project architecture linter.
 - Built-in set of rules to validate adherence to [Feature-Sliced Design](https://fsd.how/)
 - Watch mode
 - Rule configurability
+- Language server
+- Extensions for [VS Code](https://marketplace.visualstudio.com/items?itemName=feature-sliced.steiger-vscode), [other VS Code-based editors](https://open-vsx.org/extension/feature-sliced/steiger-vscode) and [JetBrains IDEs](https://plugins.jetbrains.com/plugin/35319-steiger)
 
 ## Installation
 
