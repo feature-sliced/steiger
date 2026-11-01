@@ -5,6 +5,7 @@ import { joinFromRoot, parseIntoFolder as parseIntoFsdRoot } from '@steiger/tool
 type SourceFile = {
   file: File
   layerName: LayerName
+  layerPath: string
   sliceName: string | null
   segmentName: string | null
 }
@@ -16,7 +17,10 @@ type SourceFile = {
  */
 export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
   const index = {} as Record<string, SourceFile>
-  function walk(node: File | Folder, metadata: Pick<SourceFile, 'layerName' | 'sliceName' | 'segmentName'>) {
+  function walk(
+    node: File | Folder,
+    metadata: Pick<SourceFile, 'layerName' | 'layerPath' | 'sliceName' | 'segmentName'>,
+  ) {
     if (node.type === 'file') {
       index[node.path] = { ...metadata, file: node }
     } else {
@@ -32,21 +36,23 @@ export function indexSourceFiles(root: Folder): Record<string, SourceFile> {
     // So, we need to index all files directly inside a layer to find errors.
     layer.children
       .filter((child) => child.type === 'file')
-      .forEach((file) => walk(file, { layerName: layerName as LayerName, sliceName: null, segmentName: null }))
+      .forEach((file) =>
+        walk(file, { layerName: layerName as LayerName, layerPath: layer.path, sliceName: null, segmentName: null }),
+      )
 
     if (!isSliced(layer)) {
       for (const [segmentName, segment] of Object.entries(getSegments(layer))) {
-        walk(segment, { layerName: layerName as LayerName, sliceName: null, segmentName })
+        walk(segment, { layerName: layerName as LayerName, layerPath: layer.path, sliceName: null, segmentName })
       }
     } else {
       for (const [sliceName, slice] of Object.entries(getSlices(layer))) {
         for (const [segmentName, segment] of Object.entries(getSegments(slice))) {
-          walk(segment, { layerName: layerName as LayerName, sliceName, segmentName })
+          walk(segment, { layerName: layerName as LayerName, layerPath: layer.path, sliceName, segmentName })
         }
         const indexes = getIndexes(slice)
 
         for (const index of indexes) {
-          walk(index, { layerName: layerName as LayerName, sliceName, segmentName: null })
+          walk(index, { layerName: layerName as LayerName, layerPath: layer.path, sliceName, segmentName: null })
         }
       }
     }
@@ -91,6 +97,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'features',
+        layerPath: joinFromRoot('features'),
         segmentName: null,
         sliceName: 'comments',
       },
@@ -100,6 +107,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'features',
+        layerPath: joinFromRoot('features'),
         segmentName: 'ui',
         sliceName: 'comments',
       },
@@ -109,6 +117,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'pages',
+        layerPath: joinFromRoot('pages'),
         segmentName: null,
         sliceName: 'editor',
       },
@@ -118,6 +127,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'pages',
+        layerPath: joinFromRoot('pages'),
         segmentName: 'ui',
         sliceName: 'editor',
       },
@@ -127,6 +137,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'pages',
+        layerPath: joinFromRoot('pages'),
         segmentName: 'ui',
         sliceName: 'editor',
       },
@@ -136,6 +147,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'pages',
+        layerPath: joinFromRoot('pages'),
         segmentName: 'ui',
         sliceName: 'editor',
       },
@@ -145,6 +157,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'shared',
+        layerPath: joinFromRoot('shared'),
         segmentName: 'ui',
         sliceName: null,
       },
@@ -154,6 +167,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'shared',
+        layerPath: joinFromRoot('shared'),
         segmentName: 'ui',
         sliceName: null,
       },
@@ -163,6 +177,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'shared',
+        layerPath: joinFromRoot('shared'),
         segmentName: 'ui',
         sliceName: null,
       },
@@ -172,6 +187,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'shared',
+        layerPath: joinFromRoot('shared'),
         segmentName: 'ui',
         sliceName: null,
       },
@@ -181,6 +197,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'app',
+        layerPath: joinFromRoot('app'),
         segmentName: 'ui',
         sliceName: null,
       },
@@ -190,6 +207,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'app',
+        layerPath: joinFromRoot('app'),
         segmentName: 'root',
         sliceName: null,
       },
@@ -199,6 +217,7 @@ if (import.meta.vitest) {
           type: 'file',
         },
         layerName: 'app',
+        layerPath: joinFromRoot('app'),
         segmentName: null,
         sliceName: null,
       },
