@@ -1,5 +1,13 @@
 # @feature-sliced/steiger-plugin
 
+## 0.8.2
+
+### Patch Changes
+
+- [#295](https://github.com/feature-sliced/steiger/pull/295) [`5861595`](https://github.com/feature-sliced/steiger/commit/586159533c3c7d0bc7fd6db51aa57b183f571a8e) Thanks [@Solant](https://github.com/Solant)! - include re-exports in dependency extraction for the dependency-based rules
+
+- [#305](https://github.com/feature-sliced/steiger/pull/305) [`a7f9958`](https://github.com/feature-sliced/steiger/commit/a7f9958b1c1230ec87eea32a084eff73623da306) Thanks [@phrimm136](https://github.com/phrimm136)! - fix false `no-cross-imports` and `forbidden-imports` errors for `@x` cross-imports in layers with a prefixed folder name, such as `_entities` or `1_entities`
+
 ## 0.8.1
 
 ### Patch Changes
