@@ -15,6 +15,10 @@ vi.mock('node:fs', () =>
       const isEven = await import('is-even')
     }
   `,
+    '/src/import-with-re-export.ts': `
+import { foo } from './foo';
+export { bar } from './bar';`,
+
     '/src/imports.ts': [
       "import './bare'",
       "import Default from './default'",
@@ -197,8 +201,27 @@ it('returns imports and re-exports in source order', async () => {
 })
 
 it('leaves re-exports out of the imports of a module', async () => {
-  expect((await extractDependencies('/src/ordering.ts')).map((dependency) => dependency.path)).toEqual([
-    './first',
-    './second',
+  expect(
+    (await extractDependencies('/src/ordering.ts', { includeReExports: false })).map((dependency) => dependency.path),
+  ).toEqual(['./first', './second'])
+})
+
+it('extracts imports with re-export', async () => {
+  const imports = await extractDependencies('/src/import-with-re-export.ts')
+  expect(imports).toEqual([
+    {
+      path: './foo',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 2, column: 22 },
+      end: { line: 2, column: 27 },
+    },
+    {
+      path: './bar',
+      builtIn: false,
+      dynamic: false,
+      start: { line: 3, column: 22 },
+      end: { line: 3, column: 27 },
+    },
   ])
 })

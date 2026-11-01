@@ -362,38 +362,63 @@ interface Dependency {
 }
 
 /**
- * Find the modules that a file imports.
+ * Get all dependencies of a specific file.
  *
- * Re-exports are left out. {@link extractReExports} returns those.
+ * @param path - The file to analyze.
+ * @param options.includeBuiltIns - Keep dependencies on Node builtins. Defaults to `false`.
+ * @param options.includeReExports - Keep `export ... from` statements of every shape. Defaults to `true`.
+ * @param options.importType - Keep only one kind of import, `'static'` or `'dynamic'`. Defaults to `undefined` (both). Re-exports count as static, so `'dynamic'` leaves them out.
+ * @returns The dependencies that survive the filters, in source order.
+ *
+ * @see {@link extractReExports} for re-exports alone, with their kinds.
  */
 export async function extractDependencies(
   path: string,
   options?: {
     includeBuiltIns?: boolean
+    includeReExports?: boolean
     importType?: 'static' | 'dynamic'
   },
 ): Promise<Dependency[]> {
   const includeBuiltIns = options?.includeBuiltIns ?? false
   const importType = options?.importType
+  const includeReExports = options?.includeReExports ?? true
 
   const { statements } = await analyzeModule(path)
 
-  return statements
-    .filter((statement): statement is ImportStatement => statement.type === 'import')
-    .filter((moduleImport) => {
-      if (includeBuiltIns === false && moduleImport.builtIn === true) return false
-      if (importType === 'dynamic' && moduleImport.dynamic === false) return false
-      if (importType === 'static' && moduleImport.dynamic === true) return false
+  const result: Dependency[] = []
+  for (const statement of statements) {
+    if (statement.type === 're-export') {
+      if (includeReExports === false) continue
+      if (importType === 'dynamic') continue
+      if (statement.builtIn === true && includeBuiltIns === false) continue
 
-      return true
-    })
-    .map((moduleImport) => ({
-      path: moduleImport.source,
-      builtIn: moduleImport.builtIn,
-      dynamic: moduleImport.dynamic,
-      start: moduleImport.sourceRange.start,
-      end: moduleImport.sourceRange.end,
-    }))
+      result.push({
+        path: statement.source,
+        builtIn: statement.builtIn,
+        dynamic: false,
+        start: statement.sourceRange.start,
+        end: statement.sourceRange.end,
+      })
+      continue
+    }
+
+    if (statement.type === 'import') {
+      if (includeBuiltIns === false && statement.builtIn === true) continue
+      if (importType === 'dynamic' && statement.dynamic === false) continue
+      if (importType === 'static' && statement.dynamic === true) continue
+
+      result.push({
+        path: statement.source,
+        builtIn: statement.builtIn,
+        dynamic: statement.dynamic,
+        start: statement.sourceRange.start,
+        end: statement.sourceRange.end,
+      })
+    }
+  }
+
+  return result
 }
 
 /** Find the modules that a file re-exports, in source order. */
