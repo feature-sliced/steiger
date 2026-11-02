@@ -3,5 +3,7 @@ packages:
   - 'packages/*'
   - 'tooling/*'
   - 'integration-tests'
-onlyBuiltDependencies:
-  - esbuild
+trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 10080
+allowBuilds:
+  esbuild: true
