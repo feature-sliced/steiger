@@ -17,7 +17,7 @@
   "engines": {
     "node": ">=22.18.0"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@12.16.1",
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^2.31.0",

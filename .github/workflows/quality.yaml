@@ -48,6 +48,7 @@ jobs:
         uses: $/.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
+          save-cache: ${{ matrix.node == 22 }}
 
       - name: Run tests
         run: |
