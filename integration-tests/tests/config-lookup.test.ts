@@ -137,6 +137,39 @@ test('does not inherit configuration from above the Git repository', async () =>
   expectProcessesDiagnostic(await runSteiger(project, [target, '--reporter=json']), target)
 })
 
+test('formats invalid configuration with Zod built-in error formatting', async () => {
+  const { project, target } = await createWorkspace()
+  await fs.writeFile(
+    join(project, 'steiger.config.mjs'),
+    `export default [
+  {
+    meta: { name: 'test-plugin', version: '1.0.0' },
+    ruleDefinitions: [{ name: 'known-rule', check: () => ({ diagnostics: [] }) }],
+  },
+  { rules: { 'unknown-rule': 'warn' } },
+]
+`,
+  )
+
+  const result = await runSteiger(project, [target])
+
+  expect(result.exitCode).toBe(100)
+  expect(result.stderr).toContain('Invalid configuration in steiger.config.mjs:')
+  expect(result.stderr).toContain('Unrecognized key: "unknown-rule"')
+  expect(result.stderr).toContain('→ at [1].rules')
+})
+
+test('preserves ordinary configuration error messages', async () => {
+  const { project, target } = await createWorkspace()
+  await fs.writeFile(join(project, 'steiger.config.mjs'), 'export default {}\n')
+
+  const result = await runSteiger(project, [target])
+
+  expect(result.exitCode).toBe(100)
+  expect(result.stderr).toContain('Invalid configuration in steiger.config.mjs:')
+  expect(result.stderr).toContain('Old configuration format detected.')
+})
+
 test.each(['--help', '-h', '-wh'])('prints help for %s without selecting a target', async (flag) => {
   const { cwd } = await createWorkspace()
   await writeConfig(cwd)
