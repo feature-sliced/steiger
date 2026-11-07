@@ -6,9 +6,9 @@ import yargs from 'yargs'
 import prexit from 'prexit'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
-import { fromError } from 'zod-validation-error'
 import { cosmiconfig } from 'cosmiconfig'
 import * as find from 'empathic/find'
+import z from 'zod'
 
 import { linter } from './app'
 import { $globalConfig, processConfiguration } from './models/config'
@@ -63,9 +63,10 @@ async function loadConfiguration(searchFrom: string) {
     processConfiguration(config || defaultConfig, configLocationDirectory)
   } catch (err) {
     if (filepath !== undefined) {
-      console.error(
-        fromError(err, { prefix: `Invalid configuration in ${relative(process.cwd(), filepath)}` }).toString(),
-      )
+      const prefix = `Invalid configuration in ${relative(process.cwd(), filepath)}`
+      const message =
+        err instanceof z.ZodError ? z.prettifyError(err) : err instanceof Error ? err.message : 'Unknown error'
+      console.error(`${prefix}: ${message}`)
       process.exit(100)
     }
   }
