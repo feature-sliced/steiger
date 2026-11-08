@@ -2,7 +2,7 @@ import { performance } from 'node:perf_hooks'
 import { Console } from 'node:console'
 import { createEffect, createStore, merge, sample } from 'effector'
 import { debounce, not } from 'patronum'
-import type { Config, Folder, Rule } from '@steiger/types'
+import type { Config, Folder, Rule, ConfigObject, Plugin, GlobalIgnore } from '@steiger/types'
 
 import { scan, createWatcher } from './features/transfer-fs-to-vfs'
 import { defer } from './shared/defer'
@@ -134,3 +134,4 @@ export function defineConfig<Rules extends Array<Rule> = Array<Rule>>(config: Co
 }
 
 export { processConfiguration, processScopedConfiguration }
+export type { Config, ConfigObject, Plugin, Rule, GlobalIgnore }
