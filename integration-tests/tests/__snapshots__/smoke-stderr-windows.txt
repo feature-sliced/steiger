@@ -1,3 +1,4 @@
+No usable configuration file found in src or its parent directories, using default config
 
 ┌ src\entities\user\api\getUser.ts:1:22
 × Forbidden import from higher layer "app".
