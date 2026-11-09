@@ -98,3 +98,63 @@ it('reports errors on a project with custom layers if base layers are absent', (
     },
   ])
 })
+
+it('reports no errors on a project with prefixed layer names', () => {
+  const root = parseIntoFsdRoot(`
+    📂 6_shared
+    📂 5_entities
+    📂 4_features
+    📂 3_widgets
+    📂 _pages
+    📂 _app
+  `)
+
+  expect(typoInLayerName.check(root)).toEqual({ diagnostics: [] })
+})
+
+it('reports no errors on a project with prefixed and unprefixed folders for the same layer', () => {
+  const root = parseIntoFsdRoot(`
+    📂 shared
+    📂 _pages
+    📂 pages
+    📂 _app
+    📂 app
+  `)
+
+  expect(typoInLayerName.check(root)).toEqual({ diagnostics: [] })
+})
+
+it('reports errors on a project with typos in layer names, including prefixed ones', () => {
+  const root = parseIntoFsdRoot(`
+    📂 6_shared
+    📂 entites
+    📂 _fietures
+    📂 _pages
+    📂 _app
+  `)
+
+  const diagnostics = typoInLayerName.check(root).diagnostics
+  expect(diagnostics).toEqual([
+    {
+      message: 'Layer "entites" potentially contains a typo. Did you mean "entities"?',
+      location: { path: joinFromRoot('entites') },
+    },
+    {
+      message: 'Layer "_fietures" potentially contains a typo. Did you mean "features"?',
+      location: { path: joinFromRoot('_fietures') },
+    },
+  ])
+})
+
+it('reports no errors on a project with custom layers if prefixed base layers are present', () => {
+  const root = parseIntoFsdRoot(`
+    📂 6_shared
+    📂 shapes
+    📂 _pages
+    📂 places
+    📂 _app
+    📂 amp
+  `)
+
+  expect(typoInLayerName.check(root)).toEqual({ diagnostics: [] })
+})

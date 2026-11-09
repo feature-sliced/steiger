@@ -1,6 +1,6 @@
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { NAMESPACE } from '../constants.js'
-import { LayerName, layerSequence } from '@feature-sliced/filesystem'
+import { getLayers, type LayerName, layerSequence } from '@feature-sliced/filesystem'
 import { distance } from 'fastest-levenshtein'
 import { basename, join } from 'node:path'
 
@@ -11,11 +11,15 @@ const typoInLayerName = {
   check(root) {
     const diagnostics: Array<PartialDiagnostic> = []
 
+    // skip folders that getLayers recognizes as layers, including prefixed ones like "_pages" or "6_shared"
+    const recognizedLayers = getLayers(root)
+    const recognizedLayerPaths = Object.values(recognizedLayers).map((layer) => layer.path)
+
     // construct list of suggestions, like [{ input: 'shraed', suggestion: 'shared', distance: 2 }, ...],
     // limit Levenshtein distance upper bound to 3,
     // sort by Levenshtein distance in ascending order,
     const suggestionsList = root.children
-      .filter((child) => child.type === 'folder')
+      .filter((child) => child.type === 'folder' && !recognizedLayerPaths.includes(child.path))
       .flatMap((child) => {
         const layer = basename(child.path)
 
@@ -30,7 +34,8 @@ const typoInLayerName = {
       .sort((a, b) => a.distance - b.distance)
 
     const processedInputs: string[] = []
-    const suggestedLayers: LayerName[] = []
+    // mark existing layers as taken so that no other folder gets them as a suggestion
+    const suggestedLayers = Object.keys(recognizedLayers) as LayerName[]
 
     suggestionsList.forEach((layer) => {
       // if Levenshtein distance is 0, the layer name is correct - add it as a "suggestion"
