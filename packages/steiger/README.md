@@ -47,6 +47,12 @@ To report errors only and hide warnings, use `--ignore-warnings`. `--ignore-warn
 npx steiger ./src --ignore-warnings
 ```
 
+To use a specific configuration file instead of searching for one, pass `--config` (or `-c`) with a path to it:
+
+```bash
+npx steiger ./src --config ./steiger.config.ts
+```
+
 ## Performance profiling
 
 If Steiger feels slow, you can find out which rules take the most time by enabling timing output with the `TIMING` environment variable.
@@ -104,6 +110,9 @@ export default defineConfig([
   },
 ])
 ```
+
+> [!NOTE]
+> All glob patterns are relative to the configuration file location.
 
 > [!TIP]
 > If you want Steiger to ignore certain files, add an object like this to the config array:

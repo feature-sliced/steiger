@@ -4,6 +4,7 @@ import { resolve, relative, dirname } from 'node:path'
 import * as process from 'node:process'
 import yargs from 'yargs'
 import prexit from 'prexit'
+import { statSync } from 'node:fs'
 import { hideBin } from 'yargs/helpers'
 import { reportPretty } from '@steiger/pretty-reporter'
 import { cosmiconfig } from 'cosmiconfig'
@@ -54,21 +55,84 @@ async function searchConfiguration(searchFrom: string) {
   }
 }
 
-async function loadConfiguration(searchFrom: string) {
+function reportConfigError(err: unknown, filepath: string): never {
+  const prefix = `Invalid configuration in ${relative(process.cwd(), filepath)}`
+  const message =
+    err instanceof z.ZodError ? z.prettifyError(err) : err instanceof Error ? err.message : 'Unknown error'
+  console.error(`${prefix}: ${message}`)
+
+  process.exit(100)
+}
+
+function formatConfigLoadingError(error: unknown, configFilePath: string): string {
+  if (!(error instanceof Error)) return String(error)
+
+  // JSON/YAML loader errors from cosmiconfig already embed the file path in their message
+  const hasEmbeddedPath =
+    'filepath' in error && typeof error.filepath === 'string' && error.message.includes(error.filepath)
+
+  if (hasEmbeddedPath) {
+    return `${error.name}: ${error.message}`
+  }
+  return `${error.name} while loading config at "${configFilePath}": ${error.message}`
+}
+
+async function loadConfiguration(searchFrom: string, opts?: { warnWhenUsingDefault?: boolean }) {
   const { config, filepath } = (await searchConfiguration(searchFrom)) ?? { config: null, filepath: undefined }
 
   try {
     const configLocationDirectory = filepath ? dirname(filepath) : null
+
     // use FSD recommended config as a default
-    processConfiguration(config || defaultConfig, configLocationDirectory)
+    let configToProcess
+    if (config) {
+      configToProcess = config
+    } else {
+      if (opts?.warnWhenUsingDefault ?? true) {
+        console.error(
+          `No usable configuration file found in ${relative(process.cwd(), searchFrom) || searchFrom} or its parent directories, using default config`,
+        )
+      }
+      configToProcess = defaultConfig
+    }
+
+    processConfiguration(configToProcess, configLocationDirectory)
   } catch (err) {
     if (filepath !== undefined) {
-      const prefix = `Invalid configuration in ${relative(process.cwd(), filepath)}`
-      const message =
-        err instanceof z.ZodError ? z.prettifyError(err) : err instanceof Error ? err.message : 'Unknown error'
-      console.error(`${prefix}: ${message}`)
-      process.exit(100)
+      reportConfigError(err, filepath)
     }
+  }
+}
+
+async function loadExplicitConfiguration(configFilePath: string) {
+  let stats
+  try {
+    stats = statSync(configFilePath, { throwIfNoEntry: false })
+  } catch (e) {
+    console.error(formatConfigLoadingError(e, configFilePath))
+    process.exit(100)
+  }
+  if (stats?.isFile() !== true) {
+    console.error(`No configuration file found at "${configFilePath}"`)
+    process.exit(100)
+  }
+
+  let result
+  try {
+    result = await configExplorer.load(configFilePath)
+  } catch (e) {
+    console.error(formatConfigLoadingError(e, configFilePath))
+    process.exit(100)
+  }
+  if (result == null || result.config == null) {
+    console.error(`No steiger configuration found in "${configFilePath}"`)
+    process.exit(100)
+  }
+
+  try {
+    processConfiguration(result.config, dirname(result.filepath))
+  } catch (err) {
+    reportConfigError(err, result.filepath)
   }
 }
 
@@ -104,11 +168,19 @@ const yargsProgram = yargs(rawArgs)
     choices: ['pretty', 'json'],
     default: 'pretty',
   })
+  .option('config', {
+    alias: 'c',
+    demandOption: false,
+    describe: 'config file path',
+    type: 'string',
+  })
   .string('_')
   .check((argv) => {
     const filePaths = argv._
     if (filePaths.length > 1) {
       throw new Error('Pass only one path to watch')
+    } else if (argv.config === '') {
+      throw new Error('Pass a file path when using --config')
     } else {
       return true
     }
@@ -133,7 +205,11 @@ if (parseError && !consoleArgs.help) {
 
 if (parseOutput) {
   if (consoleArgs.version) {
-    await loadConfiguration(process.cwd())
+    if (consoleArgs.config !== undefined) {
+      await loadExplicitConfiguration(resolve(consoleArgs.config))
+    } else {
+      await loadConfiguration(process.cwd(), { warnWhenUsingDefault: false })
+    }
     console.log(createVersionString())
   } else {
     console.log(parseOutput)
@@ -170,7 +246,11 @@ if (inputPaths.length > 0) {
   }
 }
 
-await loadConfiguration(targetPath)
+if (consoleArgs.config !== undefined) {
+  await loadExplicitConfiguration(resolve(consoleArgs.config))
+} else {
+  await loadConfiguration(targetPath)
+}
 
 const printDiagnostics = (diagnostics: Array<Diagnostic>) => {
   const diagnosticsToReport = consoleArgs['ignore-warnings']
