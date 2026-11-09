@@ -1,5 +1,17 @@
 # steiger
 
+## 0.10.0
+
+### Minor Changes
+
+- [#313](https://github.com/feature-sliced/steiger/pull/313) [`7789e78`](https://github.com/feature-sliced/steiger/commit/7789e7855edb04a3e8caa24e27389bc8e2555357) Thanks [@Solant](https://github.com/Solant)! - export additional config types
+
+- [#313](https://github.com/feature-sliced/steiger/pull/313) [`7789e78`](https://github.com/feature-sliced/steiger/commit/7789e7855edb04a3e8caa24e27389bc8e2555357) Thanks [@Solant](https://github.com/Solant)! - Add a `--config` (`-c`) option to specify configuration file. Add a warning message when default configuration is used.
+
+### Patch Changes
+
+- [#310](https://github.com/feature-sliced/steiger/pull/310) [`6f37ca8`](https://github.com/feature-sliced/steiger/commit/6f37ca88a7820481bf83210255e3222b859b4d7e) Thanks [@yslpn](https://github.com/yslpn)! - Use Zod's built-in formatter for invalid configuration errors.
+
 ## 0.9.0
 
 ### Minor Changes
