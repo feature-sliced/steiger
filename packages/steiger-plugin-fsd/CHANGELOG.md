@@ -1,5 +1,11 @@
 # @feature-sliced/steiger-plugin
 
+## 0.8.3
+
+### Patch Changes
+
+- [#314](https://github.com/feature-sliced/steiger/pull/314) [`d31040c`](https://github.com/feature-sliced/steiger/commit/d31040ca03d861978f5d00981398938525b18a83) Thanks [@Gaic4o](https://github.com/Gaic4o)! - fix false `typo-in-layer-name` errors for layers with a prefixed folder name, such as `_pages` or `6_shared`
+
 ## 0.8.2
 
 ### Patch Changes

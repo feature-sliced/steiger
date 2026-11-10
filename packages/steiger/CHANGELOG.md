@@ -1,5 +1,12 @@
 # steiger
 
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`d31040c`](https://github.com/feature-sliced/steiger/commit/d31040ca03d861978f5d00981398938525b18a83)]:
+  - @feature-sliced/steiger-plugin@0.8.3
+
 ## 0.10.0
 
 ### Minor Changes
