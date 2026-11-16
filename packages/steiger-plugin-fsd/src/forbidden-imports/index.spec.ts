@@ -40,6 +40,14 @@ vi.mock('node:fs', async (importOriginal) => {
       '/src/entities/order/ui/OrderBadge.tsx': '',
       '/src/entities/order/@x/cart/index.ts': '',
       '/src/entities/order/index.ts': '',
+      '/src/entities/role/model/Role.ts': '',
+      '/src/entities/role/@x/security-module/user.ts': '',
+      '/src/entities/role/index.ts': '',
+      '/src/entities/security-module/user/model/User.ts':
+        'import { Role } from "@/entities/role/@x/security-module/user"',
+      '/src/entities/security-module/user/index.ts': '',
+      '/src/entities/other-module/user/model/User.ts': 'import { Role } from "@/entities/role/@x/security-module/user"',
+      '/src/entities/other-module/user/index.ts': '',
       '/src/entities/cart/ui/SmallCart.tsx': 'import { App } from "@/app"',
       '/src/entities/cart/ui/BadSmallCart.tsx': 'import { UserAvatar } from "@/entities/user/@x/product"',
       '/src/entities/cart/ui/CartItem.tsx': 'import { OrderBadge } from "@/entities/order/@x/cart"',
@@ -313,6 +321,41 @@ it('reports no errors on a project with cross-imports through @x index files', a
   )
 
   expect((await forbiddenImports.check(root)).diagnostics).toEqual([])
+})
+
+it('restricts grouped @x imports to the named slice', async () => {
+  const root = parseIntoFsdRoot(
+    `
+      📂 entities
+        📂 role
+          📂 model
+            📄 Role.ts
+          📂 @x
+            📂 security-module
+              📄 user.ts
+          📄 index.ts
+        📂 security-module
+          📂 user
+            📂 model
+              📄 User.ts
+            📄 index.ts
+        📂 other-module
+          📂 user
+            📂 model
+              📄 User.ts
+            📄 index.ts
+    `,
+    joinFromRoot('src'),
+  )
+
+  expect((await forbiddenImports.check(root)).diagnostics).toEqual([
+    expect.objectContaining({
+      message: 'Forbidden cross-import from slice "role".',
+      location: expect.objectContaining({
+        path: joinFromRoot('src', 'entities', 'other-module', 'user', 'model', 'User.ts'),
+      }),
+    }),
+  ])
 })
 
 it('reports errors on a project with incorrect cross-imports through @x', async () => {

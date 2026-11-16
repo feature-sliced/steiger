@@ -1,11 +1,12 @@
 import * as fs from 'node:fs'
-import { layerSequence, isCrossImportPublicApi } from '@feature-sliced/filesystem'
+import { layerSequence } from '@feature-sliced/filesystem'
 import { parse as parseNearestTsConfig } from 'tsconfck'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
+import { isCrossImportPublicApi } from '../_lib/is-cross-import-public-api.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 import { NAMESPACE } from '../constants.js'
 
