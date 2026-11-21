@@ -11,11 +11,11 @@ import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 const noHigherLevelImports = {
   name: `${NAMESPACE}/no-higher-level-imports` as const,
-  async check(root) {
+  async check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, additionalSegmentNames)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)

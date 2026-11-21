@@ -79,7 +79,7 @@ const BAD_NAMES = new Set([
 /** Discourage the use of segment names that group code by its essence, and instead encourage grouping by purpose. */
 const segmentsByPurpose = {
   name: `${NAMESPACE}/segments-by-purpose` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
@@ -97,7 +97,7 @@ const segmentsByPurpose = {
           }
         }
       } else {
-        for (const slice of Object.values(getSlices(layer))) {
+        for (const slice of Object.values(getSlices(layer, additionalSegmentNames))) {
           for (const [segmentName, segment] of Object.entries(getSegments(slice))) {
             if (BAD_NAMES.has(segmentName)) {
               diagnostics.push({

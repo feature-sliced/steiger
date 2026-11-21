@@ -116,3 +116,18 @@ export default defineConfig([
   },
 ])
 ```
+
+## Recognize additional segment names
+
+```typescript
+import { createFsdPlugin } from '@feature-sliced/steiger-plugin'
+import { defineConfig } from 'steiger'
+
+const fsd = createFsdPlugin({ additionalSegmentNames: ['bridge'] })
+
+export default defineConfig([...fsd.configs.recommended])
+```
+
+The names apply across sliced layers and extend the conventional segment names. For example, Steiger recognizes `features/checkout` as a slice if its only segment is `bridge`. Use the configured preset in place of the default FSD preset.
+
+Use individual names without paths or extensions. Slice detection uses the same name matching as conventional segments. For example, a file named `bridge.ts` can also identify a slice. If a slice group directly contains a slice whose name matches an added segment, Steiger can recognize that group as a slice instead. Check for these name collisions before enabling the option.

@@ -12,7 +12,7 @@ const neutralWords = new Set(['k8s', 'kubernetes', 'media'])
 /** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
   name: `${NAMESPACE}/inconsistent-naming` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     const { entities } = getLayers(root)
@@ -20,7 +20,7 @@ const inconsistentNaming = {
       return { diagnostics }
     }
 
-    const slices = getSlices(entities)
+    const slices = getSlices(entities, additionalSegmentNames)
     const sliceNames = groupSlices(Object.keys(slices))
     for (const [groupPrefix, group] of Object.entries(sliceNames)) {
       const namesToCheck = group.filter((g) => !isNeutralWord(g))

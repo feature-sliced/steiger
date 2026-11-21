@@ -6,7 +6,7 @@ import { NAMESPACE } from '../constants.js'
 /** Forbid slice names that match some segment’s name in shared (e.g., theme, i18n) */
 const ambiguousSliceNames = {
   name: `${NAMESPACE}/ambiguous-slice-names` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     const layers = getLayers(root)
@@ -18,7 +18,7 @@ const ambiguousSliceNames = {
 
     const segmentNamesInShared = Object.keys(getSegments(sharedLayer))
 
-    for (const [sliceName, slice] of Object.entries(getAllSlices(root))) {
+    for (const [sliceName, slice] of Object.entries(getAllSlices(root, additionalSegmentNames))) {
       const pathSegments = sliceName.split(sep)
       const matchingSegment = segmentNamesInShared.find((segmentName) => pathSegments.includes(segmentName))
 
