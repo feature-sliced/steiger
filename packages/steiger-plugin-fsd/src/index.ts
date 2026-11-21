@@ -1,4 +1,15 @@
-import { enableSpecificRules, type ConfigObjectOf, createPlugin, createConfigs } from '@steiger/toolkit'
+import { parse } from 'node:path'
+import { crossReferenceToken } from '@feature-sliced/filesystem'
+import {
+  createConfigs,
+  createPlugin,
+  enableSpecificRules,
+  type BaseRuleOptions,
+  type ConfigObjectOf,
+  type Folder,
+  type Rule,
+  type RuleResult,
+} from '@steiger/toolkit'
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
 import forbiddenImports from './forbidden-imports/index.js'
@@ -45,21 +56,68 @@ const disabledRules = [noCrossImports, noHigherLevelImports, importLocality, noW
 
 const rules = [...enabledRules, ...disabledRules]
 
-const plugin = createPlugin({
-  meta: {
-    name: '@feature-sliced/steiger-plugin',
-    version: packageJson.version,
-  },
-  ruleDefinitions: rules,
-})
-
-const configs = createConfigs({
-  recommended: enableSpecificRules(plugin, enabledRules),
-})
-
-export default {
-  plugin,
-  configs,
+export interface FSDPluginOptions {
+  /** Extra names that can identify a segment when detecting slices. */
+  additionalSegmentNames?: ReadonlyArray<string>
 }
 
-export type FSDConfigObject = ConfigObjectOf<typeof plugin>
+type SegmentAwareRule<Name extends string> = {
+  name: Name
+  check(
+    root: Folder,
+    options: BaseRuleOptions,
+    additionalSegmentNames?: Array<string>,
+  ): RuleResult | Promise<RuleResult>
+}
+
+function configureRule<Name extends string>(rule: SegmentAwareRule<Name>, additionalSegmentNames: Array<string>) {
+  return {
+    ...rule,
+    check(root, options) {
+      return rule.check(root, options, additionalSegmentNames)
+    },
+  } satisfies Rule<unknown, BaseRuleOptions, Name>
+}
+
+export function createFsdPlugin({ additionalSegmentNames = [] }: FSDPluginOptions = {}) {
+  if (!Array.isArray(additionalSegmentNames)) {
+    throw new TypeError('additionalSegmentNames must be an array of names.')
+  }
+
+  const segmentNames = new Set<string>()
+  for (const name of additionalSegmentNames) {
+    if (
+      typeof name !== 'string' ||
+      name.trim() === '' ||
+      name === '.' ||
+      name === '..' ||
+      /[/\\]/.test(name) ||
+      parse(name).name !== name ||
+      name === 'index' ||
+      name === crossReferenceToken
+    ) {
+      throw new TypeError(`Invalid additional segment name: ${String(name)}.`)
+    }
+    segmentNames.add(name)
+  }
+  const names = Array.from(segmentNames)
+  const plugin = createPlugin({
+    meta: {
+      name: '@feature-sliced/steiger-plugin',
+      version: packageJson.version,
+    },
+    ruleDefinitions: names.length === 0 ? rules : rules.map((rule) => configureRule(rule, names)),
+  })
+
+  const configs = createConfigs({
+    recommended: enableSpecificRules(plugin, enabledRules),
+  })
+
+  return { plugin, configs }
+}
+
+const fsd = createFsdPlugin()
+
+export default fsd
+
+export type FSDConfigObject = ConfigObjectOf<typeof fsd.plugin>

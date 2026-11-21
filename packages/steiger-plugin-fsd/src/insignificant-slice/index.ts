@@ -12,10 +12,10 @@ import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 const insignificantSlice = {
   name: `${NAMESPACE}/insignificant-slice` as const,
-  async check(root) {
+  async check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    const references = await traceSliceReferences(root)
+    const references = await traceSliceReferences(root, additionalSegmentNames)
 
     for (const [sourceLocationKey, targetLocationKeys] of references) {
       const [sourceLayerName] = sourceLocationKey.split(sep, 2) as [LayerName, string | undefined]
@@ -52,8 +52,8 @@ const insignificantSlice = {
 
 export default insignificantSlice
 
-async function traceSliceReferences(root: Folder) {
-  const sourceFileIndex = indexSourceFiles(root)
+async function traceSliceReferences(root: Folder, additionalSegmentNames: Array<string>) {
+  const sourceFileIndex = indexSourceFiles(root, additionalSegmentNames)
   const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
   const tsConfigs = collectRelatedTsConfigs(parseResult)
   const references = new Map<string, Set<string>>()

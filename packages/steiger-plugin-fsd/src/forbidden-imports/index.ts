@@ -12,11 +12,11 @@ import { NAMESPACE } from '../constants.js'
 
 const forbiddenImports = {
   name: `${NAMESPACE}/forbidden-imports` as const,
-  async check(root) {
+  async check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, additionalSegmentNames)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)

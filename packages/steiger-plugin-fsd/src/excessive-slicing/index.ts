@@ -15,7 +15,7 @@ const THRESHOLDS = {
 /** Warn about excessive amounts of ungrouped entities/features/widgets/pages. */
 const excessiveSlicing = {
   name: `${NAMESPACE}/excessive-slicing` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
@@ -23,7 +23,7 @@ const excessiveSlicing = {
         continue
       }
 
-      const sliceGroups = groupSlices(Object.keys(getSlices(layer)))
+      const sliceGroups = groupSlices(Object.keys(getSlices(layer, additionalSegmentNames)))
       const threshold = THRESHOLDS[layerName as keyof typeof THRESHOLDS]
 
       for (const [group, slices] of Object.entries(sliceGroups)) {
