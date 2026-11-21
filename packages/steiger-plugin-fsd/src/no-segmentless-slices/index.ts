@@ -4,7 +4,7 @@ import { NAMESPACE } from '../constants.js'
 
 const noSegmentlessSlices = {
   name: `${NAMESPACE}/no-segmentless-slices` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
@@ -20,11 +20,10 @@ const noSegmentlessSlices = {
         }
 
         // A folder inside a layer can either be a slice or a group of slices
-        if (isSliceGroup(sliceCandidate)) {
+        if (isSliceGroup(sliceCandidate, additionalSegmentNames)) {
           sliceCandidates = sliceCandidates.concat(sliceCandidate.children as Array<Folder>)
         } else {
-          // The slice detection algorithm relies on the presence of a conventional segment
-          if (!isSlice(sliceCandidate)) {
+          if (!isSlice(sliceCandidate, additionalSegmentNames)) {
             diagnostics.push({
               message: 'This slice has no segments. Consider dividing the code inside into segments.',
               location: { path: sliceCandidate.path },
@@ -41,14 +40,16 @@ const noSegmentlessSlices = {
 export default noSegmentlessSlices
 
 /** A slice group is a folder that contains only folders, and those folders are either slices or slice groups. */
-function isSliceGroup(folder: Folder): boolean {
+function isSliceGroup(folder: Folder, additionalSegmentNames: Array<string>): boolean {
   return (
     folder.children.length > 0 &&
-    !isSlice(folder) &&
+    !isSlice(folder, additionalSegmentNames) &&
     folder.children.every(
       (child) =>
         child.type === 'folder' &&
-        (isSlice(child) || child.children.every((grandchild) => grandchild.type === 'file') || isSliceGroup(child)),
+        (isSlice(child, additionalSegmentNames) ||
+          child.children.every((grandchild) => grandchild.type === 'file') ||
+          isSliceGroup(child, additionalSegmentNames)),
     )
   )
 }

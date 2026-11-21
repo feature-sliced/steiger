@@ -8,10 +8,10 @@ import { NAMESPACE } from '../constants.js'
 /** Forbid wildcard re-exports (`export * from`, `export * as ns from`) in public APIs. */
 const noWildcardExports = {
   name: `${NAMESPACE}/no-wildcard-exports` as const,
-  async check(root) {
+  async check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const sourceFile of Object.values(indexSourceFiles(root))) {
+    for (const sourceFile of Object.values(indexSourceFiles(root, additionalSegmentNames))) {
       if (!isIndex(sourceFile.file)) continue
 
       const sourceType = getSourceType(sourceFile.file.path)

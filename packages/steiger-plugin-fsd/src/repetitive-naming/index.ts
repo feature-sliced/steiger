@@ -20,7 +20,7 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 /** Warn about repetitive parts in slice names (e.g. adding page to every slice on Pages) */
 const repetitiveNaming = {
   name: `${NAMESPACE}/repetitive-naming` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
@@ -28,7 +28,7 @@ const repetitiveNaming = {
         continue
       }
 
-      const sliceGroups = groupSlices(Object.keys(getSlices(layer)))
+      const sliceGroups = groupSlices(Object.keys(getSlices(layer, additionalSegmentNames)))
 
       for (const [group, sliceNames] of Object.entries(sliceGroups)) {
         const wordsInSliceNames = sliceNames.map((name) =>

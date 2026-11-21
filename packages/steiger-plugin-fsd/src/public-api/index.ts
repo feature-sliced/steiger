@@ -6,7 +6,7 @@ import { NAMESPACE } from '../constants.js'
 /** Require slices (or segments on sliceless layers) to have a public API. */
 const publicApi = {
   name: `${NAMESPACE}/public-api` as const,
-  check(root) {
+  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
@@ -50,7 +50,7 @@ const publicApi = {
           }
         }
       } else {
-        for (const slice of Object.values(getSlices(layer))) {
+        for (const slice of Object.values(getSlices(layer, additionalSegmentNames))) {
           if (getIndexes(slice).length === 0) {
             diagnostics.push({
               message: 'This slice is missing a public API.',
