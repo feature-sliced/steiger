@@ -15,7 +15,7 @@ type SourceFile = {
  *
  * @returns A mapping of source file paths to their file object and location information.
  */
-export function indexSourceFiles(root: Folder, additionalSegmentNames: Array<string> = []): Record<string, SourceFile> {
+export function indexSourceFiles(root: Folder, additionalSegments: Array<string> = []): Record<string, SourceFile> {
   const index = {} as Record<string, SourceFile>
   function walk(
     node: File | Folder,
@@ -45,7 +45,7 @@ export function indexSourceFiles(root: Folder, additionalSegmentNames: Array<str
         walk(segment, { layerName: layerName as LayerName, layerPath: layer.path, sliceName: null, segmentName })
       }
     } else {
-      for (const [sliceName, slice] of Object.entries(getSlices(layer, additionalSegmentNames))) {
+      for (const [sliceName, slice] of Object.entries(getSlices(layer, additionalSegments))) {
         for (const [segmentName, segment] of Object.entries(getSegments(slice))) {
           walk(segment, { layerName: layerName as LayerName, layerPath: layer.path, sliceName, segmentName })
         }

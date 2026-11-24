@@ -2,4 +2,4 @@
 '@feature-sliced/steiger-plugin': minor
 ---
 
-Add an opt-in `additionalSegmentNames` option through `createFsdPlugin` so FSD rules recognize slices that only contain project-specific segments.
+Add an `additionalSegments` option to `createFsdPlugin`. FSD rules then recognize slices whose only segments have project-specific names.

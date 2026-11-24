@@ -5,6 +5,7 @@ import { getLayers, getSlices } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 
 const neutralWords = new Set(['k8s', 'kubernetes', 'media'])
@@ -12,7 +13,7 @@ const neutralWords = new Set(['k8s', 'kubernetes', 'media'])
 /** Detect inconsistent naming of slices on layers (singular vs plural) */
 const inconsistentNaming = {
   name: `${NAMESPACE}/inconsistent-naming` as const,
-  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
+  check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     const { entities } = getLayers(root)
@@ -20,7 +21,7 @@ const inconsistentNaming = {
       return { diagnostics }
     }
 
-    const slices = getSlices(entities, additionalSegmentNames)
+    const slices = getSlices(entities, additionalSegments)
     const sliceNames = groupSlices(Object.keys(slices))
     for (const [groupPrefix, group] of Object.entries(sliceNames)) {
       const namesToCheck = group.filter((g) => !isNeutralWord(g))

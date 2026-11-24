@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 import { groupSlices } from '../_lib/group-slices.js'
 
@@ -20,7 +21,7 @@ const wordPattern = /(?:[A-Z]+|[a-z]+)[a-z]*/g
 /** Warn about repetitive parts in slice names (e.g. adding page to every slice on Pages) */
 const repetitiveNaming = {
   name: `${NAMESPACE}/repetitive-naming` as const,
-  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
+  check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const layer of Object.values(getLayers(root))) {
@@ -28,7 +29,7 @@ const repetitiveNaming = {
         continue
       }
 
-      const sliceGroups = groupSlices(Object.keys(getSlices(layer, additionalSegmentNames)))
+      const sliceGroups = groupSlices(Object.keys(getSlices(layer, additionalSegments)))
 
       for (const [group, sliceNames] of Object.entries(sliceGroups)) {
         const wordsInSliceNames = sliceNames.map((name) =>

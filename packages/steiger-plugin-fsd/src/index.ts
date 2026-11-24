@@ -10,6 +10,7 @@ import {
   type Rule,
   type RuleResult,
 } from '@steiger/toolkit'
+import type { FSDPluginOptions } from './_lib/plugin-options.js'
 import ambiguousSliceNames from './ambiguous-slice-names/index.js'
 import excessiveSlicing from './excessive-slicing/index.js'
 import forbiddenImports from './forbidden-imports/index.js'
@@ -56,36 +57,30 @@ const disabledRules = [noCrossImports, noHigherLevelImports, importLocality, noW
 
 const rules = [...enabledRules, ...disabledRules]
 
-export interface FSDPluginOptions {
-  /** Extra names that can identify a segment when detecting slices. */
-  additionalSegmentNames?: ReadonlyArray<string>
-}
+export type { FSDPluginOptions }
 
 type SegmentAwareRule<Name extends string> = {
   name: Name
-  check(
-    root: Folder,
-    options: BaseRuleOptions,
-    additionalSegmentNames?: Array<string>,
-  ): RuleResult | Promise<RuleResult>
+  check(root: Folder, ruleOptions: BaseRuleOptions, pluginOptions?: FSDPluginOptions): RuleResult | Promise<RuleResult>
 }
 
-function configureRule<Name extends string>(rule: SegmentAwareRule<Name>, additionalSegmentNames: Array<string>) {
+/** Binds the plugin options to a rule, since Steiger itself only calls `check(root, ruleOptions)`. */
+function configureRule<Name extends string>(rule: SegmentAwareRule<Name>, pluginOptions: FSDPluginOptions) {
   return {
     ...rule,
-    check(root, options) {
-      return rule.check(root, options, additionalSegmentNames)
+    check(root, ruleOptions) {
+      return rule.check(root, ruleOptions, pluginOptions)
     },
   } satisfies Rule<unknown, BaseRuleOptions, Name>
 }
 
-export function createFsdPlugin({ additionalSegmentNames = [] }: FSDPluginOptions = {}) {
-  if (!Array.isArray(additionalSegmentNames)) {
-    throw new TypeError('additionalSegmentNames must be an array of names.')
+function validateSegmentNames(additionalSegments: unknown): Array<string> {
+  if (!Array.isArray(additionalSegments)) {
+    throw new TypeError('additionalSegments must be an array of names.')
   }
 
   const segmentNames = new Set<string>()
-  for (const name of additionalSegmentNames) {
+  for (const name of additionalSegments) {
     if (
       typeof name !== 'string' ||
       name.trim() === '' ||
@@ -100,13 +95,20 @@ export function createFsdPlugin({ additionalSegmentNames = [] }: FSDPluginOption
     }
     segmentNames.add(name)
   }
-  const names = Array.from(segmentNames)
+  return Array.from(segmentNames)
+}
+
+export function createFsdPlugin(options: FSDPluginOptions = {}) {
+  const additionalSegments = validateSegmentNames(options.additionalSegments ?? [])
+  const pluginOptions: FSDPluginOptions = { additionalSegments }
+  const isConfigured = additionalSegments.length > 0
+
   const plugin = createPlugin({
     meta: {
       name: '@feature-sliced/steiger-plugin',
       version: packageJson.version,
     },
-    ruleDefinitions: names.length === 0 ? rules : rules.map((rule) => configureRule(rule, names)),
+    ruleDefinitions: isConfigured ? rules.map((rule) => configureRule(rule, pluginOptions)) : rules,
   })
 
   const configs = createConfigs({

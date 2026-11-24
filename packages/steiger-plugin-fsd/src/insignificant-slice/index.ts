@@ -7,15 +7,16 @@ import type { Folder, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 const insignificantSlice = {
   name: `${NAMESPACE}/insignificant-slice` as const,
-  async check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
+  async check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    const references = await traceSliceReferences(root, additionalSegmentNames)
+    const references = await traceSliceReferences(root, additionalSegments)
 
     for (const [sourceLocationKey, targetLocationKeys] of references) {
       const [sourceLayerName] = sourceLocationKey.split(sep, 2) as [LayerName, string | undefined]
@@ -52,8 +53,8 @@ const insignificantSlice = {
 
 export default insignificantSlice
 
-async function traceSliceReferences(root: Folder, additionalSegmentNames: Array<string>) {
-  const sourceFileIndex = indexSourceFiles(root, additionalSegmentNames)
+async function traceSliceReferences(root: Folder, additionalSegments: Array<string>) {
+  const sourceFileIndex = indexSourceFiles(root, additionalSegments)
   const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
   const tsConfigs = collectRelatedTsConfigs(parseResult)
   const references = new Map<string, Set<string>>()

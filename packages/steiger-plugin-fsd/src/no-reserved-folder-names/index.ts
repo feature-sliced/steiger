@@ -10,20 +10,21 @@ import {
 } from '@feature-sliced/filesystem'
 import { findAllRecursively, type PartialDiagnostic, type Rule } from '@steiger/toolkit'
 
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 
 /** Forbid subfolders in segments that have names of common segments (e.g., shared/lib/ui). */
 const noReservedFolderNames = {
   name: `${NAMESPACE}/no-reserved-folder-names` as const,
-  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
+  check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     // getAllSegments uses conventional slice detection and cannot accept additional names.
     const segments =
-      additionalSegmentNames.length === 0
+      additionalSegments.length === 0
         ? getAllSegments(root).map(({ segment }) => segment)
         : Object.values(getLayers(root)).flatMap((layer) => {
-            const parents = isSliced(layer) ? Object.values(getSlices(layer, additionalSegmentNames)) : [layer]
+            const parents = isSliced(layer) ? Object.values(getSlices(layer, additionalSegments)) : [layer]
             return parents.flatMap((parent) => Object.values(getSegments(parent)))
           })
 

@@ -3,6 +3,7 @@ import { getLayers, getSlices, isSliced } from '@feature-sliced/filesystem'
 import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { groupSlices } from '../_lib/group-slices.js'
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 
 const THRESHOLDS = {
@@ -15,7 +16,7 @@ const THRESHOLDS = {
 /** Warn about excessive amounts of ungrouped entities/features/widgets/pages. */
 const excessiveSlicing = {
   name: `${NAMESPACE}/excessive-slicing` as const,
-  check(root, _options?: unknown, additionalSegmentNames: Array<string> = []) {
+  check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
     for (const [layerName, layer] of Object.entries(getLayers(root))) {
@@ -23,7 +24,7 @@ const excessiveSlicing = {
         continue
       }
 
-      const sliceGroups = groupSlices(Object.keys(getSlices(layer, additionalSegmentNames)))
+      const sliceGroups = groupSlices(Object.keys(getSlices(layer, additionalSegments)))
       const threshold = THRESHOLDS[layerName as keyof typeof THRESHOLDS]
 
       for (const [group, slices] of Object.entries(sliceGroups)) {
