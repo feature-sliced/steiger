@@ -82,11 +82,11 @@ async function runRules({ vfs, config }: { vfs: Folder; config: ProcessedConfig 
 }
 
 export const linter = {
-  run: (path: string) =>
+  run: (path: string, options?: { config?: ProcessedConfig }) =>
     scan(path).then((vfs) => {
-      const config = $globalConfig.getState()
+      const config = options?.config ?? $globalConfig.getState()
       if (config === null) {
-        throw new Error('Cannot start watching without a configuration. Call processConfiguration first.')
+        throw new Error('Cannot run without a configuration. Call processConfiguration first or pass options.config.')
       }
 
       return runRules({

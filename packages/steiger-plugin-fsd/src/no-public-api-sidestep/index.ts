@@ -7,17 +7,18 @@ import type { Folder, File, PartialDiagnostic, Rule } from '@steiger/toolkit'
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { collectRelatedTsConfigs } from '../_lib/collect-related-ts-configs.js'
 import { resolveDependency } from '../_lib/resolve-dependency.js'
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 import { extractDependencies, getSourceType } from '../_language-tools/index.js'
 
 /** Restrict imports that go inside the slice, sidestepping the public API. */
 const noPublicApiSidestep = {
   name: `${NAMESPACE}/no-public-api-sidestep` as const,
-  async check(root) {
+  async check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
     const parseResult = await parseNearestTsConfig(root.children[0]?.path ?? root.path)
     const tsConfigs = collectRelatedTsConfigs(parseResult)
-    const sourceFileIndex = indexSourceFiles(root)
+    const sourceFileIndex = indexSourceFiles(root, additionalSegments)
 
     for (const sourceFile of Object.values(sourceFileIndex)) {
       const sourceType = getSourceType(sourceFile.file.path)

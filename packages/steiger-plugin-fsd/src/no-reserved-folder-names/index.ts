@@ -1,16 +1,34 @@
 import { basename } from 'node:path'
-import { getAllSegments, conventionalSegmentNames, crossReferenceToken } from '@feature-sliced/filesystem'
+import {
+  getAllSegments,
+  getLayers,
+  getSegments,
+  getSlices,
+  isSliced,
+  conventionalSegmentNames,
+  crossReferenceToken,
+} from '@feature-sliced/filesystem'
 import { findAllRecursively, type PartialDiagnostic, type Rule } from '@steiger/toolkit'
 
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 
 /** Forbid subfolders in segments that have names of common segments (e.g., shared/lib/ui). */
 const noReservedFolderNames = {
   name: `${NAMESPACE}/no-reserved-folder-names` as const,
-  check(root) {
+  check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const { segment } of getAllSegments(root)) {
+    // getAllSegments uses conventional slice detection and cannot accept additional names.
+    const segments =
+      additionalSegments.length === 0
+        ? getAllSegments(root).map(({ segment }) => segment)
+        : Object.values(getLayers(root)).flatMap((layer) => {
+            const parents = isSliced(layer) ? Object.values(getSlices(layer, additionalSegments)) : [layer]
+            return parents.flatMap((parent) => Object.values(getSegments(parent)))
+          })
+
+    for (const segment of segments) {
       if (segment.type === 'file') {
         continue
       }
@@ -34,7 +52,7 @@ const noReservedFolderNames = {
             })
           } else {
             diagnostics.push({
-              message: `Having a folder with the name "${basename(violatingFolder.path)}" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.`,
+              message: `Having a folder with the name "${reservedName}" inside a segment could be confusing because that name is commonly used for segments. Consider renaming it.`,
               location: { path: violatingFolder.path },
             })
           }

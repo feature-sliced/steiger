@@ -3,15 +3,16 @@ import type { PartialDiagnostic, Rule } from '@steiger/toolkit'
 
 import { indexSourceFiles } from '../_lib/index-source-files.js'
 import { extractReExports, getSourceType } from '../_language-tools/index.js'
+import type { FSDPluginOptions } from '../_lib/plugin-options.js'
 import { NAMESPACE } from '../constants.js'
 
 /** Forbid wildcard re-exports (`export * from`, `export * as ns from`) in public APIs. */
 const noWildcardExports = {
   name: `${NAMESPACE}/no-wildcard-exports` as const,
-  async check(root) {
+  async check(root, _ruleOptions?: unknown, { additionalSegments = [] }: FSDPluginOptions = {}) {
     const diagnostics: Array<PartialDiagnostic> = []
 
-    for (const sourceFile of Object.values(indexSourceFiles(root))) {
+    for (const sourceFile of Object.values(indexSourceFiles(root, additionalSegments))) {
       if (!isIndex(sourceFile.file)) continue
 
       const sourceType = getSourceType(sourceFile.file.path)
