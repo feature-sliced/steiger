@@ -52,7 +52,8 @@
     "@steiger/types": "workspace:*",
     "@types/node": "^24.19.0",
     "steiger": "workspace:*",
-    "tsup": "^8.5.0"
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "cosmiconfig": "^10.0.1",
