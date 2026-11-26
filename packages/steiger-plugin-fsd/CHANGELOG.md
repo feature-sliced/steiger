@@ -1,5 +1,17 @@
 # @feature-sliced/steiger-plugin
 
+## 0.9.0
+
+### Minor Changes
+
+- [#318](https://github.com/feature-sliced/steiger/pull/318) [`ac2c688`](https://github.com/feature-sliced/steiger/commit/ac2c6885aa984edf7e9b893bffcfd3283aee8b13) Thanks [@Gaic4o](https://github.com/Gaic4o)! - Add an `additionalSegments` option to `createFsdPlugin`. FSD rules then recognize slices whose only segments have project-specific names.
+
+### Patch Changes
+
+- [#317](https://github.com/feature-sliced/steiger/pull/317) [`ebbb3fb`](https://github.com/feature-sliced/steiger/commit/ebbb3fb979bfe56d53edb2f0a7bba6aaee90faa5) Thanks [@Gaic4o](https://github.com/Gaic4o)! - Fix false cross-import errors when a grouped slice imports through a file-based `@x` public API, such as `role/@x/security-module/user.ts`.
+
+- [#314](https://github.com/feature-sliced/steiger/pull/314) [`d31040c`](https://github.com/feature-sliced/steiger/commit/d31040ca03d861978f5d00981398938525b18a83) Thanks [@Gaic4o](https://github.com/Gaic4o)! - fix false `typo-in-layer-name` errors for layers with a prefixed folder name, such as `_pages` or `6_shared`
+
 ## 0.8.2
 
 ### Patch Changes

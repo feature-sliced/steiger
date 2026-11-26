@@ -1,5 +1,16 @@
 # steiger
 
+## 0.11.0
+
+### Minor Changes
+
+- [#318](https://github.com/feature-sliced/steiger/pull/318) [`ac2c688`](https://github.com/feature-sliced/steiger/commit/ac2c6885aa984edf7e9b893bffcfd3283aee8b13) Thanks [@Gaic4o](https://github.com/Gaic4o)! - `linter.run` accepts a scoped configuration through `options.config`, like `linter.watch` already does. Several configurations can now run on one Steiger instance.
+
+### Patch Changes
+
+- Updated dependencies [[`ac2c688`](https://github.com/feature-sliced/steiger/commit/ac2c6885aa984edf7e9b893bffcfd3283aee8b13), [`ebbb3fb`](https://github.com/feature-sliced/steiger/commit/ebbb3fb979bfe56d53edb2f0a7bba6aaee90faa5), [`d31040c`](https://github.com/feature-sliced/steiger/commit/d31040ca03d861978f5d00981398938525b18a83)]:
+  - @feature-sliced/steiger-plugin@0.9.0
+
 ## 0.10.0
 
 ### Minor Changes
